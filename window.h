@@ -22,6 +22,8 @@ public:
 	void setBlockCursor() { this->setCursorWidth(7); }
 	void setLineCursor() { this->setCursorWidth(1); }
 
+	// TODO(remy): use this->overwriteMode for the replace mode
+
 protected:
 	void keyPressEvent(QKeyEvent *event);
 

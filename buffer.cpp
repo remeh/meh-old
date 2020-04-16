@@ -14,3 +14,10 @@ QByteArray Buffer::readFile() {
 	file.open(QIODevice::ReadWrite);
 	return file.readAll();
 }
+
+void Buffer::onLeave(const QTextEdit& editor) {
+	// store the last cursor position
+	this->setLastCursorPosition(editor.textCursor().position());
+
+	// TODO(remy): implement me.
+}

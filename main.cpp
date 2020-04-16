@@ -6,7 +6,7 @@ int main(int argv, char **args)
 {
     QApplication app(argv, args);
 
-	Buffer buffer("/home/remy/docs/code/gopath/src/github.com/DataDog/datadog-agent/.gitlab-ci.yml");
+	Buffer buffer("/Users/remy.mathieu/go/src/github.com/DataDog/datadog-agent/.gitlab-ci.yml");
 
     Window window;
     window.setWindowTitle(QObject::tr("mh"));
