@@ -3,21 +3,19 @@
 #include <QTextEdit>
 
 #include "buffer.h"
+#include "mode.h"
 
-QT_BEGIN_NAMESPACE
-class QPaintEvent;
-class QResizeEvent;
-class QSize;
-class QWidget;
-QT_END_NAMESPACE
-
-class Window : public QTextEdit
+class Editor : public QTextEdit
 {
     Q_OBJECT
 public:
-    Window(QWidget *parent = nullptr);
+    Editor(QWidget *parent = nullptr);
 
 	void setCurrentBuffer(Buffer *buffer);
+	Buffer* getCurrentBuffer() { return this->currentBuffer; }
+
+	void setMode(int mode);
+	int getMode() { return this->mode; }
 
 	void setBlockCursor() { this->setCursorWidth(7); }
 	void setLineCursor() { this->setCursorWidth(1); }
@@ -30,6 +28,7 @@ protected:
 private slots:
 
 private:
-	Buffer *currentBuffer;
+	Buffer* currentBuffer;
 
+	int mode;
 };

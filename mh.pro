@@ -1,7 +1,7 @@
 QT += widgets
 
-HEADERS     =   window.h \
+HEADERS     =   editor.h \
                 buffer.h
 SOURCES     =   main.cpp \
-                window.cpp \
+                editor.cpp \
                 buffer.cpp

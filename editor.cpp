@@ -6,28 +6,30 @@
 #include <QTextEdit>
 #include <QTextCursor>
 
-#include "window.h"
 #include "buffer.h"
+#include "editor.h"
+#include "mode.h"
 
-Window::Window(QWidget *parent) :
+Editor::Editor(QWidget *parent) :
 	QTextEdit(parent),
-	currentBuffer(NULL) {
+	currentBuffer(NULL),
+	mode(MODE_INSERT) {
 	// we don't want a rich text editor
 	this->setAcceptRichText(false);
 }
 
-void Window::setCurrentBuffer(Buffer* buffer) {
+void Editor::setCurrentBuffer(Buffer* buffer) {
 	Q_ASSERT(buffer != NULL);
 
+	if (this->currentBuffer != NULL) {
+		this->currentBuffer->onLeave(this);
+	}
+
 	this->currentBuffer = buffer;
-
-	// load the content of the buffer
-	this->setText(this->currentBuffer->readFile());
-
-	// TODO(remy): set the cursor position to the latest used
+	this->currentBuffer->onEnter(this);
 }
 
-void Window::keyPressEvent(QKeyEvent *event) {
+void Editor::keyPressEvent(QKeyEvent *event) {
 	Q_ASSERT(event != NULL);
 
 	// NOTE(remy): there is a warning about the use of QKeyEvent::modifier() in
@@ -56,6 +58,7 @@ void Window::keyPressEvent(QKeyEvent *event) {
 				return;
 		}
 	} else {
+		// TODO(remy): depend on the active mode
 		switch (event->key()) {
 			case Qt::Key_K:
 				this->moveCursor(QTextCursor::Up);
