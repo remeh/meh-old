@@ -1,3 +1,5 @@
+#include <QCoreApplication>
+
 #include "command.h"
 #include "window.h"
 
@@ -29,6 +31,10 @@ void Command::keyPressEvent(QKeyEvent* event) {
 
 void Command::execute() {
 	// TODO(remy): implement me.
+	if (this->text() == ":q!") {
+		QCoreApplication::quit();
+		return;
+	}
 
 	this->clear();
 }
