@@ -10,12 +10,17 @@
 #include "editor.h"
 #include "mode.h"
 
-Editor::Editor(QWidget *parent) :
+Editor::Editor(QWidget* parent) :
 	QTextEdit(parent),
 	currentBuffer(NULL),
-	mode(MODE_INSERT) {
+	mode(MODE_NORMAL) {
 	// we don't want a rich text editor
 	this->setAcceptRichText(false);
+	this->setMode(MODE_NORMAL);
+}
+
+Editor::~Editor() {
+	// TODO(remy): delete the buffers
 }
 
 void Editor::setCurrentBuffer(Buffer* buffer) {
@@ -29,7 +34,20 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
 	this->currentBuffer->onEnter(this);
 }
 
-void Editor::keyPressEvent(QKeyEvent *event) {
+void Editor::setMode(int mode) {
+	switch (mode) {
+	case MODE_NORMAL:
+	default:
+		this->setBlockCursor();
+		break;
+	case MODE_INSERT:
+		this->setLineCursor();
+		break;
+	}
+	this->mode = mode;
+}
+
+void Editor::keyPressEvent(QKeyEvent* event) {
 	Q_ASSERT(event != NULL);
 
 	// NOTE(remy): there is a warning about the use of QKeyEvent::modifier() in
@@ -42,45 +60,94 @@ void Editor::keyPressEvent(QKeyEvent *event) {
 		bool ctrl = event->modifiers() & Qt::ControlModifier;
 	#endif
 
+	// First we want to test for general purpose commands and shortcuts (for instance
+	// the page up/down on control-u/d).
+	// ----------------------
+
 	if (ctrl) {
 		switch (event->key()) {
 			case Qt::Key_U:
 				{
-					QKeyEvent *pageEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_PageUp, Qt::NoModifier);
-					QCoreApplication::postEvent(this, pageEvent);
+					QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageUp, Qt::NoModifier);
+					QTextEdit::keyPressEvent(&pageEvent);
 				}
 				return;
 			case Qt::Key_D:
 				{
-					QKeyEvent *pageEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_PageDown, Qt::NoModifier);
-					QCoreApplication::postEvent(this, pageEvent);
+					QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageDown, Qt::NoModifier);
+					QTextEdit::keyPressEvent(&pageEvent);
 				}
-				return;
-		}
-	} else {
-		// TODO(remy): depend on the active mode
-		switch (event->key()) {
-			case Qt::Key_K:
-				this->moveCursor(QTextCursor::Up);
-				return;
-			case Qt::Key_J:
-				this->moveCursor(QTextCursor::Down);
-				return;
-			case Qt::Key_H:
-				this->moveCursor(QTextCursor::Left);
-				return;
-			case Qt::Key_L:
-				this->moveCursor(QTextCursor::Right);
-				return;
-			case Qt::Key_Escape:
-				this->setBlockCursor();
-				return;
-			case Qt::Key_I:
-				this->setLineCursor();
 				return;
 		}
 	}
 
-	// otherwise, rely on the original behavior of QTextEdit
+	// Normal mode
+	// ----------------------
+
+	if (this->mode == MODE_NORMAL) {
+		this->keyPressEventNormal(event, ctrl, shift);
+		return;
+	}
+
+	// Insert mode
+	// ----------------------
+
+	if (event->key() == Qt::Key_Escape) {
+		this->setMode(MODE_NORMAL);
+		return;
+	}
+
+	// Otherwise, rely on the original behavior of QTextEdit
 	QTextEdit::keyPressEvent(event);
+}
+
+void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
+	Q_ASSERT(event != NULL);
+
+	switch (event->key()) {
+		case Qt::Key_I:
+			if (shift) {
+				this->moveCursor(QTextCursor::StartOfLine);
+			}
+			this->setMode(MODE_INSERT);
+			return;
+		case Qt::Key_A:
+			if (shift) {
+				this->moveCursor(QTextCursor::EndOfLine);
+			}
+			this->setMode(MODE_INSERT);
+			return;
+
+		case Qt::Key_K:
+			this->moveCursor(QTextCursor::Up);
+			return;
+		case Qt::Key_J:
+			this->moveCursor(QTextCursor::Down);
+			return;
+		case Qt::Key_H:
+			this->moveCursor(QTextCursor::Left);
+			return;
+		case Qt::Key_L:
+			this->moveCursor(QTextCursor::Right);
+			return;
+
+		case Qt::Key_G:
+			if (shift) {
+				this->moveCursor(QTextCursor::End);
+			} else {
+				this->moveCursor(QTextCursor::Start);
+			}
+			return;
+
+		case Qt::Key_E:
+			if (shift) { /* TODO(remy): move right until previous space */ }
+			// TODO(remy): confirm this is the wanted behavior
+			this->moveCursor(QTextCursor::NextWord);
+			return;
+		case Qt::Key_B:
+			if (shift) { /* TODO(remy): move left until previous space */ }
+			// TODO(remy): confirm this is the wanted behavior
+			this->moveCursor(QTextCursor::PreviousWord);
+			return;
+	}
 }
