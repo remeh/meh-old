@@ -1,7 +1,13 @@
 QT += widgets
 
-HEADERS     =   editor.h \
-                buffer.h
-SOURCES     =   main.cpp \
+HEADERS     =   buffer.h \
+                command.h \
+                editor.h \
+                window.h
+SOURCES     =   buffer.cpp \
+                command.cpp \
                 editor.cpp \
-                buffer.cpp
+                main.cpp \
+                window.cpp
+
+# CONFIG += sanitizer sanitize_address

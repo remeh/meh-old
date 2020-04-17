@@ -6,14 +6,17 @@
 #include <QTextEdit>
 #include <QTextCursor>
 
-#include "buffer.h"
+#include "qdebug.h"
 #include "editor.h"
 #include "mode.h"
+#include "window.h"
 
-Editor::Editor(QWidget* parent) :
-	QTextEdit(parent),
+Editor::Editor(Window* window) :
+	window(window),
 	currentBuffer(NULL),
 	mode(MODE_NORMAL) {
+	Q_ASSERT(window != NULL);
+
 	// we don't want a rich text editor
 	this->setAcceptRichText(false);
 	this->setMode(MODE_NORMAL);
@@ -42,6 +45,10 @@ void Editor::setMode(int mode) {
 		break;
 	case MODE_INSERT:
 		this->setLineCursor();
+		break;
+	case MODE_COMMAND:
+		this->setBlockCursor();
+		this->window->openCommand();
 		break;
 	}
 	this->mode = mode;
@@ -105,6 +112,10 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 	Q_ASSERT(event != NULL);
 
 	switch (event->key()) {
+		case Qt::Key_Escape:
+			this->setMode(MODE_COMMAND);
+			break;
+
 		case Qt::Key_I:
 			if (shift) {
 				this->moveCursor(QTextCursor::StartOfLine);
@@ -148,6 +159,14 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			if (shift) { /* TODO(remy): move left until previous space */ }
 			// TODO(remy): confirm this is the wanted behavior
 			this->moveCursor(QTextCursor::PreviousWord);
+			return;
+
+		case Qt::Key_U:
+			if (shift) {
+				this->redo();
+			} else {
+				this->undo();
+			}
 			return;
 	}
 }
