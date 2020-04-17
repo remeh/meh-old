@@ -1,12 +1,12 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QKeyEvent>
-#include <qglobal.h>
+#include <QFont>
+#include <QFontMetrics>
 #include <QPainter>
 #include <QTextEdit>
 #include <QTextCursor>
 
-#include "qdebug.h"
 #include "editor.h"
 #include "mode.h"
 #include "window.h"
@@ -20,6 +20,26 @@ Editor::Editor(Window* window) :
 	// we don't want a rich text editor
 	this->setAcceptRichText(false);
 	this->setMode(MODE_NORMAL);
+
+	// editor font
+	// ----------------------
+
+	QFont font;
+	font.setFamily("Inconsolata");
+	font.setStyleHint(QFont::Monospace);
+	font.setFixedPitch(true);
+	#ifdef Q_OS_MAC
+	font.setPointSize(12);
+	#else
+	font.setPointSize(10);
+	#endif
+	this->setFont(font);
+
+	// tab space size
+
+	const int tabSpace = 4;
+	QFontMetrics metrics(font);
+	this->setTabStopDistance(tabSpace*metrics.averageCharWidth());
 }
 
 Editor::~Editor() {
