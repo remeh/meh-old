@@ -1,5 +1,9 @@
+#include <QFileInfo>
+
 #include "buffer.h"
 #include "editor.h"
+
+#include "qdebug.h"
 
 Buffer::Buffer() :
 	lastCursorPosition(0),
@@ -8,8 +12,11 @@ Buffer::Buffer() :
 
 Buffer::Buffer(QString filename) :
 	lastCursorPosition(0),
-	filename(filename),
 	readFromDisk(false) {
+	// resolve the absolute path of this
+	QFileInfo info(filename);
+	this->filename = info.absoluteFilePath();
+	qDebug() << "new buffer:" << this->filename;
 }
 
 QByteArray Buffer::read() {
@@ -17,7 +24,7 @@ QByteArray Buffer::read() {
 		return this->data;
 	}
 
-	QFile file(filename);
+	QFile file(this->filename);
 	// TODO(remy): it creates the file
 	file.open(QIODevice::ReadWrite);
 

@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QKeyEvent>
+#include <QFileInfo>
 #include <QFont>
 #include <QFontMetrics>
 #include <QPainter>
@@ -62,8 +63,9 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
 }
 
 void Editor::selectBuffer(const QString& filename) {
-	Buffer* buffer = this->buffers.take(filename);
-	this->buffersPos.remove(this->buffersPos.indexOf(filename));
+	QFileInfo info(filename);
+	Buffer* buffer = this->buffers.take(info.absoluteFilePath());
+	this->buffersPos.remove(this->buffersPos.indexOf(info.absoluteFilePath()));
 	if (buffer == nullptr) {
 		// TODO(remy): ???
 		return;
@@ -72,7 +74,8 @@ void Editor::selectBuffer(const QString& filename) {
 }
 
 bool Editor::hasBuffer(const QString& filename) {
-	return this->buffers.contains(filename);
+	QFileInfo info(filename);
+	return this->buffers.contains(info.absoluteFilePath());
 }
 
 void Editor::setMode(int mode, QString command) {
