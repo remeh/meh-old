@@ -79,6 +79,8 @@ bool Editor::hasBuffer(const QString& filename) {
 }
 
 void Editor::setMode(int mode, QString command) {
+	// NOTE(remy): here we could run a leaveMode(mode) method?
+	this->setOverwriteMode(false);
 	switch (mode) {
 	case MODE_NORMAL:
 	default:
@@ -93,6 +95,10 @@ void Editor::setMode(int mode, QString command) {
 		if (command.size() > 0) {
 			this->window->setCommand(command);
 		}
+		break;
+	case MODE_REPLACE:
+		this->setBlockCursor();
+		this->setOverwriteMode(true);
 		break;
 	}
 	this->mode = mode;
@@ -140,6 +146,19 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 		}
 	}
 
+	// Replace mode
+	// ----------------------
+
+	if (this->mode == MODE_REPLACE) {
+		if (event->key() == Qt::Key_Escape) {
+			this->setMode(MODE_NORMAL);
+			return;
+		}
+
+		QTextEdit::keyPressEvent(event);
+		return;
+	}
+
 	// Normal mode
 	// ----------------------
 
@@ -172,6 +191,10 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			break;
 		case Qt::Key_W:
 			this->setMode(MODE_COMMAND, ":w");
+			return;
+
+		case Qt::Key_R:
+			this->setMode(MODE_REPLACE);
 			return;
 
 		case Qt::Key_I:
