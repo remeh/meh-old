@@ -24,8 +24,9 @@ Window::Window(QWidget* parent) :
 	// ----------------------
 
 	this->layout = new QGridLayout();
-	layout->addWidget(this->editor);
-	layout->addWidget(this->command);
+	this->layout->setContentsMargins(0, 0, 0, 0);
+	this->layout->addWidget(this->editor);
+	this->layout->addWidget(this->command);
 	this->setLayout(layout);
 }
 

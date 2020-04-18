@@ -18,6 +18,7 @@ private slots:
 
 private:
 	void execute(QString text);
+	void openFile(const QString& filename);
 
 	Window* window;
 };

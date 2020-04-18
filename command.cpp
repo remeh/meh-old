@@ -3,8 +3,6 @@
 #include "command.h"
 #include "window.h"
 
-#include "qdebug.h"
-
 Command::Command(Window* window) :
 	window(window) {
 	Q_ASSERT(window != NULL);
@@ -30,14 +28,22 @@ void Command::keyPressEvent(QKeyEvent* event) {
 void Command::execute(QString text) {
 	this->clear();
 
-	if (text == ":q!") {
+	QStringList list = text.split(" ");
+	const QString& command = list[0];
+
+	// quit
+	// ----------------------
+
+	if (command == ":q!") {
 		QCoreApplication::quit();
 		return;
 	}
 
 	// go to a specific line
-	if (text.size() > 1 && text.at(0) == ":" && text.at(1).isDigit()) {
-		QStringRef lineStr = text.rightRef(text.size() - 1);
+	// ----------------------
+
+	if (command.size() > 1 && command.at(0) == ":" && command.at(1).isDigit()) {
+		QStringRef lineStr = command.rightRef(command.size() - 1);
 		bool ok = true;
 		int line = lineStr.toInt(&ok);
 		if (ok) {
@@ -45,4 +51,45 @@ void Command::execute(QString text) {
 		}
 		return;
 	}
+
+	// open a file
+	// ----------------------
+
+	if (command == ":e" && list.size() > 1) {
+		// TODO(remy): opening multiple files?
+		const QString& file = list[1];
+		this->openFile(file);
+		return;
+	}
+
+	// save a file
+	if (command == ":w") {
+		if (list.size() > 1) {
+			// TODO(remy):  save to another file
+		}
+		this->window->getEditor()->save();
+	}
+}
+
+void Command::openFile(const QString& filename) {
+	Editor* editor = this->window->getEditor();
+	if (editor == nullptr) {
+		// TODO(remy): display a warning
+		return;
+	}
+
+	// if current buffer, don't do anything
+	if (editor->getCurrentBuffer()->getFilename() == filename) {
+		return;
+	}
+
+	// if already loaded, re-use the buffer
+	if (editor->hasBuffer(filename)) {
+		editor->selectBuffer(filename);
+		return;
+	}
+
+	// not already loaded, open it and let the editor do the rest.
+	Buffer* buffer = new Buffer(filename);
+	this->window->getEditor()->setCurrentBuffer(buffer);
 }

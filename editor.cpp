@@ -8,7 +8,6 @@
 #include <QTextCursor>
 #include <QTextEdit>
 
-#include "qdebug.h"
 #include "editor.h"
 #include "mode.h"
 #include "window.h"
@@ -53,10 +52,27 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
 
 	if (this->currentBuffer != NULL) {
 		this->currentBuffer->onLeave(this);
+		// we're leaving this one, append it to the end of the buffers list.
+		this->buffersPos.append(this->currentBuffer->getFilename());
+		this->buffers[this->currentBuffer->getFilename()] = this->currentBuffer;
 	}
 
 	this->currentBuffer = buffer;
 	this->currentBuffer->onEnter(this);
+}
+
+void Editor::selectBuffer(const QString& filename) {
+	Buffer* buffer = this->buffers.take(filename);
+	this->buffersPos.remove(this->buffersPos.indexOf(filename));
+	if (buffer == nullptr) {
+		// TODO(remy): ???
+		return;
+	}
+	this->setCurrentBuffer(buffer);
+}
+
+bool Editor::hasBuffer(const QString& filename) {
+	return this->buffers.contains(filename);
 }
 
 void Editor::setMode(int mode, QString command) {

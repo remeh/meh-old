@@ -19,7 +19,9 @@ public:
 	QByteArray read();
 
 	// save saves the file on disk.
-	void save();
+	void save(Editor* editor);
+
+	const QString& getFilename() { return this->filename; }
 
 	// onLeave is called when the Window is leaving this Buffer (either to show
 	// another or because we're closing the application for instance).

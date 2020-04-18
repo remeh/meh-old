@@ -18,9 +18,7 @@ QByteArray Buffer::read() {
 	}
 
 	QFile file(filename);
-	if (!file.exists()) {
-		// TODO(remy): doesn't exist.
-	}
+	// TODO(remy): it creates the file
 	file.open(QIODevice::ReadWrite);
 
 	this->data = file.readAll();
@@ -28,8 +26,13 @@ QByteArray Buffer::read() {
 	return this->data;
 }
 
-void Buffer::save() {
-	// TODO(remy): imlement me
+void Buffer::save(Editor* editor) {
+	Q_ASSERT(editor != NULL);
+	QFile file(filename);
+	file.open(QIODevice::ReadWrite);
+	file.write(editor->toPlainText().toUtf8());
+
+	// TODO(remy): error management
 }
 
 void Buffer::onLeave(Editor* editor) {
@@ -37,8 +40,6 @@ void Buffer::onLeave(Editor* editor) {
 
 	// store the last cursor position
 	this->lastCursorPosition = editor->textCursor().position();
-
-	// TODO(remy): implement me.
 }
 
 void Buffer::onEnter(Editor* editor) {
@@ -53,6 +54,4 @@ void Buffer::onEnter(Editor* editor) {
 	auto cursor = editor->textCursor();
 	cursor.setPosition(this->lastCursorPosition);
 	editor->setTextCursor(cursor);
-
-	// TODO(remy): implement me.
 }
