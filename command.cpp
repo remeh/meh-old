@@ -34,7 +34,7 @@ void Command::execute(QString text) {
 	// quit
 	// ----------------------
 
-	if (command == ":q!") {
+	if (command == ":q!" || command == ":qa!") {
 		QCoreApplication::quit();
 		return;
 	}
@@ -56,9 +56,10 @@ void Command::execute(QString text) {
 	// ----------------------
 
 	if (command == ":e" && list.size() > 1) {
-		// TODO(remy): opening multiple files?
-		const QString& file = list[1];
-		this->openFile(file);
+		for (int i = 1; i < list.size(); i++) {
+			const QString& file = list[i];
+			this->openFile(file);
+		}
 		return;
 	}
 

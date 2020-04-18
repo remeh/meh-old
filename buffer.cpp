@@ -3,8 +3,6 @@
 #include "buffer.h"
 #include "editor.h"
 
-#include "qdebug.h"
-
 Buffer::Buffer() :
 	lastCursorPosition(0),
 	readFromDisk(false) {
@@ -16,7 +14,6 @@ Buffer::Buffer(QString filename) :
 	// resolve the absolute path of this
 	QFileInfo info(filename);
 	this->filename = info.absoluteFilePath();
-	qDebug() << "new buffer:" << this->filename;
 }
 
 QByteArray Buffer::read() {
