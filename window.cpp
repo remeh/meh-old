@@ -2,8 +2,6 @@
 #include "editor.h"
 #include "window.h"
 
-#include "qdebug.h"
-
 Window::Window(QWidget* parent) :
 	QWidget(parent),
 	editor(nullptr) {
@@ -17,7 +15,7 @@ Window::Window(QWidget* parent) :
 
 	this->editor = new Editor(this);
 
-	Buffer* buffer = new Buffer("../editor.cpp");
+	Buffer* buffer = new Buffer("editor.cpp");
 	editor->setCurrentBuffer(buffer);
 
 	// layout

@@ -22,6 +22,7 @@ Editor::Editor(Window* window) :
 	// we don't want a rich text editor
 	this->setAcceptRichText(false);
 	this->setMode(MODE_NORMAL);
+	this->setSubMode(NO_SUBMODE);
 
 	// editor font
 	// ----------------------
@@ -104,6 +105,11 @@ void Editor::setMode(int mode, QString command) {
 	this->mode = mode;
 }
 
+void Editor::setSubMode(int subMode) {
+	// TODO(remy): change the cursor
+	this->subMode = subMode;
+}
+
 void Editor::goToLine(int lineNumber) {
 	// note that the findBlockByLineNumber starts with 0
 	QTextBlock block = this->document()->findBlockByLineNumber(lineNumber - 1);
@@ -182,6 +188,11 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 	Q_ASSERT(event != NULL);
 
+	if (this->subMode != NO_SUBMODE) {
+		this->keyPressEventSubMode(event, ctrl, shift);
+		return;
+	}
+
 	switch (event->key()) {
 		case Qt::Key_Escape:
 			this->setMode(MODE_COMMAND);
@@ -199,13 +210,13 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
 		case Qt::Key_I:
 			if (shift) {
-				this->moveCursor(QTextCursor::StartOfLine);
+				this->moveCursor(QTextCursor::StartOfBlock);
 			}
 			this->setMode(MODE_INSERT);
 			return;
 		case Qt::Key_A:
 			if (shift) {
-				this->moveCursor(QTextCursor::EndOfLine);
+				this->moveCursor(QTextCursor::EndOfBlock);
 			}
 			this->setMode(MODE_INSERT);
 			return;
@@ -219,6 +230,10 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			this->moveCursor(QTextCursor::EndOfLine);
 			this->insertPlainText("\n" + this->currentLineIndent());
 			this->setMode(MODE_INSERT);
+			return;
+
+		case Qt::Key_Dollar:
+			this->moveCursor(QTextCursor::EndOfBlock);
 			return;
 
 		case Qt::Key_X:
@@ -236,6 +251,14 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			return;
 		case Qt::Key_L:
 			this->moveCursor(QTextCursor::Right);
+			return;
+
+		case Qt::Key_C:
+			if (shift) {
+				// TODO(remy): remove the end of the line and enter insert mode
+			} else {
+				this->setSubMode(SUBMODE_c);
+			}
 			return;
 
 		case Qt::Key_G:
@@ -264,6 +287,35 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 				this->undo();
 			}
 			return;
+	}
+}
+
+void Editor::keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift) {
+	if (event->key() ==  Qt::Key_Escape) {
+		this->setSubMode(NO_SUBMODE);
+		this->setMode(MODE_NORMAL);
+		return;
+	}
+
+	switch (this->subMode) {
+		case SUBMODE_c:
+			if (!shift && event->key() == Qt::Key_C) {
+				QTextCursor cursor = this->textCursor();
+				QString indent = this->currentLineIndent();
+				cursor.movePosition(QTextCursor::StartOfBlock);
+				cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+				cursor.removeSelectedText();
+				this->insertPlainText(indent);
+				this->setMode(MODE_INSERT);
+				this->setSubMode(NO_SUBMODE);
+			return;
+			}
+			break;
+		case SUBMODE_cf:
+		case SUBMODE_cF:
+		case SUBMODE_f:
+		case SUBMODE_F:
+			break;
 	}
 }
 

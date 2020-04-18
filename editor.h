@@ -28,6 +28,9 @@ public:
 	void setMode(int mode, QString command = "");
 	int getMode() { return this->mode; }
 
+	void setSubMode(int subMode);
+	int getSubMode() { return this->subMode; }
+
 	void setBlockCursor() { this->setCursorWidth(7); } // FIXME(remy):
 	void setLineCursor() { this->setCursorWidth(1); }
 
@@ -36,9 +39,6 @@ public:
 
 	// save saves the current buffer.
 	void save() { this->currentBuffer->save(this); }
-
-
-	// TODO(remy): use this->overwriteMode for the replace mode
 
 protected:
 	void keyPressEvent(QKeyEvent* event);
@@ -49,6 +49,7 @@ private:
 	// keyPressEventNormal handles this event in normal mode.
 	// ctrl is Control on Linux, Windows but is Command on macOS.
 	void keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift);
+	void keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift);
 
 	// currentLineIndent returns the current line indentation.
 	QString currentLineIndent();
@@ -69,4 +70,5 @@ private:
 	QVector<QString> buffersPos;
 
 	int mode;
+	int subMode;
 };
