@@ -198,6 +198,10 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			this->setMode(MODE_INSERT);
 			return;
 
+		case Qt::Key_X:
+			this->textCursor().deleteChar();
+			return;
+
 		case Qt::Key_K:
 			this->moveCursor(QTextCursor::Up);
 			return;
