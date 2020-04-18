@@ -44,6 +44,7 @@ void Buffer::onLeave(Editor* editor) {
 
 	// store the last cursor position
 	this->lastCursorPosition = editor->textCursor().position();
+	this->data = editor->document()->toPlainText().toUtf8();
 }
 
 void Buffer::onEnter(Editor* editor) {
