@@ -333,9 +333,12 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift) {
 	switch (this->subMode) {
 		case SUBMODE_c:
 			if (!shift && event->key() == Qt::Key_C) {
+				QTextCursor cursor = this->textCursor();
 				QString indent = this->currentLineIndent();
+				cursor.beginEditBlock();
 				this->deleteCurrentLine();
 				this->insertPlainText(indent);
+				cursor.endEditBlock();
 				this->setMode(MODE_INSERT);
 				this->setSubMode(NO_SUBMODE);
 			return;
