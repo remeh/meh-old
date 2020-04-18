@@ -184,6 +184,17 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			this->setMode(MODE_INSERT);
 			return;
 
+		case Qt::Key_O:
+			// NOTE(remy): we could detect the { at the end of a line
+			// to have another behavior.
+			if (shift) {
+				this->moveCursor(QTextCursor::Up);
+			}
+			this->moveCursor(QTextCursor::EndOfLine);
+			this->insertPlainText("\n" + this->currentLineIndent());
+			this->setMode(MODE_INSERT);
+			return;
+
 		case Qt::Key_K:
 			this->moveCursor(QTextCursor::Up);
 			return;
@@ -225,3 +236,18 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			return;
 	}
 }
+
+QString Editor::currentLineIndent() {
+	QString text = this->textCursor().block().text();
+	QString rv;
+	for(int i = 0; i < text.size(); i++) {
+		if (text.at(i) == ' '  || text.at(i) == '\t') {
+			rv.append(text.at(i));
+		} else {
+			// stop as soon as something else has been found
+			break;
+		}
+	}
+	return rv;
+}
+

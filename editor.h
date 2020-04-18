@@ -28,7 +28,7 @@ public:
 	void setMode(int mode, QString command = "");
 	int getMode() { return this->mode; }
 
-	void setBlockCursor() { this->setCursorWidth(7); }
+	void setBlockCursor() { this->setCursorWidth(7); } // FIXME(remy):
 	void setLineCursor() { this->setCursorWidth(1); }
 
 	// goToLine moves the cursor to a given position in the buffer.
@@ -36,6 +36,7 @@ public:
 
 	// save saves the current buffer.
 	void save() { this->currentBuffer->save(this); }
+
 
 	// TODO(remy): use this->overwriteMode for the replace mode
 
@@ -45,14 +46,19 @@ protected:
 private slots:
 
 private:
-	Window* window;
-
 	// keyPressEventNormal handles this event in normal mode.
 	// ctrl is Control on Linux, Windows but is Command on macOS.
 	void keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift);
 
-	// currentBuffer is the currently visible buffer. Note that it not part
-	// of the buffers list.
+	// currentLineIndent returns the current line indentation.
+	QString currentLineIndent();
+
+	// ----------------------
+
+	Window* window;
+
+	// currentBuffer is the currently visible buffer. Note that it is not part
+	// of the buffers map.
 	Buffer* currentBuffer;
 
 	// buffers is the currently loaded buffers. Note that it doesn't contain
