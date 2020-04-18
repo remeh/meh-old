@@ -118,6 +118,13 @@ void Editor::goToLine(int lineNumber) {
 	this->setTextCursor(cursor);
 }
 
+void Editor::deleteCurrentLine() {
+	QTextCursor cursor = this->textCursor();
+	cursor.movePosition(QTextCursor::StartOfBlock);
+	cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+	cursor.removeSelectedText();
+}
+
 void Editor::keyPressEvent(QKeyEvent* event) {
 	Q_ASSERT(event != NULL);
 
@@ -253,11 +260,37 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			this->moveCursor(QTextCursor::Right);
 			return;
 
+		case Qt::Key_P:
+			{
+				QTextCursor cursor = this->textCursor();
+				cursor.beginEditBlock();
+				if (shift) {
+					this->moveCursor(QTextCursor::StartOfBlock);
+					this->paste();
+					this->moveCursor(QTextCursor::Left);
+				} else {
+					this->moveCursor(QTextCursor::Down);
+					this->moveCursor(QTextCursor::StartOfBlock);
+					this->paste();
+					this->moveCursor(QTextCursor::Left);
+				}
+				cursor.endEditBlock();
+			}
+			return;
+
 		case Qt::Key_C:
 			if (shift) {
 				// TODO(remy): remove the end of the line and enter insert mode
 			} else {
 				this->setSubMode(SUBMODE_c);
+			}
+			return;
+
+		case Qt::Key_D:
+			if (shift) {
+				// TODO(remy): remove the end of line but stay in normal mode
+			} else {
+				this->setSubMode(SUBMODE_d);
 			}
 			return;
 
@@ -300,11 +333,8 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift) {
 	switch (this->subMode) {
 		case SUBMODE_c:
 			if (!shift && event->key() == Qt::Key_C) {
-				QTextCursor cursor = this->textCursor();
 				QString indent = this->currentLineIndent();
-				cursor.movePosition(QTextCursor::StartOfBlock);
-				cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-				cursor.removeSelectedText();
+				this->deleteCurrentLine();
 				this->insertPlainText(indent);
 				this->setMode(MODE_INSERT);
 				this->setSubMode(NO_SUBMODE);
@@ -315,8 +345,20 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift) {
 		case SUBMODE_cF:
 		case SUBMODE_f:
 		case SUBMODE_F:
+		case SUBMODE_d:
+			if (!shift && event->key() == Qt::Key_D) {
+				QTextCursor cursor = this->textCursor();
+				cursor.movePosition(QTextCursor::StartOfBlock);
+				cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+				cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+				this->setTextCursor(cursor);
+				this->cut();
+			}
 			break;
 	}
+
+	this->setMode(MODE_NORMAL);
+	this->setSubMode(NO_SUBMODE);
 }
 
 QString Editor::currentLineIndent() {

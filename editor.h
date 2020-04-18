@@ -37,6 +37,9 @@ public:
 	// goToLine moves the cursor to a given position in the buffer.
 	void goToLine(int lineNumber);
 
+	// deleteCurrentLine removes the current line of the buffer.
+	void deleteCurrentLine();
+
 	// save saves the current buffer.
 	void save() { this->currentBuffer->save(this); }
 
