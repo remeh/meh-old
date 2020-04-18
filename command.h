@@ -17,7 +17,7 @@ protected:
 private slots:
 
 private:
-	void execute();
+	void execute(QString text);
 
 	Window* window;
 };

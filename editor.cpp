@@ -4,9 +4,11 @@
 #include <QFont>
 #include <QFontMetrics>
 #include <QPainter>
-#include <QTextEdit>
+#include <QTextBlock>
 #include <QTextCursor>
+#include <QTextEdit>
 
+#include "qdebug.h"
 #include "editor.h"
 #include "mode.h"
 #include "window.h"
@@ -39,7 +41,7 @@ Editor::Editor(Window* window) :
 
 	const int tabSpace = 4;
 	QFontMetrics metrics(font);
-	this->setTabStopDistance(tabSpace*metrics.averageCharWidth());
+	this->setTabStopDistance(tabSpace*metrics.horizontalAdvance(" "));
 }
 
 Editor::~Editor() {
@@ -57,7 +59,7 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
 	this->currentBuffer->onEnter(this);
 }
 
-void Editor::setMode(int mode) {
+void Editor::setMode(int mode, QString command) {
 	switch (mode) {
 	case MODE_NORMAL:
 	default:
@@ -69,9 +71,20 @@ void Editor::setMode(int mode) {
 	case MODE_COMMAND:
 		this->setBlockCursor();
 		this->window->openCommand();
+		if (command.size() > 0) {
+			this->window->setCommand(command);
+		}
 		break;
 	}
 	this->mode = mode;
+}
+
+void Editor::goToLine(int lineNumber) {
+	// note that the findBlockByLineNumber starts with 0
+	QTextBlock block = this->document()->findBlockByLineNumber(lineNumber - 1);
+	QTextCursor cursor = this->textCursor();
+	cursor.setPosition(block.position());
+	this->setTextCursor(cursor);
 }
 
 void Editor::keyPressEvent(QKeyEvent* event) {
@@ -135,6 +148,12 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 		case Qt::Key_Escape:
 			this->setMode(MODE_COMMAND);
 			break;
+		case Qt::Key_Colon:
+			this->setMode(MODE_COMMAND, ":");
+			break;
+		case Qt::Key_W:
+			this->setMode(MODE_COMMAND, ":w");
+			return;
 
 		case Qt::Key_I:
 			if (shift) {

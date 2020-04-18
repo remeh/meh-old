@@ -40,3 +40,7 @@ void Window::closeCommand() {
 		this->editor->setMode(MODE_NORMAL);
 	}
 }
+
+void Window::setCommand(const QString& text) {
+	this->command->setText(text);
+}

@@ -17,11 +17,14 @@ public:
 	void setCurrentBuffer(Buffer* buffer);
 	Buffer* getCurrentBuffer() { return this->currentBuffer; }
 
-	void setMode(int mode);
+	void setMode(int mode, QString command = "");
 	int getMode() { return this->mode; }
 
 	void setBlockCursor() { this->setCursorWidth(7); }
 	void setLineCursor() { this->setCursorWidth(1); }
+
+	// goToLine moves the cursor to a given position in the buffer.
+	void goToLine(int lineNumber);
 
 	// TODO(remy): use this->overwriteMode for the replace mode
 

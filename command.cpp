@@ -15,13 +15,11 @@ void Command::keyPressEvent(QKeyEvent* event) {
 
 	switch (event->key()) {
 		case Qt::Key_Escape:
-			// return to normal mode
 			this->clear();
 			this->window->closeCommand();
 			break;
 		case Qt::Key_Return:
-			// return to normal mode
-			this->execute();
+			this->execute(this->text());
 			this->window->closeCommand();
 			break;
 	}
@@ -29,12 +27,22 @@ void Command::keyPressEvent(QKeyEvent* event) {
 	QLineEdit::keyPressEvent(event);
 }
 
-void Command::execute() {
-	// TODO(remy): implement me.
-	if (this->text() == ":q!") {
+void Command::execute(QString text) {
+	this->clear();
+
+	if (text == ":q!") {
 		QCoreApplication::quit();
 		return;
 	}
 
-	this->clear();
+	// go to a specific line
+	if (text.size() > 1 && text.at(0) == ":" && text.at(1).isDigit()) {
+		QStringRef lineStr = text.rightRef(text.size() - 1);
+		bool ok = true;
+		int line = lineStr.toInt(&ok);
+		if (ok) {
+			this->window->getEditor()->goToLine(line);
+		}
+		return;
+	}
 }
