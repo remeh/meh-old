@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QChar>
 #include <QMap>
 #include <QVector>
 #include <QTextEdit>
@@ -57,6 +58,14 @@ private:
 	// currentLineIndent returns the current line indentation.
 	QString currentLineIndent();
 
+	// findNextOneInCurrentLine returns the distance to the next occurence of the
+	// given char in the current line. The distance is from the current cursor position.
+	int findNextOneInCurrentLine(QChar c);
+
+	// findPreviousOneInCurrentLine returns the distance to the previous occurence of
+	// the given char in the current line. The distance is from the current cursor position.
+	int findPreviousOneInCurrentLine(QChar c);
+
 	// ----------------------
 
 	Window* window;
@@ -75,3 +84,4 @@ private:
 	int mode;
 	int subMode;
 };
+

@@ -32,9 +32,10 @@ Editor::Editor(Window* window) :
 	font.setStyleHint(QFont::Monospace);
 	font.setFixedPitch(true);
 	#ifdef Q_OS_MAC
+				this->setSubMode(SUBMODE_f);
 	font.setPointSize(12);
 	#else
-	font.setPointSize(10);
+	font.setPointSize(11);
 	#endif
 	this->setFont(font);
 
@@ -215,6 +216,14 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			this->setMode(MODE_REPLACE);
 			return;
 
+		case Qt::Key_F:
+			if (shift) {
+				this->setSubMode(SUBMODE_F);
+			} else {
+				this->setSubMode(SUBMODE_f);
+			}
+			return;
+
 		case Qt::Key_I:
 			if (shift) {
 				this->moveCursor(QTextCursor::StartOfBlock);
@@ -330,6 +339,12 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift) {
 		return;
 	}
 
+	// ignore modifiers keys, etc.
+	// NOTE(remy): maybe we will have to do that only for some submodes
+	if (event->text()[0] == '\x0') {
+		return;
+	}
+
 	switch (this->subMode) {
 		case SUBMODE_c:
 			if (!shift && event->key() == Qt::Key_C) {
@@ -345,9 +360,27 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift) {
 			}
 			break;
 		case SUBMODE_cf:
+			// TODO(remy): implement
+			break;
 		case SUBMODE_cF:
+			// TODO(remy): implement
+			break;
 		case SUBMODE_f:
+			{
+				int distance = this->findNextOneInCurrentLine(event->text()[0]);
+				QTextCursor cursor = this->textCursor();
+				cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, distance);
+				this->setTextCursor(cursor);
+			}
+			break;
 		case SUBMODE_F:
+			{
+				int distance = this->findPreviousOneInCurrentLine(event->text()[0]);
+				QTextCursor cursor = this->textCursor();
+				cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, distance);
+				this->setTextCursor(cursor);
+			}
+			break;
 		case SUBMODE_d:
 			if (!shift && event->key() == Qt::Key_D) {
 				QTextCursor cursor = this->textCursor();
@@ -378,3 +411,28 @@ QString Editor::currentLineIndent() {
 	return rv;
 }
 
+int Editor::findPreviousOneInCurrentLine(QChar c) {
+	QTextCursor cursor = this->textCursor();
+	QString text = cursor.block().text();
+
+	if (cursor.positionInBlock() == 0) { return 0; }
+
+	for (int i = cursor.positionInBlock(); i >= 0; i--) {
+		if (text[i] == c) {
+			return cursor.positionInBlock() - i;
+		}
+	}
+
+	return 0;
+}
+
+int Editor::findNextOneInCurrentLine(QChar c) {
+	QTextCursor cursor = this->textCursor();
+	QString text = cursor.block().text();
+	for (int i = cursor.positionInBlock()+1; i < text.size(); i++) {
+		if (text[i] == c) {
+			return i - cursor.positionInBlock();
+		}
+	}
+	return 0;
+}
