@@ -9,6 +9,8 @@
 #define SUBMODE_c 1
 #define SUBMODE_cf 2
 #define SUBMODE_cF 3
-#define SUBMODE_f 4
-#define SUBMODE_F 5
-#define SUBMODE_d 6
+#define SUBMODE_ct 4
+#define SUBMODE_cT 5
+#define SUBMODE_f 6
+#define SUBMODE_F 7
+#define SUBMODE_d 8
