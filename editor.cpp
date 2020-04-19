@@ -32,7 +32,6 @@ Editor::Editor(Window* window) :
 	font.setStyleHint(QFont::Monospace);
 	font.setFixedPitch(true);
 	#ifdef Q_OS_MAC
-				this->setSubMode(SUBMODE_f);
 	font.setPointSize(12);
 	#else
 	font.setPointSize(11);
@@ -186,6 +185,21 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 
 	if (event->key() == Qt::Key_Escape) {
 		this->setMode(MODE_NORMAL);
+		return;
+	}
+
+	if (event->key() == Qt::Key_Return) {
+		QTextCursor cursor = this->textCursor();
+		// remove all indentation if nothing has been written on the line
+		for (int v = this->currentLineIsOnlyWhitespaces(); v > 0; v--) {
+			cursor.deletePreviousChar();
+		}
+
+		if (shift) {
+			this->moveCursor(QTextCursor::Up);
+		}
+		this->moveCursor(QTextCursor::EndOfLine);
+		this->insertPlainText("\n" + this->currentLineIndent());
 		return;
 	}
 
@@ -461,6 +475,20 @@ QString Editor::currentLineIndent() {
 		}
 	}
 	return rv;
+}
+
+int Editor::currentLineIsOnlyWhitespaces() {
+	QString text = this->textCursor().block().text();
+	int count = 0;
+	for(int i = 0; i < text.size(); i++) {
+		QChar c = text.at(i);
+		if (c != ' '  && c != '\t' && c != '\n') {
+			return -1;
+		}
+		if (c == '\n') { break; }
+		count++;
+	}
+	return count;
 }
 
 int Editor::findPreviousOneInCurrentLine(QChar c) {

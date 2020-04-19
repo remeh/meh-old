@@ -58,6 +58,10 @@ private:
 	// currentLineIndent returns the current line indentation.
 	QString currentLineIndent();
 
+	// currentLineIsOnlyWhitespaces return -1 if this is wrong and returns how
+	// many whitespaces (' ' or '\t') are composing this line.
+	int currentLineIsOnlyWhitespaces();
+
 	// findNextOneInCurrentLine returns the distance to the next occurence of the
 	// given char in the current line. The distance is from the current cursor position.
 	int findNextOneInCurrentLine(QChar c);
