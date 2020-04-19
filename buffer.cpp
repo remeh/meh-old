@@ -33,7 +33,7 @@ QByteArray Buffer::read() {
 void Buffer::save(Editor* editor) {
 	Q_ASSERT(editor != NULL);
 	QFile file(filename);
-	file.open(QIODevice::ReadWrite);
+	file.open(QIODevice::Truncate | QIODevice::ReadWrite);
 	file.write(editor->toPlainText().toUtf8());
 
 	// TODO(remy): error management
