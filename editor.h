@@ -7,6 +7,7 @@
 
 #include "buffer.h"
 #include "mode.h"
+#include "syntax.h"
 
 class Window;
 
@@ -73,6 +74,8 @@ private:
 	// ----------------------
 
 	Window* window;
+
+	Syntax* syntax;
 
 	// currentBuffer is the currently visible buffer. Note that it is not part
 	// of the buffers map.

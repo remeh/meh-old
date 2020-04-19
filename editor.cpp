@@ -11,6 +11,7 @@
 
 #include "editor.h"
 #include "mode.h"
+#include "syntax.h"
 #include "window.h"
 
 Editor::Editor(Window* window) :
@@ -20,7 +21,13 @@ Editor::Editor(Window* window) :
 	Q_ASSERT(window != NULL);
 
 	// we don't want a rich text editor
+	// ----------------------
+
 	this->setAcceptRichText(false);
+
+	// start in normal mode
+	// ----------------------
+
 	this->setMode(MODE_NORMAL);
 	this->setSubMode(NO_SUBMODE);
 
@@ -38,7 +45,13 @@ Editor::Editor(Window* window) :
 	#endif
 	this->setFont(font);
 
+	// syntax highlighting
+	// ----------------------
+
+	this->syntax = new Syntax(this->document());
+
 	// tab space size
+	// ----------------------
 
 	const int tabSpace = 4;
 	QFontMetrics metrics(font);
