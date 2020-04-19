@@ -202,6 +202,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 	}
 
 	if (event->key() == Qt::Key_Return) {
+		QString indent = this->currentLineIndent();
+
 		QTextCursor cursor = this->textCursor();
 		// remove all indentation if nothing has been written on the line
 		for (int v = this->currentLineIsOnlyWhitespaces(); v > 0; v--) {
@@ -212,7 +214,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 			this->moveCursor(QTextCursor::Up);
 		}
 		this->moveCursor(QTextCursor::EndOfLine);
-		this->insertPlainText("\n" + this->currentLineIndent());
+		this->insertPlainText("\n" + indent);
 		return;
 	}
 
