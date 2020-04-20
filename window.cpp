@@ -9,6 +9,13 @@ Window::Window(QWidget* parent) :
 	// ----------------------
 	this->command = new Command(this);
 	this->command->hide();
+	this->list = new QListWidget(this);
+	new QListWidgetItem("main.cpp", this->list);
+	new QListWidgetItem("editor.cpp", this->list);
+	new QListWidgetItem("editor.h", this->list);
+	new QListWidgetItem("syntax.cpp", this->list);
+	new QListWidgetItem("syntax.h", this->list);
+	this->list->hide();
 
 	// editor
 	// ----------------------
@@ -25,6 +32,7 @@ Window::Window(QWidget* parent) :
 	this->layout->setContentsMargins(0, 0, 0, 0);
 	this->layout->addWidget(this->editor);
 	this->layout->addWidget(this->command);
+	this->layout->addWidget(this->list);
 	this->setLayout(layout);
 }
 
@@ -38,6 +46,14 @@ void Window::closeCommand() {
 	if (this->editor) {
 		this->editor->setMode(MODE_NORMAL);
 	}
+}
+
+void Window::openList() {
+	this->list->show();
+}
+
+void Window::closeList() {
+	this->list->hide();
 }
 
 void Window::setCommand(const QString& text) {

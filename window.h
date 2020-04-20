@@ -2,6 +2,7 @@
 
 #include <QGridLayout>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QWidget>
 
 #include "editor.h"
@@ -24,6 +25,12 @@ public:
 	// setCommand sets the text in the command to the given value.
 	void setCommand(const QString& text);
 
+	// showList shows the list below the command field at the bottom of the window.
+	void openList();
+
+	// closeList removes all entries in the list and hides it.
+	void closeList();
+
 	Editor* getEditor() { return this->editor; }
 
 protected:
@@ -34,4 +41,5 @@ private:
 	Editor* editor;
 	QGridLayout* layout;
 	Command* command;
+	QListWidget* list;
 };

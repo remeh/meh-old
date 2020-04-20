@@ -9,6 +9,8 @@
 #include <QTextCursor>
 #include <QTextEdit>
 
+#include "qdebug.h"
+
 #include "editor.h"
 #include "mode.h"
 #include "syntax.h"
@@ -79,10 +81,15 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
 void Editor::selectBuffer(const QString& filename) {
 	QFileInfo info(filename);
 	Buffer* buffer = this->buffers.take(info.absoluteFilePath());
-	this->buffersPos.remove(this->buffersPos.indexOf(info.absoluteFilePath()));
 	if (buffer == nullptr) {
 		// TODO(remy): ???
 		return;
+	}
+	int pos = this->buffersPos.indexOf(info.absoluteFilePath());
+	if (pos >= 0) { // should not happen
+		this->buffersPos.remove(pos);
+	} else {
+		qDebug() << "pos == -1 in selectBuffer, should never happen.";
 	}
 	this->setCurrentBuffer(buffer);
 }
@@ -167,6 +174,26 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 				{
 					QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageDown, Qt::NoModifier);
 					QTextEdit::keyPressEvent(&pageEvent);
+				}
+				return;
+
+			// switch to previous buffer
+			case Qt::Key_P:
+				{
+					if (this->buffersPos.size() == 0) {
+						return;
+					}
+					// NOTE(remy): don't remove it here, just take a ref,
+					// the selectBuffer takes care of the list order etc.
+					const QString& filename = this->buffersPos.last();
+					this->selectBuffer(filename);
+				}
+				return;
+
+			// open a file with the FilesLookup
+			case Qt::Key_O:
+				{
+					this->window->openList();
 				}
 				return;
 		}
