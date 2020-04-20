@@ -6,6 +6,7 @@
 #include <QTextEdit>
 
 #include "buffer.h"
+#include "fileslookup.h"
 #include "mode.h"
 #include "syntax.h"
 

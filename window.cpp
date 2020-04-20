@@ -1,6 +1,9 @@
 #include "command.h"
 #include "editor.h"
+#include "fileslookup.h"
 #include "window.h"
+
+#include "qdebug.h"
 
 Window::Window(QWidget* parent) :
 	QWidget(parent),
@@ -9,13 +12,8 @@ Window::Window(QWidget* parent) :
 	// ----------------------
 	this->command = new Command(this);
 	this->command->hide();
-	this->list = new QListWidget(this);
-	new QListWidgetItem("main.cpp", this->list);
-	new QListWidgetItem("editor.cpp", this->list);
-	new QListWidgetItem("editor.h", this->list);
-	new QListWidgetItem("syntax.cpp", this->list);
-	new QListWidgetItem("syntax.h", this->list);
-	this->list->hide();
+	this->filesLookup = new FilesLookup(this);
+	this->filesLookup->hide();
 
 	// editor
 	// ----------------------
@@ -32,7 +30,7 @@ Window::Window(QWidget* parent) :
 	this->layout->setContentsMargins(0, 0, 0, 0);
 	this->layout->addWidget(this->editor);
 	this->layout->addWidget(this->command);
-	this->layout->addWidget(this->list);
+	this->layout->addWidget(this->filesLookup);
 	this->setLayout(layout);
 }
 
@@ -49,11 +47,13 @@ void Window::closeCommand() {
 }
 
 void Window::openList() {
-	this->list->show();
+	qDebug() << "openList()";
+	this->filesLookup->lookupDir("../");
+	this->filesLookup->show();
 }
 
 void Window::closeList() {
-	this->list->hide();
+	this->filesLookup->hide();
 }
 
 void Window::setCommand(const QString& text) {

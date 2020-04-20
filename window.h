@@ -41,5 +41,5 @@ private:
 	Editor* editor;
 	QGridLayout* layout;
 	Command* command;
-	QListWidget* list;
+	FilesLookup* filesLookup;
 };

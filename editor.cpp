@@ -289,6 +289,8 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 		case Qt::Key_A:
 			if (shift) {
 				this->moveCursor(QTextCursor::EndOfBlock);
+			} else {
+				this->moveCursor(QTextCursor::Right);
 			}
 			this->setMode(MODE_INSERT);
 			return;
