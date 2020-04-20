@@ -39,7 +39,7 @@ Editor::Editor(Window* window) :
 	font.setStyleHint(QFont::Monospace);
 	font.setFixedPitch(true);
 	#ifdef Q_OS_MAC
-	font.setPointSize(12);
+	font.setPointSize(13);
 	#else
 	font.setPointSize(11);
 	#endif
