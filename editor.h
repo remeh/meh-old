@@ -36,6 +36,7 @@ public:
 	int getSubMode() { return this->subMode; }
 
 	void setBlockCursor() { this->setCursorWidth(7); } // FIXME(remy):
+	void setMidCursor() { this->setCursorWidth(4); } // FIXME(remy):
 	void setLineCursor() { this->setCursorWidth(1); }
 
 	// goToLine moves the cursor to a given position in the buffer.

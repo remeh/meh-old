@@ -127,7 +127,7 @@ void Editor::setMode(int mode, QString command) {
 		}
 		break;
 	case MODE_REPLACE:
-		this->setBlockCursor();
+		this->setMidCursor();
 		this->setOverwriteMode(true);
 		break;
 	}
@@ -136,6 +136,9 @@ void Editor::setMode(int mode, QString command) {
 
 void Editor::setSubMode(int subMode) {
 	// TODO(remy): change the cursor
+	if (subMode != NO_SUBMODE) {
+		this->setMidCursor();
+	}
 	this->subMode = subMode;
 }
 
