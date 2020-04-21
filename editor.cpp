@@ -336,7 +336,22 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			this->moveCursor(QTextCursor::Up);
 			return;
 		case Qt::Key_J:
-			this->moveCursor(QTextCursor::Down);
+			if (shift) {
+				this->moveCursor(QTextCursor::EndOfLine);
+				QTextCursor cursor = this->textCursor();
+				QTextDocument* document = this->document();
+				// TODO(remy): beginEditBlock
+				cursor.deleteChar();
+				QChar c = document->characterAt(cursor.position());
+				while (c == "\t" || c == " ") {
+					cursor.deleteChar();
+					c = document->characterAt(cursor.position());
+				}
+				cursor.insertText(" ");
+				return;
+			} else {
+				this->moveCursor(QTextCursor::Down);
+			}
 			return;
 		case Qt::Key_H:
 			this->moveCursor(QTextCursor::Left);
