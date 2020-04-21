@@ -280,6 +280,12 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			this->setMode(MODE_COMMAND, ":w");
 			return;
 
+		case Qt::Key_Y:
+			if (!shift) {
+				this->setSubMode(SUBMODE_y);
+			}
+			return;
+
 		case Qt::Key_R:
 			this->setMode(MODE_REPLACE);
 			return;
@@ -486,6 +492,20 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool, bool shift) {
 			this->setMode(MODE_INSERT);
 			this->setSubMode(NO_SUBMODE);
 			return;
+		case SUBMODE_y:
+			if (!shift && event->key() == Qt::Key_Y) {
+				QTextCursor cursor = this->textCursor();
+				int position = cursor.position();
+				cursor.movePosition(QTextCursor::StartOfBlock);
+				cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+				cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+				this->setTextCursor(cursor);
+				this->copy();
+				cursor.clearSelection();
+				cursor.setPosition(position);
+				this->setTextCursor(cursor);
+			}
+			break;
 
 		case SUBMODE_f:
 			{

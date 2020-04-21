@@ -14,3 +14,4 @@
 #define SUBMODE_f 6
 #define SUBMODE_F 7
 #define SUBMODE_d 8
+#define SUBMODE_y 9
