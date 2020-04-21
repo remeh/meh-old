@@ -3,6 +3,8 @@
 #include "buffer.h"
 #include "editor.h"
 
+#include "qdebug.h"
+
 Buffer::Buffer() :
 	lastCursorPosition(0),
 	readFromDisk(false) {

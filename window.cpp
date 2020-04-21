@@ -3,8 +3,6 @@
 #include "fileslookup.h"
 #include "window.h"
 
-#include "qdebug.h"
-
 Window::Window(QWidget* parent) :
 	QWidget(parent),
 	editor(nullptr) {
@@ -44,7 +42,6 @@ void Window::closeCommand() {
 }
 
 void Window::openList() {
-	qDebug() << "openList()";
 	this->filesLookup->lookupDir("../");
 	this->filesLookup->show();
 }

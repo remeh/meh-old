@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QFileInfoList>
+#include <QIcon>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
@@ -192,12 +193,16 @@ void FilesLookup::refreshList() {
 	this->list->clear();
 	auto it = this->filteredDirs.begin();
 	while (it != this->filteredDirs.end()) {
-		new QListWidgetItem(*it, this->list);
+		new QListWidgetItem(QIcon::fromTheme("folder"), *it, this->list);
 		++it;
 	}
 	it = this->filteredFiles.begin();
 	while (it != this->filteredFiles.end()) {
-		new QListWidgetItem(*it, this->list);
+		QString icon = "document-new";
+		if (this->window->getEditor()->hasBuffer(*it)) {
+			icon = "document-edit";
+		}
+		new QListWidgetItem(QIcon::fromTheme(icon), *it, this->list);
 		++it;
 	}
 }

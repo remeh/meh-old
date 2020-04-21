@@ -99,8 +99,13 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
 }
 
 bool Editor::hasBuffer(const QString& filename) {
+	if (this->currentBuffer == nullptr) {
+		return false;
+	}
+
 	QFileInfo info(filename);
-	return this->buffers.contains(info.absoluteFilePath());
+	return this->currentBuffer->getFilename() == info.absoluteFilePath() ||
+			this->buffers.contains(info.absoluteFilePath());
 }
 
 void Editor::setMode(int mode, QString command) {
