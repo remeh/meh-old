@@ -84,13 +84,6 @@ void Command::openFile(const QString& filename) {
 		return;
 	}
 
-	// if already loaded, re-use the buffer
-	if (editor->hasBuffer(filename)) {
-		editor->selectBuffer(filename);
-		return;
-	}
-
-	// not already loaded, open it and let the editor do the rest.
-	Buffer* buffer = new Buffer(filename);
-	this->window->getEditor()->setCurrentBuffer(buffer);
+	// this will automatically creates a buffer if needed.
+	editor->selectOrCreateBuffer(filename);
 }

@@ -23,8 +23,9 @@ public:
 	void setCurrentBuffer(Buffer* buffer);
 	// getCurrentBuffer retuns the currently used buffer.
 	Buffer* getCurrentBuffer() { return this->currentBuffer; }
-	// selectBuffer uses an already opened buffer and set it as the active one.
-	void selectBuffer(const QString& filename);
+	// selectOrCreateBuffer uses an already opened buffer and set it as the active one,
+	// if this buffer doesn't exist (file not already loaded) it creates it.
+	void selectOrCreateBuffer(const QString& filename);
 	// hasBuffer returns true if a buffer has already been loaded.
 	bool hasBuffer(const QString& filename);
 

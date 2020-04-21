@@ -78,19 +78,23 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
 	this->currentBuffer->onEnter(this);
 }
 
-void Editor::selectBuffer(const QString& filename) {
+void Editor::selectOrCreateBuffer(const QString& filename) {
 	QFileInfo info(filename);
-	Buffer* buffer = this->buffers.take(info.absoluteFilePath());
+	QString f = info.absoluteFilePath();
+
+	Buffer* buffer = this->buffers.take(f);
 	if (buffer == nullptr) {
-		// TODO(remy): ???
-		return;
-	}
-	int pos = this->buffersPos.indexOf(info.absoluteFilePath());
-	if (pos >= 0) { // should not happen
-		this->buffersPos.remove(pos);
+		// this file has never been opened, open it
+		buffer = new Buffer(f);
 	} else {
-		qDebug() << "pos == -1 in selectBuffer, should never happen.";
+		int pos = this->buffersPos.indexOf(f);
+		if (pos >= 0) { // should not happen
+			this->buffersPos.remove(pos);
+		} else {
+			qDebug() << "pos == -1 in selectBuffer, should never happen.";
+		}
 	}
+
 	this->setCurrentBuffer(buffer);
 }
 
@@ -186,7 +190,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 					// NOTE(remy): don't remove it here, just take a ref,
 					// the selectBuffer takes care of the list order etc.
 					const QString& filename = this->buffersPos.last();
-					this->selectBuffer(filename);
+					this->selectOrCreateBuffer(filename);
 				}
 				return;
 
