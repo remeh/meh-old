@@ -20,9 +20,6 @@ Window::Window(QWidget* parent) :
 
 	this->editor = new Editor(this);
 
-	Buffer* buffer = new Buffer("editor.cpp");
-	editor->setCurrentBuffer(buffer);
-
 	// layout
 	// ----------------------
 
