@@ -6,6 +6,8 @@
 #include <QLineEdit>
 #include <QListWidgetItem>
 
+#include "qdebug.h"
+
 #include "fileslookup.h"
 #include "mode.h"
 #include "window.h"
@@ -35,6 +37,7 @@ void FilesLookup::onEditChanged() {
 		this->filter(this->edit->text());
 	}
 	this->refreshList();
+	this->list->setCurrentRow(0);
 }
 
 void FilesLookup::show() {
@@ -76,15 +79,45 @@ void FilesLookup::lookupDir(QString filepath) {
 	}
 }
 
+void FilesLookup::openSelection() {
+	QListWidgetItem* item = this->list->currentItem();
+	if (item == nullptr) {
+		qDebug() << "item == nullptr in FilesLookup::keyPressEvent";
+	}
+
+	qDebug() << item->text();
+	// TODO(remy): support building a tree hierarchy
+
+	QFileInfo info(item->text());
+	if (info.isFile()) {
+		this->window->getEditor()->selectOrCreateBuffer(info.absoluteFilePath());
+		return;
+	}
+
+	qDebug() << "is dir";
+}
+
 void FilesLookup::keyPressEvent(QKeyEvent* event) {
+	qDebug() << "event";
 	switch (event->key()) {
 		case Qt::Key_Escape:
 			this->window->closeList();
 			this->window->getEditor()->setMode(MODE_NORMAL);
 			return;
+
+		// TODO(remy): we probably want to have a custom QLineEdit to be able
+		// to properly override its keyPressEvent to be able to use Key_Down
+		// to focus on the list.
+
 		case Qt::Key_Return:
-			// TODO(remy):
-			break;
+			{
+				if (this->list->currentItem() == nullptr) {
+					return;
+				}
+				this->openSelection();
+				this->window->closeList();
+			}
+			return;
 	}
 }
 

@@ -28,6 +28,11 @@ public:
 	// refreshList refreshes the content of the list.
 	void refreshList();
 
+	// openSelection opens the given selection: if it is a files, it opens
+	// the buffer, if it is a directory, it opens the directory and refreshes
+	// the list of the FilesLookup.
+	void openSelection();
+
 	// TODO(remy): comment me
 	void filter(QString string);
 
