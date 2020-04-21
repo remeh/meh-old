@@ -3,6 +3,7 @@
 #include <QFileInfo>
 #include <QFileInfoList>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QLineEdit>
 #include <QListWidgetItem>
 
@@ -17,6 +18,7 @@ FilesLookup::FilesLookup(Window* window) :
 	Q_ASSERT(window != nullptr);
 
 	this->edit = new QLineEdit(this);
+	this->label = new QLabel(this);
 	this->list = new QListWidget(this);
 
 	this->setFocusPolicy(Qt::StrongFocus);
@@ -24,6 +26,7 @@ FilesLookup::FilesLookup(Window* window) :
 	this->layout = new QGridLayout();
 	this->layout->setContentsMargins(0, 0, 0, 0);
 	this->layout->addWidget(this->edit);
+	this->layout->addWidget(this->label);
 	this->layout->addWidget(this->list);
 	this->setLayout(layout);
 
@@ -41,18 +44,20 @@ void FilesLookup::onEditChanged() {
 }
 
 void FilesLookup::show() {
-	this->edit->show();
-	this->list->show();
-	this->setEnabled(true);
+	this->base = "";
 	this->edit->setText("");
-	this->edit->setFocus();
 	this->lookupDir(".");
+	this->edit->show();
+	this->label->show();
+	this->list->show();
+	this->edit->setFocus();
 	this->refreshList();
 	QWidget::show();
 }
 
 void FilesLookup::hide() {
 	this->edit->hide();
+	this->label->hide();
 	this->list->hide();
 	QWidget::hide();
 }
@@ -63,7 +68,9 @@ void FilesLookup::lookupDir(QString filepath) {
 	this->directories.clear();
 	this->filteredDirs.clear();
 
-	QDir dir(filepath);
+	this->base += filepath + "/";
+	this->label->setText(this->base);
+	QDir dir(this->base);
 	QFileInfoList list = dir.entryInfoList();
 	for (int i = 0; i < list.size(); i++) {
 		QFileInfo info = list.at(i);
@@ -79,22 +86,21 @@ void FilesLookup::lookupDir(QString filepath) {
 	}
 }
 
-void FilesLookup::openSelection() {
+bool FilesLookup::openSelection() {
 	QListWidgetItem* item = this->list->currentItem();
 	if (item == nullptr) {
 		qDebug() << "item == nullptr in FilesLookup::keyPressEvent";
 	}
 
-	qDebug() << item->text();
-	// TODO(remy): support building a tree hierarchy
-
-	QFileInfo info(item->text());
+	QFileInfo info(this->base + item->text());
 	if (info.isFile()) {
 		this->window->getEditor()->selectOrCreateBuffer(info.absoluteFilePath());
-		return;
+		return true;
+	} else {
+		this->lookupDir(item->text());
+		this->edit->setText("");
+		return false;
 	}
-
-	qDebug() << "is dir";
 }
 
 void FilesLookup::keyPressEvent(QKeyEvent* event) {
@@ -114,8 +120,10 @@ void FilesLookup::keyPressEvent(QKeyEvent* event) {
 				if (this->list->currentItem() == nullptr) {
 					return;
 				}
-				this->openSelection();
-				this->window->closeList();
+				bool close = this->openSelection();
+				if (close) {
+					this->window->closeList();
+				}
 			}
 			return;
 	}

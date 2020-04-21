@@ -4,6 +4,7 @@
 #include <QFileInfo>
 #include <QGridLayout>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QObject>
@@ -31,7 +32,8 @@ public:
 	// openSelection opens the given selection: if it is a files, it opens
 	// the buffer, if it is a directory, it opens the directory and refreshes
 	// the list of the FilesLookup.
-	void openSelection();
+	// Returns true if we're done and we can close the FilesLookup.
+	bool openSelection();
 
 	// TODO(remy): comment me
 	void filter(QString string);
@@ -48,7 +50,10 @@ protected:
 private:
 	Window* window;
 
+	QString base;
+
 	QLineEdit* edit;
+	QLabel* label;
 	QListWidget* list;
 	QGridLayout* layout;
 
