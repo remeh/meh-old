@@ -39,6 +39,15 @@ void Command::execute(QString text) {
 		return;
 	}
 
+	if (command == ":x" || command == ":x!") {
+		if (list.size() > 1) {
+			// TODO(remy):  save to another file
+		}
+		this->window->getEditor()->save();
+		QCoreApplication::quit();
+		return;
+	}
+
 	// go to a specific line
 	// ----------------------
 
