@@ -104,7 +104,12 @@ bool FilesLookup::openSelection() {
 }
 
 void FilesLookup::keyPressEvent(QKeyEvent* event) {
-	qDebug() << "event";
+	#ifdef Q_OS_MAC
+		bool ctrl = event->modifiers() & Qt::MetaModifier;
+	#else
+		bool ctrl = event->modifiers() & Qt::ControlModifier;
+	#endif
+
 	switch (event->key()) {
 		case Qt::Key_Escape:
 			this->window->closeList();
@@ -114,6 +119,18 @@ void FilesLookup::keyPressEvent(QKeyEvent* event) {
 		// TODO(remy): we probably want to have a custom QLineEdit to be able
 		// to properly override its keyPressEvent to be able to use Key_Down
 		// to focus on the list.
+
+		case Qt::Key_N:
+			if (ctrl) {
+				this->list->setCurrentRow(this->list->currentRow() + 1);
+			}
+			return;
+
+		case Qt::Key_P:
+			if (ctrl) {
+				this->list->setCurrentRow(this->list->currentRow() - 1);
+			}
+			return;
 
 		case Qt::Key_Return:
 			{
