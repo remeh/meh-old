@@ -101,6 +101,7 @@ bool FilesLookup::openSelection() {
 	} else {
 		this->lookupDir(item->text());
 		this->edit->setText("");
+		this->refreshList();
 		return false;
 	}
 }
