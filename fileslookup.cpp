@@ -21,6 +21,7 @@ FilesLookup::FilesLookup(Window* window) :
 	this->edit = new QLineEdit(this);
 	this->label = new QLabel(this);
 	this->list = new QListWidget(this);
+	this->list->setSortingEnabled(true);
 
 	this->setFocusPolicy(Qt::StrongFocus);
 
