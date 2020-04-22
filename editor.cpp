@@ -251,8 +251,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 
 		if (shift) {
 			this->moveCursor(QTextCursor::Up);
+			this->moveCursor(QTextCursor::EndOfLine);
 		}
-		this->moveCursor(QTextCursor::EndOfLine);
 		this->insertPlainText("\n" + indent);
 		return;
 	}
