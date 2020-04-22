@@ -1,3 +1,5 @@
+#include <QFileInfo>
+
 #include "command.h"
 #include "editor.h"
 #include "fileslookup.h"
@@ -17,6 +19,13 @@ Window::Window(QWidget* parent) :
 	// ----------------------
 
 	this->editor = new Editor(this);
+
+	// set base dir
+	// ----------------------
+
+	QFileInfo dir(".");
+	this->baseDir = dir.absoluteFilePath();
+
 
 	// layout
 	// ----------------------
@@ -42,7 +51,6 @@ void Window::closeCommand() {
 }
 
 void Window::openList() {
-	this->filesLookup->lookupDir("../");
 	this->filesLookup->show();
 }
 

@@ -48,6 +48,11 @@ void Command::execute(QString text) {
 		return;
 	}
 
+	if (command == "basedir") {
+		this->window->setBaseDir(list[1]);
+		return;
+	}
+
 	// go to a specific line
 	// ----------------------
 
@@ -94,5 +99,6 @@ void Command::openFile(const QString& filename) {
 	}
 
 	// this will automatically creates a buffer if needed.
+	// FIXME(remy): there is a bug with :e
 	editor->selectOrCreateBuffer(filename);
 }

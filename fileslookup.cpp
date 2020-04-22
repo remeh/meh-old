@@ -48,7 +48,7 @@ void FilesLookup::onEditChanged() {
 void FilesLookup::show() {
 	this->base = "";
 	this->edit->setText("");
-	this->lookupDir(".");
+	this->lookupDir(this->window->getBaseDir());
 	this->edit->show();
 	this->label->show();
 	this->list->show();

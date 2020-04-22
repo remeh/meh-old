@@ -31,6 +31,11 @@ public:
 	// closeList removes all entries in the list and hides it.
 	void closeList();
 
+	// setBaseDir sets the base dir on which the FilesLookup
+	// should be opened.
+	void setBaseDir(const QString& dir) { this->baseDir = dir; }
+	QString getBaseDir() { return this->baseDir; }
+
 	Editor* getEditor() { return this->editor; }
 
 protected:
@@ -42,4 +47,7 @@ private:
 	QGridLayout* layout;
 	Command* command;
 	FilesLookup* filesLookup;
+
+	// baseDir on which the FilesLookup should be opened.
+	QString baseDir;
 };
