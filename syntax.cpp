@@ -28,24 +28,24 @@ Syntax::Syntax(QTextDocument *parent)
 	}
 
 	classFormat.setFontWeight(QFont::Bold);
-	classFormat.setForeground(Qt::darkMagenta);
+	classFormat.setForeground(Qt::gray);
 	rule.pattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
 	rule.format = classFormat;
 	highlightingRules.append(rule);
 
-	quotationFormat.setForeground(Qt::darkGreen);
+	quotationFormat.setForeground(QColor::fromRgb(98,98,98));
 	rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
 	rule.format = quotationFormat;
 	highlightingRules.append(rule);
 
 	// TODO(remy): add the same for instanciation in Go / Zig
 	functionFormat.setFontItalic(true);
-	functionFormat.setForeground(Qt::blue);
+	functionFormat.setForeground(Qt::gray);
 	rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
 	rule.format = functionFormat;
 	highlightingRules.append(rule);
 
-	singleLineCommentFormat.setForeground(Qt::gray);
+	singleLineCommentFormat.setForeground(QColor::fromRgb(98,98,98));
 	rule.pattern = QRegularExpression(QStringLiteral("//[^\n]*"));
 	rule.format = singleLineCommentFormat;
 	highlightingRules.append(rule);

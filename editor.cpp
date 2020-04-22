@@ -41,11 +41,16 @@ Editor::Editor(Window* window) :
 	font.setStyleHint(QFont::Monospace);
 	font.setFixedPitch(true);
 	#ifdef Q_OS_MAC
-	font.setPointSize(13);
+	font.setPointSize(14);
 	#else
 	font.setPointSize(11);
 	#endif
 	this->setFont(font);
+
+	// basic theming
+	// ----------------------
+
+	this->setStyleSheet("color: #e7e7e7; background-color: #262626;");
 
 	// syntax highlighting
 	// ----------------------
