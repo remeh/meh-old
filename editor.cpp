@@ -342,7 +342,6 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			{
 				QTextCursor cursor = this->textCursor();
 				QChar c = this->document()->characterAt(cursor.position());
-				qDebug() << c;
 				if (c != "\u2029") {
 					this->textCursor().deleteChar();
 				}
@@ -371,6 +370,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 				this->moveCursor(QTextCursor::Down);
 			}
 			return;
+		case Qt::Key_Backspace:
 		case Qt::Key_H:
 			this->moveCursor(QTextCursor::Left);
 			return;

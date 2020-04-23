@@ -9,7 +9,7 @@ int main(int argv, char **args)
 
 	Window window;
     window.setWindowTitle(QObject::tr("mh"));
-    window.resize(800, 500);
+    window.resize(800, 700);
     window.show();
 
     return app.exec();
