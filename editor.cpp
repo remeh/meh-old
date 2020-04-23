@@ -240,6 +240,11 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 	// ----------------------
 
 	if (event->key() == Qt::Key_Escape) {
+		QTextCursor cursor = this->textCursor();
+		QChar c = this->document()->characterAt(cursor.position());
+		if (c == "\u2029") {
+			this->moveCursor(QTextCursor::Left);
+		}
 		this->setMode(MODE_NORMAL);
 		return;
 	}
