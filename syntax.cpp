@@ -1,7 +1,9 @@
 #include "syntax.h"
 
+#include "qdebug.h"
+
 Syntax::Syntax(QTextDocument *parent)
-	: QSyntaxHighlighter(parent)
+	: QSyntaxHighlighter(parent), selectedWord(nullptr)
 {
 	HighlightingRule rule;
 
@@ -61,13 +63,40 @@ Syntax::Syntax(QTextDocument *parent)
 	commentEndExpression = QRegularExpression(QStringLiteral("\\*/"));
 }
 
-void Syntax::highlightBlock(const QString &text)
+void Syntax::setSelectedWord(const QString& text) {
+	if (this->selectedWord != nullptr) {
+		delete this->selectedWord;
+		this->selectedWord = nullptr;
+	}
+
+	if (text.size() == 0) { return; }
+
+	this->selectedWord = new HighlightingRule;
+	this->s = text;
+	
+	QTextCharFormat format;
+	format.setBackground(Qt::black);
+	format.setForeground(Qt::green);
+	format.setFontWeight(QFont::Bold);
+	this->selectedWord->format = format;
+	this->selectedWord->pattern = QRegularExpression(text);
+}
+
+void Syntax::highlightBlock(const QString& text)
 {
 	for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
 		QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
 		while (matchIterator.hasNext()) {
 			QRegularExpressionMatch match = matchIterator.next();
 			setFormat(match.capturedStart(), match.capturedLength(), rule.format);
+		}
+	}
+
+	if (this->selectedWord != nullptr) {
+		QRegularExpressionMatchIterator matchIterator = this->selectedWord->pattern.globalMatch(text);
+		while (matchIterator.hasNext()) {
+			QRegularExpressionMatch match = matchIterator.next();
+			setFormat(match.capturedStart(), match.capturedLength(), this->selectedWord->format);
 		}
 	}
 
