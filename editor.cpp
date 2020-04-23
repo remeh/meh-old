@@ -140,7 +140,6 @@ void Editor::setMode(int mode, QString command) {
 }
 
 void Editor::setSubMode(int subMode) {
-	// TODO(remy): change the cursor
 	if (subMode != NO_SUBMODE) {
 		this->setMidCursor();
 	}
@@ -266,6 +265,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 	QTextEdit::keyPressEvent(event);
 }
 
+// TODO(remy): I should consider moving this to its own class or at least its own file
 void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 	Q_ASSERT(event != NULL);
 
@@ -276,7 +276,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
 	switch (event->key()) {
 		case Qt::Key_Escape:
-			this->setMode(MODE_COMMAND);
+			this->setMode(MODE_NORMAL);
 			break;
 		case Qt::Key_Colon:
 			this->setMode(MODE_COMMAND, ":");
@@ -334,7 +334,14 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			return;
 
 		case Qt::Key_X:
-			this->textCursor().deleteChar();
+			{
+				QTextCursor cursor = this->textCursor();
+				QChar c = this->document()->characterAt(cursor.position());
+				qDebug() << c;
+				if (c != "\u2029") {
+					this->textCursor().deleteChar();
+				}
+			}
 			return;
 
 		case Qt::Key_K:
@@ -345,7 +352,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 				this->moveCursor(QTextCursor::EndOfLine);
 				QTextCursor cursor = this->textCursor();
 				QTextDocument* document = this->document();
-				// TODO(remy): beginEditBlock
+				cursor.beginEditBlock();
 				cursor.deleteChar();
 				QChar c = document->characterAt(cursor.position());
 				while (c == "\t" || c == " ") {
@@ -353,6 +360,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 					c = document->characterAt(cursor.position());
 				}
 				cursor.insertText(" ");
+				cursor.endEditBlock();
 				return;
 			} else {
 				this->moveCursor(QTextCursor::Down);
@@ -362,7 +370,13 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			this->moveCursor(QTextCursor::Left);
 			return;
 		case Qt::Key_L:
-			this->moveCursor(QTextCursor::Right);
+			{
+				QTextCursor cursor = this->textCursor();
+				QChar c = this->document()->characterAt(cursor.position()+1);
+				if (c != "\u2029") {
+					this->moveCursor(QTextCursor::Right);
+				}
+			}
 			return;
 
 		case Qt::Key_P:
@@ -385,7 +399,12 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
 		case Qt::Key_C:
 			if (shift) {
-				// TODO(remy): remove the end of the line and enter insert mode
+				QTextCursor cursor = this->textCursor();
+				cursor.beginEditBlock();
+				this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+				this->cut();
+				cursor.endEditBlock();
+				this->setMode(MODE_INSERT);
 			} else {
 				this->setSubMode(SUBMODE_c);
 			}

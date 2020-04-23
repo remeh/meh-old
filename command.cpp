@@ -48,7 +48,7 @@ void Command::execute(QString text) {
 		return;
 	}
 
-	if (command == "basedir") {
+	if (command == ":basedir") {
 		this->window->setBaseDir(list[1]);
 		return;
 	}
