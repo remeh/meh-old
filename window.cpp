@@ -61,3 +61,18 @@ void Window::closeList() {
 void Window::setCommand(const QString& text) {
 	this->command->setText(text);
 }
+
+void Window::setBaseDir(const QString& dir) {
+	if (dir.startsWith("/")) {
+		this->baseDir = dir;
+		return;
+	}
+	if (!this->baseDir.endsWith("/")) {
+		this->baseDir += "/";
+	}
+
+	this->baseDir += dir;
+
+	QFileInfo info(this->baseDir);
+	this->baseDir = info.absoluteFilePath();
+}

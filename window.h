@@ -33,7 +33,7 @@ public:
 
 	// setBaseDir sets the base dir on which the FilesLookup
 	// should be opened.
-	void setBaseDir(const QString& dir) { this->baseDir = dir; }
+	void setBaseDir(const QString& dir);
 	QString getBaseDir() { return this->baseDir; }
 
 	Editor* getEditor() { return this->editor; }

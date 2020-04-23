@@ -70,7 +70,11 @@ void FilesLookup::lookupDir(QString filepath) {
 	this->directories.clear();
 	this->filteredDirs.clear();
 
-	this->base += filepath + "/";
+	if (filepath.endsWith("/")) {
+		this->base += filepath;
+	} else {
+		this->base += filepath + "/";
+	}
 	this->label->setText(this->base);
 	QDir dir(this->base);
 	QFileInfoList list = dir.entryInfoList();
