@@ -19,8 +19,7 @@
 Editor::Editor(Window* window) :
 	window(window),
 	currentBuffer(NULL),
-	mode(MODE_NORMAL),
-	alphaNumRx("^[a-zA-Z0-9]*$") {
+	mode(MODE_NORMAL) {
 	Q_ASSERT(window != NULL);
 
 	// we don't want a rich text editor
@@ -64,8 +63,6 @@ Editor::Editor(Window* window) :
 	const int tabSpace = 4;
 	QFontMetrics metrics(font);
 	this->setTabStopDistance(tabSpace*metrics.horizontalAdvance(" "));
-	
-	connect(this, &QTextEdit::selectionChanged, this, &Editor::selectionChanged);
 }
 
 Editor::~Editor() {
@@ -114,18 +111,6 @@ bool Editor::hasBuffer(const QString& filename) {
 	QFileInfo info(filename);
 	return this->currentBuffer->getFilename() == info.absoluteFilePath() ||
 			this->buffers.contains(info.absoluteFilePath());
-}
-
-void Editor::selectionChanged() {
-	const QString& text = this->textCursor().selectedText();
-	if (text == this->syntax->s) { return; }
-	QRegularExpressionMatch match = this->alphaNumRx.match(text);
-	if (match.hasMatch()) {
-		this->syntax->setSelectedWord(text);
-		qDebug() << "before";
-		this->syntax->rehighlight();
-		qDebug() << "after";
-	}
 }
 
 void Editor::setMode(int mode, QString command) {

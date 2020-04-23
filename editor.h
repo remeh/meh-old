@@ -52,8 +52,7 @@ protected:
 	void keyPressEvent(QKeyEvent* event);
 
 private slots:
-	void selectionChanged();
-	
+
 private:
 	// keyPressEventNormal handles this event in normal mode.
 	// ctrl is Control on Linux, Windows but is Command on macOS.
@@ -94,7 +93,5 @@ private:
 
 	int mode;
 	int subMode;
-
-	QRegularExpression alphaNumRx;
 };
 

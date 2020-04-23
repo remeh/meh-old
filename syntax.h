@@ -14,10 +14,6 @@ class Syntax : public QSyntaxHighlighter
 public:
 	Syntax(QTextDocument *parent = 0);
 
-	void setSelectedWord(const QString& word);
-	void noSelectedWord() { delete this->selectedWord; s = ""; this->selectedWord = nullptr; }
-	QString s;
-
 protected:
 	void highlightBlock(const QString &text) override;
 
@@ -28,8 +24,6 @@ private:
 		QTextCharFormat format;
 	};
 	QVector<HighlightingRule> highlightingRules;
-
-	HighlightingRule* selectedWord;
 
 	QRegularExpression commentStartExpression;
 	QRegularExpression commentEndExpression;
