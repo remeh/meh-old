@@ -57,6 +57,7 @@ private:
 	// keyPressEventNormal handles this event in normal mode.
 	// ctrl is Control on Linux, Windows but is Command on macOS.
 	void keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift);
+	void keyPressEventVisual(QKeyEvent* event, bool ctrl, bool shift);
 	void keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift);
 
 	// currentLineIndent returns the current line indentation.

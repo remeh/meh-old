@@ -121,6 +121,9 @@ void Editor::setMode(int mode, QString command) {
 	default:
 		this->setBlockCursor();
 		break;
+	case MODE_VISUAL:
+		this->setMidCursor();
+		break;
 	case MODE_INSERT:
 		this->setLineCursor();
 		break;
@@ -228,6 +231,14 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 		return;
 	}
 
+	// Visual mode
+	// ----------------------
+
+	if (this->mode == MODE_VISUAL) {
+		this->keyPressEventVisual(event, ctrl, shift);
+		return;
+	}
+
 	// Normal mode
 	// ----------------------
 
@@ -294,6 +305,13 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			if (!shift) {
 				this->setSubMode(SUBMODE_y);
 			}
+			return;
+
+		case Qt::Key_V:
+			if (shift) {
+				// TODO(remy): implement me
+			}
+			this->setMode(MODE_VISUAL);
 			return;
 
 		case Qt::Key_R:
@@ -452,6 +470,78 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 	}
 }
 
+
+// TODO(remy): I should consider moving this to its own class or at least its own file
+void Editor::keyPressEventVisual(QKeyEvent* event, bool ctrl, bool shift) {
+	Q_ASSERT(event != NULL);
+
+	if (this->subMode == SUBMODE_f || this->subMode == SUBMODE_F) {
+		this->keyPressEventSubMode(event, ctrl, shift);
+		return;
+	}
+
+	switch (event->key()) {
+		case Qt::Key_Escape:
+			this->setMode(MODE_NORMAL);
+			this->textCursor().clearSelection();
+			break;
+		case Qt::Key_F:
+			if (shift) {
+				this->setSubMode(SUBMODE_F);
+			} else {
+				this->setSubMode(SUBMODE_f);
+			}
+			return;
+		case Qt::Key_Dollar:
+			this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+			return;
+		case Qt::Key_X:
+			this->cut();
+			this->setMode(MODE_NORMAL);
+			return;
+
+		case Qt::Key_K:
+			this->moveCursor(QTextCursor::Up, QTextCursor::KeepAnchor);
+			return;
+		case Qt::Key_J:
+			if (!shift) {
+				this->moveCursor(QTextCursor::Down, QTextCursor::KeepAnchor);
+			}
+			return;
+		case Qt::Key_Backspace:
+		case Qt::Key_H:
+			this->moveCursor(QTextCursor::Left, QTextCursor::KeepAnchor);
+			return;
+		case Qt::Key_L:
+			{
+				QTextCursor cursor = this->textCursor();
+				QChar c = this->document()->characterAt(cursor.position()+1);
+				if (c != "\u2029") {
+					this->moveCursor(QTextCursor::Right, QTextCursor::KeepAnchor);
+				}
+			}
+			return;
+		case Qt::Key_G:
+			if (shift) {
+				this->moveCursor(QTextCursor::End, QTextCursor::KeepAnchor);
+			} else {
+				this->moveCursor(QTextCursor::Start, QTextCursor::KeepAnchor);
+			}
+			return;
+
+		case Qt::Key_E:
+			if (shift) { /* TODO(remy): move right until previous space */ }
+			// TODO(remy): confirm this is the wanted behavior
+			this->moveCursor(QTextCursor::NextWord, QTextCursor::KeepAnchor);
+			return;
+		case Qt::Key_B:
+			if (shift) { /* TODO(remy): move left until previous space */ }
+			// TODO(remy): confirm this is the wanted behavior
+			this->moveCursor(QTextCursor::PreviousWord, QTextCursor::KeepAnchor);
+			return;
+	}
+}
+
 void Editor::keyPressEventSubMode(QKeyEvent* event, bool, bool shift) {
 	if (event->key() ==  Qt::Key_Escape) {
 		this->setSubMode(NO_SUBMODE);
@@ -555,7 +645,9 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool, bool shift) {
 			{
 				int distance = this->findNextOneInCurrentLine(event->text()[0]);
 				QTextCursor cursor = this->textCursor();
-				cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, distance);
+				auto move = QTextCursor::MoveAnchor;
+				if (this->mode == MODE_VISUAL) { move = QTextCursor::KeepAnchor; }
+				cursor.movePosition(QTextCursor::Right, move, distance);
 				this->setTextCursor(cursor);
 			}
 			break;
@@ -563,7 +655,9 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool, bool shift) {
 			{
 				int distance = this->findPreviousOneInCurrentLine(event->text()[0]);
 				QTextCursor cursor = this->textCursor();
-				cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, distance);
+				auto move = QTextCursor::MoveAnchor;
+				if (this->mode == MODE_VISUAL) { move = QTextCursor::KeepAnchor; }
+				cursor.movePosition(QTextCursor::Left, move, distance);
 				this->setTextCursor(cursor);
 			}
 			break;
@@ -579,7 +673,9 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool, bool shift) {
 			break;
 	}
 
-	this->setMode(MODE_NORMAL);
+	if (this->mode != MODE_VISUAL) {
+		this->setMode(MODE_NORMAL);
+	}
 	this->setSubMode(NO_SUBMODE);
 }
 

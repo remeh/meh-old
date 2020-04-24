@@ -4,6 +4,7 @@
 #define MODE_NORMAL 2
 #define MODE_REPLACE 3
 #define MODE_COMMAND 4
+#define MODE_VISUAL 5
 
 #define NO_SUBMODE 0
 #define SUBMODE_c 1
