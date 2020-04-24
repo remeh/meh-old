@@ -8,6 +8,7 @@
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTextEdit>
+#include <QTimer>
 
 #include "qdebug.h"
 
@@ -57,16 +58,39 @@ Editor::Editor(Window* window) :
 
 	this->syntax = new Syntax(this->document());
 
+	// selection timer
+	// ----------------------
+
+	this->selectionTimer = new QTimer;
+
 	// tab space size
 	// ----------------------
 
 	const int tabSpace = 4;
 	QFontMetrics metrics(font);
 	this->setTabStopDistance(tabSpace*metrics.horizontalAdvance(" "));
+
+	connect(this, &QTextEdit::selectionChanged, this, &Editor::onSelectionChanged);
+	connect(this->selectionTimer, &QTimer::timeout, this, &Editor::onTriggerSelectionHighlight);
 }
 
 Editor::~Editor() {
 	// TODO(remy): delete the buffers
+
+	delete this->selectionTimer;
+	this->selectionTimer = nullptr;
+}
+
+void Editor::onSelectionChanged() {
+	this->selectionTimer->start(500);
+}
+
+void Editor::onTriggerSelectionHighlight() {
+	QTextCursor cursor = this->textCursor();
+	if (this->syntax->setSelection(cursor.selectedText())) {
+		this->syntax->rehighlight();
+	}
+	this->selectionTimer->stop();
 }
 
 void Editor::setCurrentBuffer(Buffer* buffer) {

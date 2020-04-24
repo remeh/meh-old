@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QVector>
 #include <QTextEdit>
+#include <QTimer>
 
 #include "buffer.h"
 #include "fileslookup.h"
@@ -52,6 +53,8 @@ protected:
 	void keyPressEvent(QKeyEvent* event);
 
 private slots:
+	void onSelectionChanged();
+	void onTriggerSelectionHighlight();
 
 private:
 	// keyPressEventNormal handles this event in normal mode.
@@ -76,6 +79,8 @@ private:
 	int findPreviousOneInCurrentLine(QChar c);
 
 	// ----------------------
+
+	QTimer* selectionTimer;
 
 	Window* window;
 

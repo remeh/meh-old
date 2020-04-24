@@ -1,4 +1,8 @@
+#include <QTextBlock>
+
 #include "syntax.h"
+
+#include "qdebug.h"
 
 Syntax::Syntax(QTextDocument *parent)
 	: QSyntaxHighlighter(parent)
@@ -26,6 +30,8 @@ Syntax::Syntax(QTextDocument *parent)
 		rule.format = keywordFormat;
 		highlightingRules.append(rule);
 	}
+
+	selectionFormat.setForeground(Qt::yellow);
 
 	classFormat.setFontWeight(QFont::Bold);
 	classFormat.setForeground(Qt::gray);
@@ -65,4 +71,55 @@ void Syntax::highlightBlock(const QString &text)
 			setFormat(match.capturedStart(), match.capturedLength(), rule.format);
 		}
 	}
+
+	if (this->selection.size() > 0) {
+		QRegularExpressionMatchIterator matchIterator = selectionRx.globalMatch(text);
+		while (matchIterator.hasNext()) {
+			QRegularExpressionMatch match = matchIterator.next();
+			setFormat(match.capturedStart(), match.capturedLength(), selectionFormat);
+		}
+	}
 }
+
+bool Syntax::setSelection(const QString& text) {
+	if (this->selection == text) {
+		return false;
+	}
+
+	if (this->selection != text && text.size() > 0) {
+		this->selectionRx = QRegularExpression("(" + text + ")");
+	}
+	this->selection = text;
+
+	return true;
+}
+
+// void Syntax::rehighlightAround(QTextBlock currentBlock) {
+// 	QVector<QTextBlock> blocks;
+//
+// 	blocks.append(currentBlock);
+// 	int blocksAround = 10;
+//
+// 	QTextBlock block = currentBlock;
+// 	for (int i = 0; i < blocksAround; i++) {
+// 		block = block.previous();
+// 		blocks.prepend(block);
+// 		if (block == this->document()->firstBlock()) {
+// 			break;
+// 		}
+// 	}
+//
+// 	block = currentBlock;
+// 	for (int i = 0; i < blocksAround; i++) {
+// 		block = block.next();
+// 		blocks.append(block);
+// 		if (block == this->document()->lastBlock()) {
+// 			break;
+// 		}
+// 	}
+//
+// 	for (int i = 0; i < blocks.size(); i++) {
+// 		this->highlightBlock(blocks.at(i).text());
+// 		this->rehighlightBlock(blocks.at(i));
+// 	}
+// }
