@@ -54,11 +54,6 @@ Syntax::Syntax(QTextDocument *parent)
 	rule.pattern = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME)"));
 	rule.format = todoFixmeNoteFormat;
 	highlightingRules.append(rule);
-
-	multiLineCommentFormat.setForeground(Qt::red);
-
-	commentStartExpression = QRegularExpression(QStringLiteral("/\\*"));
-	commentEndExpression = QRegularExpression(QStringLiteral("\\*/"));
 }
 
 void Syntax::highlightBlock(const QString &text)
@@ -69,25 +64,5 @@ void Syntax::highlightBlock(const QString &text)
 			QRegularExpressionMatch match = matchIterator.next();
 			setFormat(match.capturedStart(), match.capturedLength(), rule.format);
 		}
-	}
-
-	setCurrentBlockState(0);
-	int startIndex = 0;
-	if (previousBlockState() != 1) {
-		startIndex = text.indexOf(commentStartExpression);
-	}
-	while (startIndex >= 0) {
-		QRegularExpressionMatch match = commentEndExpression.match(text, startIndex);
-		int endIndex = match.capturedStart();
-		int commentLength = 0;
-		if (endIndex == -1) {
-			setCurrentBlockState(1);
-			commentLength = text.length() - startIndex;
-		} else {
-			commentLength = endIndex - startIndex
-							+ match.capturedLength();
-		}
-		setFormat(startIndex, commentLength, multiLineCommentFormat);
-		startIndex = text.indexOf(commentStartExpression, startIndex + commentLength);
 	}
 }
