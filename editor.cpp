@@ -76,7 +76,6 @@ Editor::Editor(Window* window) :
 
 Editor::~Editor() {
 	// TODO(remy): delete the buffers
-
 	delete this->selectionTimer;
 	this->selectionTimer = nullptr;
 }
@@ -670,7 +669,10 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool, bool shift) {
 				int distance = this->findNextOneInCurrentLine(event->text()[0]);
 				QTextCursor cursor = this->textCursor();
 				auto move = QTextCursor::MoveAnchor;
-				if (this->mode == MODE_VISUAL) { move = QTextCursor::KeepAnchor; }
+				if (this->mode == MODE_VISUAL) {
+					move = QTextCursor::KeepAnchor;
+					distance += 1;
+				}
 				cursor.movePosition(QTextCursor::Right, move, distance);
 				this->setTextCursor(cursor);
 			}

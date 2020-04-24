@@ -72,7 +72,7 @@ void Syntax::highlightBlock(const QString &text)
 		}
 	}
 
-	if (this->selection.size() > 0) {
+	if (this->selection.size() > 0 && this->selectionRx.isValid()) {
 		QRegularExpressionMatchIterator matchIterator = selectionRx.globalMatch(text);
 		while (matchIterator.hasNext()) {
 			QRegularExpressionMatch match = matchIterator.next();
