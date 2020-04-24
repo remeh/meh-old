@@ -505,8 +505,12 @@ void Editor::keyPressEventVisual(QKeyEvent* event, bool ctrl, bool shift) {
 
 	switch (event->key()) {
 		case Qt::Key_Escape:
-			this->setMode(MODE_NORMAL);
-			this->textCursor().clearSelection();
+			{
+				this->setMode(MODE_NORMAL);
+				QTextCursor cursor = this->textCursor();
+				cursor.clearSelection();
+				this->setTextCursor(cursor);
+			}
 			break;
 		case Qt::Key_F:
 			if (shift) {
