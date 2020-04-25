@@ -4,6 +4,7 @@
 #include <QFont>
 #include <QFontMetrics>
 #include <QPainter>
+#include <QPaintEvent>
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTextEdit>
@@ -17,6 +18,7 @@
 #include "window.h"
 
 Editor::Editor(Window* window) :
+	QTextEdit(window),
 	window(window),
 	currentBuffer(NULL),
 	mode(MODE_NORMAL) {
@@ -58,8 +60,8 @@ Editor::Editor(Window* window) :
 
 	QFont labelFont = font;
 	labelFont.setPointSize(14);
-	this->modeLabel = new QLabel("NORMAL ", this);
-	this->modeLabel->setStyleSheet("background-color: rgba(0, 0, 0, 0);");
+	this->modeLabel = new QLabel("NORMAL  ", this);
+	this->modeLabel->setStyleSheet("color: rgba(255, 255, 255, 30); background-color: rgba(0, 0, 0, 0);");
 	this->modeLabel->setFont(labelFont);
 	this->modeLabel->show();
 
@@ -68,7 +70,8 @@ Editor::Editor(Window* window) :
 
 	const int tabSpace = 4;
 	QFontMetrics metrics(font);
-	this->setTabStopDistance(tabSpace*metrics.horizontalAdvance(" "));
+	this->charWidth = metrics.horizontalAdvance(" ");
+	this->setTabStopDistance(tabSpace*this->charWidth);
 
 	// start in normal mode
 	// ----------------------
@@ -91,7 +94,7 @@ Editor::~Editor() {
 }
 
 void Editor::onWindowResized(QResizeEvent*) {
-	int x = this->window->rect().width() - 80;
+	int x = this->window->rect().width() - 90;
 	this->modeLabel->move(x, 2);
 }
 
@@ -160,7 +163,6 @@ bool Editor::hasBuffer(const QString& filename) {
 }
 
 void Editor::setMode(int mode, QString command) {
-	// NOTE(remy): here we could run a leaveMode(mode) method?
 	this->setOverwriteMode(false);
 	switch (mode) {
 	case MODE_NORMAL:
@@ -245,6 +247,13 @@ void Editor::deleteCurrentLine() {
 	cursor.movePosition(QTextCursor::StartOfBlock);
 	cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
 	cursor.removeSelectedText();
+}
+
+void Editor::paintEvent(QPaintEvent* event) {
+	QTextEdit::paintEvent(event);
+	QPainter painter(this->viewport());
+	painter.setPen(QPen(QColor(255, 255, 255, 8)));
+	painter.drawLine(charWidth*80, 0, charWidth*80, this->viewport()->rect().height());
 }
 
 void Editor::keyPressEvent(QKeyEvent* event) {

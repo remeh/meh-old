@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QMap>
 #include <QResizeEvent>
+#include <QPaintEvent>
 #include <QVector>
 #include <QTextEdit>
 #include <QTimer>
@@ -18,6 +19,7 @@ class Window;
 class Editor : public QTextEdit
 {
     Q_OBJECT
+
 public:
     Editor(Window* window);
 	~Editor();
@@ -58,7 +60,8 @@ public:
 	void onWindowResized(QResizeEvent*);
 
 protected:
-	void keyPressEvent(QKeyEvent* event);
+	void keyPressEvent(QKeyEvent*) override;
+	void paintEvent(QPaintEvent*) override;
 
 private slots:
 	void onSelectionChanged();
@@ -107,7 +110,13 @@ private:
 	// bufferPos can be used to know the order of usage of the buffers.
 	QVector<QString> buffersPos;
 
+	// mode is the currently used mode. See mode.h
 	int mode;
+
+	// subMode is the currently used mode. See mode.h
 	int subMode;
+
+	// charWidth is the width of one char. Set one time during Editor construction.
+	int charWidth;
 };
 
