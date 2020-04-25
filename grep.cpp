@@ -129,6 +129,15 @@ void Grep::keyPressEvent(QKeyEvent* event) {
 				}
 			}
 			return;
+		case Qt::Key_Backspace:
+		case Qt::Key_X:
+			{
+				QTreeWidgetItem* currentItem = this->tree->currentItem();
+				if (currentItem != nullptr) {
+					delete currentItem;
+				}
+			}
+			return;
 		case Qt::Key_P:
 			if (!ctrl) {
 				return;
