@@ -78,6 +78,7 @@ Editor::Editor(Window* window) :
 	this->setMode(MODE_NORMAL);
 
 	connect(this, &QTextEdit::selectionChanged, this, &Editor::onSelectionChanged);
+	connect(this, &QTextEdit::cursorPositionChanged, this, &Editor::onCursorPositionChanged);
 	connect(this->selectionTimer, &QTimer::timeout, this, &Editor::onTriggerSelectionHighlight);
 }
 
@@ -95,13 +96,21 @@ void Editor::onWindowResized(QResizeEvent*) {
 	this->modeLabel->move(x, 2);
 }
 
+void Editor::onCursorPositionChanged() {
+	this->selectionTimer->start(1000);
+}
+
 void Editor::onSelectionChanged() {
 	this->selectionTimer->start(500);
 }
 
 void Editor::onTriggerSelectionHighlight() {
 	QTextCursor cursor = this->textCursor();
-	if (this->syntax->setSelection(cursor.selectedText())) {
+	QString text = cursor.selectedText();
+	if (text.size() == 0) {
+		text = this->getWordUnderCursor();
+	}
+	if (this->syntax->setSelection(text)) {
 		this->syntax->rehighlight();
 	}
 	this->selectionTimer->stop();
@@ -787,6 +796,37 @@ int Editor::currentLineIsOnlyWhitespaces() {
 		count++;
 	}
 	return count;
+}
+
+QString Editor::getWordUnderCursor() {
+	QString rv;
+
+	QTextCursor cursor = this->textCursor();
+	QString text = cursor.block().text();
+
+	int pos = cursor.positionInBlock();
+	if (text[pos].isNumber() || text[pos].isLetter()) {
+		rv.append(text[pos]);
+	} else {
+		return "";
+	}
+
+	for (int i = pos-1; i >= 0; i--) {
+		if (text[i].isNumber() || text[i].isLetter()) {
+			rv.prepend(text[i]);
+			continue;
+		}
+		break;
+	}
+	for (int i = pos+1; i <= text.size(); i++) {
+		if (text[i].isNumber() || text[i].isLetter()) {
+			rv.append(text[i]);
+			continue;
+		}
+		break;
+	}
+
+	return rv;
 }
 
 int Editor::findPreviousOneInCurrentLine(QChar c) {

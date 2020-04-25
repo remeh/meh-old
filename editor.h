@@ -48,6 +48,9 @@ public:
 	// deleteCurrentLine removes the current line of the buffer.
 	void deleteCurrentLine();
 
+	// getWordUnderCursor returns the word under the cursor if any.
+	QString getWordUnderCursor();
+
 	// save saves the current buffer.
 	void save() { this->currentBuffer->save(this); }
 
@@ -59,6 +62,7 @@ protected:
 
 private slots:
 	void onSelectionChanged();
+	void onCursorPositionChanged();
 	void onTriggerSelectionHighlight();
 
 private:
