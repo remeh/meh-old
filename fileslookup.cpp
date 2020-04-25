@@ -125,7 +125,7 @@ void FilesLookup::keyPressEvent(QKeyEvent* event) {
 
 		// TODO(remy): we probably want to have a custom QLineEdit to be able
 		// to properly override its keyPressEvent to be able to use Key_Down
-		// to focus on the list.
+		// to focus on the list, backspace to clear all the text.
 
 		case Qt::Key_N:
 			if (ctrl) {
