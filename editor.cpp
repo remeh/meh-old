@@ -804,21 +804,21 @@ QString Editor::getWordUnderCursor() {
 	QString text = cursor.block().text();
 
 	int pos = cursor.positionInBlock();
-	if (text[pos].isNumber() || text[pos].isLetter()) {
+	if (text[pos].isNumber() || text[pos].isLetter() || text[pos] == '_') {
 		rv.append(text[pos]);
 	} else {
 		return "";
 	}
 
 	for (int i = pos-1; i >= 0; i--) {
-		if (text[i].isNumber() || text[i].isLetter()) {
+		if (text[i].isNumber() || text[i].isLetter() || text[i] == '_') {
 			rv.prepend(text[i]);
 			continue;
 		}
 		break;
 	}
 	for (int i = pos+1; i <= text.size(); i++) {
-		if (text[i].isNumber() || text[i].isLetter()) {
+		if (text[i].isNumber() || text[i].isLetter() || text[i] == '_') {
 			rv.append(text[i]);
 			continue;
 		}
