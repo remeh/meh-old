@@ -28,12 +28,6 @@ Editor::Editor(Window* window) :
 
 	this->setAcceptRichText(false);
 
-	// start in normal mode
-	// ----------------------
-
-	this->setMode(MODE_NORMAL);
-	this->setSubMode(NO_SUBMODE);
-
 	// editor font
 	// ----------------------
 
@@ -63,12 +57,25 @@ Editor::Editor(Window* window) :
 
 	this->selectionTimer = new QTimer;
 
+	QFont labelFont = font;
+	labelFont.setPointSize(16);
+	this->modeLabel = new QLabel("NORMAL ", this);
+	this->modeLabel->setStyleSheet("background-color: rgba(0, 0, 0, 0);");
+	this->modeLabel->setFont(labelFont);
+	this->modeLabel->show();
+
 	// tab space size
 	// ----------------------
 
 	const int tabSpace = 4;
 	QFontMetrics metrics(font);
 	this->setTabStopDistance(tabSpace*metrics.horizontalAdvance(" "));
+
+	// start in normal mode
+	// ----------------------
+
+	this->setSubMode(NO_SUBMODE);
+	this->setMode(MODE_NORMAL);
 
 	connect(this, &QTextEdit::selectionChanged, this, &Editor::onSelectionChanged);
 	connect(this->selectionTimer, &QTimer::timeout, this, &Editor::onTriggerSelectionHighlight);
@@ -78,6 +85,14 @@ Editor::~Editor() {
 	// TODO(remy): delete the buffers
 	delete this->selectionTimer;
 	this->selectionTimer = nullptr;
+
+	delete this->modeLabel;
+	this->modeLabel = nullptr;
+}
+
+void Editor::onWindowResized(QResizeEvent*) {
+	int x = this->window->rect().width() - 80;
+	this->modeLabel->move(x, 2);
 }
 
 void Editor::onSelectionChanged() {
@@ -142,15 +157,19 @@ void Editor::setMode(int mode, QString command) {
 	switch (mode) {
 	case MODE_NORMAL:
 	default:
+		this->modeLabel->setText("NORMAL");
 		this->setBlockCursor();
 		break;
 	case MODE_VISUAL:
+		this->modeLabel->setText("VISUAL");
 		this->setMidCursor();
 		break;
 	case MODE_INSERT:
+		this->modeLabel->setText("INSERT");
 		this->setLineCursor();
 		break;
 	case MODE_COMMAND:
+		this->modeLabel->setText("COMMAND");
 		this->setBlockCursor();
 		this->window->openCommand();
 		if (command.size() > 0) {
@@ -158,9 +177,12 @@ void Editor::setMode(int mode, QString command) {
 		}
 		break;
 	case MODE_REPLACE:
+		this->modeLabel->setText("REPLACE");
 		this->setMidCursor();
 		this->setOverwriteMode(true);
 		break;
+	case NO_SUBMODE:
+		this->modeLabel->setText("");
 	}
 	this->mode = mode;
 }
@@ -169,6 +191,27 @@ void Editor::setSubMode(int subMode) {
 	if (subMode != NO_SUBMODE) {
 		this->setMidCursor();
 	}
+	switch (subMode) {
+	case SUBMODE_c:
+		this->modeLabel->setText("c");
+		break;
+	case SUBMODE_cf:
+		this->modeLabel->setText("cf");
+		break;
+	case SUBMODE_cF:
+		this->modeLabel->setText("cF");
+		break;
+	case SUBMODE_ct:
+		this->modeLabel->setText("ct");
+		break;
+	case SUBMODE_cT:
+		this->modeLabel->setText("cT");
+		break;
+	case SUBMODE_f:
+		this->modeLabel->setText("f");
+		break;
+	}
+
 	this->subMode = subMode;
 }
 

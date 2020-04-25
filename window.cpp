@@ -76,3 +76,9 @@ void Window::setBaseDir(const QString& dir) {
 	QFileInfo info(this->baseDir);
 	this->baseDir = info.absoluteFilePath();
 }
+
+void Window::resizeEvent(QResizeEvent* event) {
+	if (this->editor != nullptr) {
+		this->editor->onWindowResized(event);
+	}
+}

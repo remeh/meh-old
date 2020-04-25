@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QChar>
+#include <QLabel>
 #include <QMap>
+#include <QResizeEvent>
 #include <QVector>
 #include <QTextEdit>
 #include <QTimer>
@@ -49,6 +51,9 @@ public:
 	// save saves the current buffer.
 	void save() { this->currentBuffer->save(this); }
 
+	// called by the window when it is resized.
+	void onWindowResized(QResizeEvent*);
+
 protected:
 	void keyPressEvent(QKeyEvent* event);
 
@@ -81,6 +86,7 @@ private:
 	// ----------------------
 
 	QTimer* selectionTimer;
+	QLabel* modeLabel;
 
 	Window* window;
 

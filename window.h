@@ -3,6 +3,7 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QResizeEvent>
 #include <QWidget>
 
 #include "editor.h"
@@ -41,6 +42,7 @@ public:
 protected:
 
 private slots:
+	void resizeEvent(QResizeEvent*);
 
 private:
 	Editor* editor;
