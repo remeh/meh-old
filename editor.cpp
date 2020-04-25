@@ -527,7 +527,11 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
 		case Qt::Key_D:
 			if (shift) {
-				// TODO(remy): remove the end of line but stay in normal mode
+				QTextCursor cursor = this->textCursor();
+				cursor.beginEditBlock();
+				this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+				this->cut();
+				cursor.endEditBlock();
 			} else {
 				this->setSubMode(SUBMODE_d);
 			}
