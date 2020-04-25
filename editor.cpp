@@ -210,6 +210,15 @@ void Editor::setSubMode(int subMode) {
 	case SUBMODE_f:
 		this->modeLabel->setText("f");
 		break;
+	case SUBMODE_F:
+		this->modeLabel->setText("F");
+		break;
+	case SUBMODE_d:
+		this->modeLabel->setText("d");
+		break;
+	case SUBMODE_y:
+		this->modeLabel->setText("y");
+		break;
 	}
 
 	this->subMode = subMode;
