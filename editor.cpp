@@ -294,8 +294,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 				}
 				return;
 
-			// switch to previous buffer
-			case Qt::Key_P:
+			// switch to the other buffer
+			case Qt::Key_O:
 				{
 					if (this->buffersPos.size() == 0) {
 						return;
@@ -308,7 +308,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 				return;
 
 			// open a file with the FilesLookup
-			case Qt::Key_O:
+			case Qt::Key_P:
 				{
 					this->window->openList();
 				}
