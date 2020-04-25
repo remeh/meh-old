@@ -70,8 +70,14 @@ Editor::Editor(Window* window) :
 
 	const int tabSpace = 4;
 	QFontMetrics metrics(font);
-	this->charWidth = metrics.horizontalAdvance(" ");
-	this->setTabStopDistance(tabSpace*this->charWidth);
+	this->setTabStopDistance(tabSpace*metrics.horizontalAdvance(" "));
+
+	// 80 chars separator
+	// ----------------------
+
+	QString eightyChars;
+	for (int i = 0; i < 80; i++) { eightyChars += "#"; }
+	this->eightyCharsX = metrics.horizontalAdvance(eightyChars);
 
 	// start in normal mode
 	// ----------------------
@@ -253,7 +259,7 @@ void Editor::paintEvent(QPaintEvent* event) {
 	QTextEdit::paintEvent(event);
 	QPainter painter(this->viewport());
 	painter.setPen(QPen(QColor(255, 255, 255, 8)));
-	painter.drawLine(charWidth*80, 0, charWidth*80, this->viewport()->rect().height());
+	painter.drawLine(this->eightyCharsX, 0, eightyCharsX, this->viewport()->rect().height());
 }
 
 void Editor::keyPressEvent(QKeyEvent* event) {

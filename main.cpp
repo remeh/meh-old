@@ -8,7 +8,7 @@ int main(int argv, char **args)
     QApplication app(argv, args);
 
 	Window window;
-    window.setWindowTitle(QObject::tr("mh"));
+    window.setWindowTitle(QObject::tr("meh"));
     window.resize(800, 700);
     window.show();
 

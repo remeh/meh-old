@@ -116,7 +116,7 @@ private:
 	// subMode is the currently used mode. See mode.h
 	int subMode;
 
-	// charWidth is the width of one char. Set one time during Editor construction.
-	int charWidth;
+	// eightCharsX is the X position where the eighty chars line must be drawn.
+	int eightyCharsX;
 };
 
