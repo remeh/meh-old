@@ -3,6 +3,8 @@
 #include "command.h"
 #include "window.h"
 
+#include "qdebug.h"
+
 Command::Command(Window* window) :
 	window(window) {
 	Q_ASSERT(window != NULL);
@@ -63,6 +65,21 @@ void Command::execute(QString text) {
 		if (ok) {
 			this->window->getEditor()->goToLine(line);
 		}
+		return;
+	}
+
+	// grep
+	// ----------------------
+
+	if (command == ":rg") {
+		QString search = "";
+		if (list.size() > 1) {
+			list.removeFirst();
+			search = list.join(" ");
+		} else {
+			search = this->window->getEditor()->getWordUnderCursor();
+		}
+		this->window->openGrep(search);
 		return;
 	}
 

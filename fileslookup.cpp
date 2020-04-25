@@ -15,6 +15,7 @@
 #include "window.h"
 
 FilesLookup::FilesLookup(Window* window) :
+	QWidget(window),
 	window(window) {
 	Q_ASSERT(window != nullptr);
 

@@ -316,6 +316,12 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 		}
 	}
 
+	// close extra widgets
+	if (event->key() == Qt::Key_Escape) {
+		this->window->closeList();
+		this->window->closeGrep();
+	}
+
 	// Replace mode
 	// ----------------------
 

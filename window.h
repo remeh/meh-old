@@ -10,6 +10,7 @@
 
 class Command;
 class Editor;
+class Grep;
 
 class Window : public QWidget
 {
@@ -27,10 +28,17 @@ public:
 	void setCommand(const QString& text);
 
 	// showList shows the list below the command field at the bottom of the window.
+	// TODO(remy): rename me
 	void openList();
 
 	// closeList removes all entries in the list and hides it.
+	// TODO(remy): rename me
 	void closeList();
+
+	// TODO(remy): comment me
+	void openGrep(const QString& string);
+	// TODO(remy): comment me
+	void closeGrep();
 
 	// setBaseDir sets the base dir on which the FilesLookup
 	// should be opened.
@@ -49,6 +57,7 @@ private:
 	QGridLayout* layout;
 	Command* command;
 	FilesLookup* filesLookup;
+	Grep* grep;
 
 	// baseDir on which the FilesLookup should be opened.
 	QString baseDir;

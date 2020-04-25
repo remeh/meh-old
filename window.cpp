@@ -3,7 +3,10 @@
 #include "command.h"
 #include "editor.h"
 #include "fileslookup.h"
+#include "grep.h"
 #include "window.h"
+
+#include "qdebug.h"
 
 Window::Window(QWidget* parent) :
 	QWidget(parent),
@@ -26,6 +29,11 @@ Window::Window(QWidget* parent) :
 	QFileInfo dir(".");
 	this->baseDir = dir.absoluteFilePath();
 
+	// grep instance
+	// ----------------------
+
+	this->grep = new Grep(this);
+	this->grep->hide();
 
 	// layout
 	// ----------------------
@@ -35,6 +43,7 @@ Window::Window(QWidget* parent) :
 	this->layout->addWidget(this->editor);
 	this->layout->addWidget(this->command);
 	this->layout->addWidget(this->filesLookup);
+	this->layout->addWidget(this->grep);
 	this->setLayout(layout);
 }
 
@@ -57,6 +66,16 @@ void Window::openList() {
 void Window::closeList() {
 	this->filesLookup->hide();
 }
+
+void Window::openGrep(const QString& string) {
+	this->grep->grep(string, this->baseDir);
+	this->grep->show();
+}
+
+void Window::closeGrep() {
+	this->grep->close();
+}
+
 
 void Window::setCommand(const QString& text) {
 	this->command->setText(text);
