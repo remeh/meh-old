@@ -1,4 +1,3 @@
-#include <QCoreApplication>
 #include <QDebug>
 #include <QKeyEvent>
 #include <QFileInfo>
@@ -58,7 +57,7 @@ Editor::Editor(Window* window) :
 	this->selectionTimer = new QTimer;
 
 	QFont labelFont = font;
-	labelFont.setPointSize(16);
+	labelFont.setPointSize(14);
 	this->modeLabel = new QLabel("NORMAL ", this);
 	this->modeLabel->setStyleSheet("background-color: rgba(0, 0, 0, 0);");
 	this->modeLabel->setFont(labelFont);
