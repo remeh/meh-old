@@ -26,9 +26,6 @@ public:
 	void openSelection();
 
 	// TODO(remy): comment me
-	void filter(const QString& string);
-
-	// TODO(remy): comment me
 	void readAndAppendResult(const QString& result);
 
 	// TODO(remy): remove entry from the tree
@@ -37,7 +34,6 @@ public:
 	void hide();
 
 public slots:
-	void onEditChanged();
 	void onErrorOccurred();
 	void onResults();
 	void onFinished();
@@ -48,7 +44,6 @@ protected:
 private:
 	Window* window;
 
-	QLineEdit* edit;
 	QLabel* label;
 	QTreeWidget* tree;
 	QGridLayout* layout;

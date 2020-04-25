@@ -4,14 +4,11 @@
 #include "grep.h"
 #include "window.h"
 
-#include "qdebug.h"
-
 Grep::Grep(Window* window) :
 	QWidget(window),
 	window(window) {
 	Q_ASSERT(window != nullptr);
 
-	this->edit = new QLineEdit(this);
 	this->label = new QLabel(this);
 	this->tree = new QTreeWidget(this);
 	this->tree->setSortingEnabled(true);
@@ -25,18 +22,13 @@ Grep::Grep(Window* window) :
 	this->layout = new QGridLayout();
 	this->layout->setContentsMargins(0, 0, 0, 0);
 	this->layout->addWidget(this->label);
-	this->layout->addWidget(this->edit);
 	this->layout->addWidget(this->tree);
 	this->setLayout(layout);
 
 	this->process = nullptr;
-
-	connect(this->edit, &QLineEdit::textChanged, this, &Grep::onEditChanged);
 }
 
 void Grep::show() {
-	this->edit->setText("");
-	this->edit->show();
 	this->label->show();
 	this->tree->show();
 	this->label->setFocus();
@@ -50,13 +42,9 @@ void Grep::hide() {
 		this->process = nullptr;
 	}
 	this->tree->clear();
-	this->edit->hide();
 	this->label->hide();
 	this->tree->hide();
 	QWidget::hide();	
-}
-
-void Grep::onEditChanged() {
 }
 
 void Grep::onResults() {
@@ -69,7 +57,6 @@ void Grep::onResults() {
 }
 
 void Grep::onErrorOccurred() {
-	qDebug() << this->process->error();
 	delete this->process;
 	this->process = nullptr;
 }
@@ -158,10 +145,6 @@ void Grep::keyPressEvent(QKeyEvent* event) {
 			}
 			return;
 	}
-}
-
-void Grep::filter(const QString& string) {
-	// TODO(remy): implement me
 }
 
 void Grep::readAndAppendResult(const QString& result) {
