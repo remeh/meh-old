@@ -38,4 +38,5 @@ private:
 	QTextCharFormat functionFormat;
 	QTextCharFormat todoFixmeNoteFormat;
 	QTextCharFormat selectionFormat;
+	QTextCharFormat markdownTitleFormat;
 };

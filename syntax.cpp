@@ -56,6 +56,12 @@ Syntax::Syntax(QTextDocument *parent)
 	rule.format = singleLineCommentFormat;
 	highlightingRules.append(rule);
 
+	markdownTitleFormat.setFontWeight(QFont::Bold);
+	markdownTitleFormat.setForeground(QColor::fromRgb(255, 255, 255)); // TODO(remy):
+	rule.pattern = QRegularExpression(QStringLiteral("^#+[^\n]*"));
+	rule.format = markdownTitleFormat;
+	highlightingRules.append(rule);
+
 	todoFixmeNoteFormat.setForeground(Qt::red);
 	rule.pattern = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME)"));
 	rule.format = todoFixmeNoteFormat;
