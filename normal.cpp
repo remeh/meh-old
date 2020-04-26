@@ -66,6 +66,33 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			this->setMode(MODE_INSERT);
 			return;
 
+		case Qt::Key_Greater:
+			// TODO(remy): when multilines are selected
+			{
+				QTextCursor cursor = this->textCursor();
+				int position = cursor.position();
+				this->moveCursor(QTextCursor::StartOfBlock);
+				// TODO(remy): spaces
+				this->insertPlainText("\t");
+				cursor.setPosition(position+1);
+				this->setTextCursor(cursor);
+			}
+			return;
+		case Qt::Key_Less:
+			{
+				int position = this->textCursor().position();
+				this->moveCursor(QTextCursor::StartOfBlock);
+				QTextCursor cursor = this->textCursor();
+				if (this->document()->characterAt(cursor.position()) == '\t') {
+					// TODO(remy): spaces
+					cursor.deleteChar();
+					position--;
+				}
+				cursor.setPosition(position);
+				this->setTextCursor(cursor);
+			}
+			return;
+
 		case Qt::Key_O:
 			// NOTE(remy): we could detect the { at the end of a line
 			// to have another behavior.
