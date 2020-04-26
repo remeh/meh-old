@@ -13,7 +13,9 @@ SOURCES     =   buffer.cpp \
                 fileslookup.cpp \
                 grep.cpp \
                 main.cpp \
+                normal.cpp \
                 syntax.cpp \
+                visual.cpp \
                 window.cpp
 
 # CONFIG += sanitizer sanitize_address
