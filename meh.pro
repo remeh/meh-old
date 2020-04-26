@@ -14,6 +14,7 @@ SOURCES     =   buffer.cpp \
                 grep.cpp \
                 main.cpp \
                 normal.cpp \
+                submode.cpp \
                 syntax.cpp \
                 visual.cpp \
                 window.cpp
