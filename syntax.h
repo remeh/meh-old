@@ -39,4 +39,5 @@ private:
 	QTextCharFormat todoFixmeNoteFormat;
 	QTextCharFormat selectionFormat;
 	QTextCharFormat markdownTitleFormat;
+	QTextCharFormat trailingWhiteSpaces;
 };

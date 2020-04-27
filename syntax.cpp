@@ -4,8 +4,7 @@
 
 #include "qdebug.h"
 
-Syntax::Syntax(QTextDocument *parent)
-	: QSyntaxHighlighter(parent)
+Syntax::Syntax(QTextDocument *parent)	: QSyntaxHighlighter(parent)
 {
 	HighlightingRule rule;
 
@@ -65,6 +64,11 @@ Syntax::Syntax(QTextDocument *parent)
 	todoFixmeNoteFormat.setForeground(Qt::red);
 	rule.pattern = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME)"));
 	rule.format = todoFixmeNoteFormat;
+	highlightingRules.append(rule);
+
+	trailingWhiteSpaces.setBackground(Qt::red);
+	rule.pattern = QRegularExpression(QStringLiteral("( |\t)+$"));
+	rule.format = trailingWhiteSpaces;
 	highlightingRules.append(rule);
 }
 
