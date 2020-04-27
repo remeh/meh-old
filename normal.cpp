@@ -94,16 +94,26 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			return;
 
 		case Qt::Key_O:
-			// NOTE(remy): we could detect the { at the end of a line
-			// to have another behavior.
-			if (shift) {
-				this->moveCursor(QTextCursor::Up);
-			}
-			this->moveCursor(QTextCursor::EndOfLine);
-			this->insertPlainText("\n" + this->currentLineIndent());
-			this->setMode(MODE_INSERT);
-			return;
+			{
+				// NOTE(remy): we could detect the { at the end of a line
+				// to have another behavior.
+				if (shift) {
+					this->moveCursor(QTextCursor::Up);
+				}
+				this->moveCursor(QTextCursor::EndOfLine);
 
+				QString indent = this->currentLineIndent();
+
+				QChar lastChar = this->currentLineLastChar(shift ? true : false);
+				if (lastChar == ":" || lastChar == "{") {
+					// TODO(remy): 4 spaces
+					indent += "\t";
+				}
+
+				this->insertPlainText("\n" + indent);
+				this->setMode(MODE_INSERT);
+				return;
+			}
 		case Qt::Key_Dollar:
 			this->moveCursor(QTextCursor::EndOfBlock);
 			return;

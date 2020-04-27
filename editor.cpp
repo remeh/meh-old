@@ -366,8 +366,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 
 	if (event->key() == Qt::Key_Return) {
 		QString indent = this->currentLineIndent();
-
 		QTextCursor cursor = this->textCursor();
+
 		// remove all indentation if nothing has been written on the line
 		for (int v = this->currentLineIsOnlyWhitespaces(); v > 0; v--) {
 			cursor.deletePreviousChar();
@@ -376,7 +376,15 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 		if (shift) {
 			this->moveCursor(QTextCursor::Up);
 			this->moveCursor(QTextCursor::EndOfLine);
+		} else {
+			// FIXME(remy): doesn't work propery for Shift+Return.
+			QChar lastChar = this->currentLineLastChar(false);
+			if (lastChar == ":" || lastChar == "{") {
+				// TODO(remy): 4 spaces
+				indent += "\t";
+			}
 		}
+
 		this->insertPlainText("\n" + indent);
 		return;
 	}
@@ -411,6 +419,15 @@ int Editor::currentLineIsOnlyWhitespaces() {
 		count++;
 	}
 	return count;
+}
+
+QChar Editor::currentLineLastChar(bool moveUp) {
+	QTextCursor cursor = this->textCursor();
+	if (moveUp) {
+		cursor.movePosition(QTextCursor::Up);
+	}
+	cursor.movePosition(QTextCursor::EndOfBlock);
+	return QChar(this->document()->characterAt(cursor.position()-1));
 }
 
 QString Editor::getWordUnderCursor() {

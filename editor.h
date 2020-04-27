@@ -82,6 +82,10 @@ private:
 	// many whitespaces (' ' or '\t') are composing this line.
 	int currentLineIsOnlyWhitespaces();
 
+	// currentLineLastChar returns the last char of the line.
+	// moveUp should be used to move to the line above first. Used for O in normal.
+	QChar currentLineLastChar(bool moveUp);
+
 	// findNextOneInCurrentLine returns the distance to the next occurence of the
 	// given char in the current line. The distance is from the current cursor position.
 	int findNextOneInCurrentLine(QChar c);
