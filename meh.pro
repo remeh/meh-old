@@ -20,3 +20,7 @@ SOURCES     =   buffer.cpp \
                 window.cpp
 
 # CONFIG += sanitizer sanitize_address
+# Debug symbols
+# QMAKE_CXXFLAGS += -g
+# Remove optimizations
+# QMAKE_CXXFLAGS_RELEASE -= -O2

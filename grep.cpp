@@ -4,6 +4,8 @@
 #include "grep.h"
 #include "window.h"
 
+#include "qdebug.h"
+
 Grep::Grep(Window* window) :
 	QWidget(window),
 	window(window) {
@@ -37,14 +39,14 @@ void Grep::show() {
 
 void Grep::hide() {
 	if (this->process != nullptr) {
-		this->process->kill();
+		this->process->terminate();
 		delete this->process;
 		this->process = nullptr;
 	}
 	this->tree->clear();
 	this->label->hide();
 	this->tree->hide();
-	QWidget::hide();	
+	QWidget::hide();
 }
 
 void Grep::onResults() {
@@ -57,8 +59,10 @@ void Grep::onResults() {
 }
 
 void Grep::onErrorOccurred() {
-	delete this->process;
-	this->process = nullptr;
+	if (this->process) {
+		delete this->process;
+		this->process = nullptr;
+	}
 }
 
 void Grep::onFinished() {
@@ -66,7 +70,7 @@ void Grep::onFinished() {
 		delete this->process;
 		this->process = nullptr;
 	}
-	
+
 	// TODO(remy): show that it has finished (ui wise)
 }
 
@@ -156,20 +160,36 @@ void Grep::readAndAppendResult(const QString& result) {
 	new QTreeWidgetItem(this->tree, parts);
 }
 
+void Grep::grep(const QString& string, const QString& baseDir) {
+	this->grep(string, baseDir, "");
+}
+
 // TODO(remy): support case insensitive
-void Grep::grep(const QString& string, const QString& baseDir = ".") {
+void Grep::grep(const QString& string, const QString& baseDir, const QString& target) {
 	if (this->process != nullptr) {
-		this->process->kill();
+		this->process->terminate();
 		delete this->process;
 		this->process = nullptr;
 	}
+
+	// reinit
 	this->resultsCount = 0;
 	this->tree->clear();
+
+	// create and init the process
 	this->process = new QProcess(this);
-	QFileInfo info(baseDir);
-	this->process->setWorkingDirectory(info.absoluteFilePath());
-	QStringList list; list << "-n" << string << ".";
+	QFileInfo baseDirInfo(baseDir);
+	this->process->setWorkingDirectory(baseDirInfo.absoluteFilePath());
+
+	// target
+	QString t = target;
+	if (t.size() == 0) { t = "."; }
+	QStringList list; list << "--with-filename" << "--line-number" << string << t;
+
+	// run ripgrep
 	this->process->start("rg", list);
+
+	// connect the events
 	connect(this->process, &QProcess::readyReadStandardOutput, this, &Grep::onResults);
 	connect(this->process, &QProcess::errorOccurred, this, &Grep::onErrorOccurred);
 	connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Grep::onFinished);

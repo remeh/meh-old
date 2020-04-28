@@ -1,4 +1,5 @@
 #include <QFileInfo>
+#include <QString>
 
 #include "command.h"
 #include "editor.h"
@@ -68,12 +69,20 @@ void Window::closeList() {
 }
 
 void Window::openGrep(const QString& string) {
-	this->grep->grep(string, this->baseDir);
+	this->openGrep(string, "");
+}
+
+void Window::openGrep(const QString& string, const QString& target) {
+	if (target.size() > 0) {
+		this->grep->grep(string, this->baseDir, target);
+	} else {
+		this->grep->grep(string, this->baseDir);
+	}
 	this->grep->show();
 }
 
 void Window::closeGrep() {
-	this->grep->close();
+	this->grep->hide();
 }
 
 

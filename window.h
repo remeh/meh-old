@@ -4,6 +4,7 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QResizeEvent>
+#include <QString>
 #include <QWidget>
 
 #include "editor.h"
@@ -36,6 +37,7 @@ public:
 	void closeList();
 
 	// TODO(remy): comment me
+	void openGrep(const QString& string, const QString& target);
 	void openGrep(const QString& string);
 	// TODO(remy): comment me
 	void closeGrep();

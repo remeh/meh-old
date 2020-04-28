@@ -17,11 +17,11 @@ void Command::keyPressEvent(QKeyEvent* event) {
 		case Qt::Key_Escape:
 			this->clear();
 			this->window->closeCommand();
-			break;
+			return;
 		case Qt::Key_Return:
 			this->execute(this->text());
 			this->window->closeCommand();
-			break;
+			return;
 	}
 
 	QLineEdit::keyPressEvent(event);
@@ -71,15 +71,23 @@ void Command::execute(QString text) {
 	// grep
 	// ----------------------
 
-	if (command == ":rg") {
+	if (command.startsWith(":rg")) {
 		QString search = "";
+
 		if (list.size() > 1) {
-			list.removeFirst();
-			search = list.join(" ");
+			QStringList listCopy = list;
+			listCopy.removeFirst();
+			search = listCopy.join(" ");
 		} else {
 			search = this->window->getEditor()->getWordUnderCursor();
 		}
-		this->window->openGrep(search);
+
+		if (command.startsWith(":rgf")) {
+			this->window->openGrep(search, this->window->getEditor()->getCurrentBuffer()->getFilename());
+		} else {
+			this->window->openGrep(search);
+		}
+
 		return;
 	}
 
