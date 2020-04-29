@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QChar>
+#include <QColor>
 #include <QLabel>
 #include <QMap>
 #include <QResizeEvent>
@@ -102,6 +103,7 @@ private:
 
     QTimer* selectionTimer;
     QLabel* modeLabel;
+    QLabel* lineLabel;
 
     Window* window;
 
@@ -126,6 +128,8 @@ private:
 
     // eightCharsX is the X position where the eighty chars line must be drawn.
     int eightyCharsX;
+
+    QColor highlightedLine;
 
     // lastValueGoToOccurrence stores the last time a search has been done, to be
     // able to repeat it with n or N.

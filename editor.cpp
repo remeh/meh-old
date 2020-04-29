@@ -1,4 +1,4 @@
-#include <QDebug>
+#include <QColor>
 #include <QKeyEvent>
 #include <QFileInfo>
 #include <QFont>
@@ -21,7 +21,8 @@ Editor::Editor(Window* window) :
     QTextEdit(window),
     window(window),
     currentBuffer(NULL),
-    mode(MODE_NORMAL) {
+    mode(MODE_NORMAL),
+    highlightedLine(QColor::fromRgb(40, 40, 40)) {
     Q_ASSERT(window != NULL);
 
     // we don't want a rich text editor
@@ -65,6 +66,11 @@ Editor::Editor(Window* window) :
     this->modeLabel->setFont(labelFont);
     this->modeLabel->show();
 
+    this->lineLabel = new QLabel("  1", this);
+    this->lineLabel->setStyleSheet("color: rgba(255, 255, 255, 30); background-color: rgba(0, 0, 0, 0);");
+    this->lineLabel->setFont(labelFont);
+    this->lineLabel->show();
+
     // tab space size
     // ----------------------
 
@@ -105,10 +111,23 @@ Editor::~Editor() {
 void Editor::onWindowResized(QResizeEvent*) {
     int x = this->window->rect().width() - 90;
     this->modeLabel->move(x, 2);
+    this->lineLabel->move(x, 20);
 }
 
 void Editor::onCursorPositionChanged() {
     this->selectionTimer->start(1000);
+
+    QList<QTextEdit::ExtraSelection> extraSelections;
+    QTextEdit::ExtraSelection selection;
+    selection.format.setBackground(this->highlightedLine);
+    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+    selection.cursor = textCursor();
+    selection.cursor.clearSelection();
+    extraSelections.append(selection);
+    this->setExtraSelections(extraSelections);
+
+    // NOTE(remy): block number should not only be equals to line number...
+    this->lineLabel->setText(QString::number(this->textCursor().blockNumber() + 1));
 }
 
 void Editor::onSelectionChanged() {
