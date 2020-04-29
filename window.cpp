@@ -7,8 +7,6 @@
 #include "grep.h"
 #include "window.h"
 
-#include "qdebug.h"
-
 Window::Window(QWidget* parent) :
 	QWidget(parent),
 	editor(nullptr) {

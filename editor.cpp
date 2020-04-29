@@ -248,6 +248,24 @@ void Editor::goToLine(int lineNumber) {
 	this->setTextCursor(cursor);
 }
 
+void Editor::goToOccurrence(const QString& string, bool backward) {
+	QString s = string;
+	if (string == "") {
+		s = this->lastValueGoToOccurrence;
+	} else {
+		this->lastValueGoToOccurrence = string;
+	}
+
+	if (backward) {
+		this->find(s, QTextDocument::FindBackward);
+	} else {
+		if (!this->find(s)) {
+			// didn't find anything, look backward
+			this->find(s, QTextDocument::FindBackward);
+		}
+	}
+}
+
 void Editor::deleteCurrentLine() {
 	QTextCursor cursor = this->textCursor();
 	cursor.movePosition(QTextCursor::StartOfBlock);

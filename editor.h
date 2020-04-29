@@ -47,6 +47,10 @@ public:
 	// goToLine moves the cursor to a given position in the buffer.
 	void goToLine(int lineNumber);
 
+	// goToOccurrence goes to the next occurence of string if any, previous one
+	// if backward is set.
+	void goToOccurrence(const QString& string, bool backward);
+
 	// deleteCurrentLine removes the current line of the buffer.
 	void deleteCurrentLine();
 
@@ -122,5 +126,9 @@ private:
 
 	// eightCharsX is the X position where the eighty chars line must be drawn.
 	int eightyCharsX;
+
+	// lastValueGoToOccurrence stores the last time a search has been done, to be
+	// able to repeat it with n or N.
+	QString lastValueGoToOccurrence;
 };
 

@@ -19,6 +19,9 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 		case Qt::Key_Escape:
 			this->setMode(MODE_NORMAL);
 			break;
+		case Qt::Key_Slash:
+			this->setMode(MODE_COMMAND, "/");
+			break;
 		case Qt::Key_Colon:
 			this->setMode(MODE_COMMAND, ":");
 			break;
@@ -42,6 +45,15 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 		case Qt::Key_R:
 			this->setMode(MODE_REPLACE);
 			return;
+
+		case Qt::Key_N:
+			if (shift) {
+				this->goToOccurrence("", true);
+			} else {
+				this->goToOccurrence("", false);
+			}
+			return;
+
 
 		case Qt::Key_F:
 			if (shift) {

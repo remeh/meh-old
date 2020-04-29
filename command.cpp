@@ -68,6 +68,15 @@ void Command::execute(QString text) {
 		return;
 	}
 
+	// search next occurrence of a string
+	// ----------------------
+
+	if (command.size() > 1 && command.at(0) == "/") {
+		QStringRef search = command.rightRef(command.size() - 1);
+		this->window->getEditor()->goToOccurrence(search.toString(), false);
+		return;
+	}
+
 	// grep
 	// ----------------------
 
