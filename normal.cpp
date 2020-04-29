@@ -99,9 +99,8 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 				QTextCursor cursor = this->textCursor();
 				int position = cursor.position();
 				this->moveCursor(QTextCursor::StartOfBlock);
-				// TODO(remy): spaces
-				this->insertPlainText("\t");
-				cursor.setPosition(position+1);
+				this->insertPlainText("    ");
+				cursor.setPosition(position+4);
 				this->setTextCursor(cursor);
 			}
 			return;
@@ -110,10 +109,11 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 				int position = this->textCursor().position();
 				this->moveCursor(QTextCursor::StartOfBlock);
 				QTextCursor cursor = this->textCursor();
-				if (this->document()->characterAt(cursor.position()) == '\t') {
-					// TODO(remy): spaces
-					cursor.deleteChar();
-					position--;
+				for (int i = 0; i < 4; i++) {
+					if (this->document()->characterAt(cursor.position()) == ' ') {
+						cursor.deleteChar();
+						position--;
+					}
 				}
 				cursor.setPosition(position);
 				this->setTextCursor(cursor);
@@ -133,8 +133,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
 				QChar lastChar = this->currentLineLastChar(shift ? true : false);
 				if (lastChar == ":" || lastChar == "{") {
-					// TODO(remy): 4 spaces
-					indent += "\t";
+					indent += "    ";
 				}
 
 				this->insertPlainText("\n" + indent);

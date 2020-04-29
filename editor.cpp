@@ -398,8 +398,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 			// FIXME(remy): doesn't work propery for Shift+Return.
 			QChar lastChar = this->currentLineLastChar(false);
 			if (lastChar == ":" || lastChar == "{") {
-				// TODO(remy): 4 spaces
-				indent += "\t";
+				indent += "    ";
 			}
 		}
 
