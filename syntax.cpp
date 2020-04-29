@@ -56,7 +56,7 @@ Syntax::Syntax(QTextDocument *parent)	: QSyntaxHighlighter(parent)
 	highlightingRules.append(rule);
 
 	markdownTitleFormat.setFontWeight(QFont::Bold);
-	markdownTitleFormat.setForeground(QColor::fromRgb(255, 255, 255)); // TODO(remy):
+	markdownTitleFormat.setForeground(QColor::fromRgb(153,215,0));
 	rule.pattern = QRegularExpression(QStringLiteral("^#+[^\n]*"));
 	rule.format = markdownTitleFormat;
 	highlightingRules.append(rule);
