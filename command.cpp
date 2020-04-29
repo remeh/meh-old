@@ -128,7 +128,8 @@ void Command::openFile(const QString& filename) {
 	}
 
 	// if current buffer, don't do anything
-	if (editor->getCurrentBuffer()->getFilename() == filename) {
+	if (editor->getCurrentBuffer() != nullptr &&
+		editor->getCurrentBuffer()->getFilename() == filename) {
 		return;
 	}
 
