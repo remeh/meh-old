@@ -32,6 +32,15 @@ void Editor::keyPressEventVisual(QKeyEvent* event, bool ctrl, bool shift) {
 		case Qt::Key_Dollar:
 			this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
 			return;
+		case Qt::Key_Y:
+			{
+				this->copy();
+				QTextCursor cursor = this->textCursor();
+				cursor.clearSelection();
+				this->setTextCursor(cursor);
+				this->setMode(MODE_NORMAL);
+			}
+			return;
 		case Qt::Key_X:
 			this->cut();
 			this->setMode(MODE_NORMAL);

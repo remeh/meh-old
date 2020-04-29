@@ -1,6 +1,9 @@
 #include <QChar>
+#include <QClipboard>
 #include <QCoreApplication>
+#include <QGuiApplication>
 #include <QKeyEvent>
+#include <QScrollBar>
 #include <QTextCursor>
 #include <QTextDocument>
 
@@ -30,8 +33,18 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 			return;
 
 		case Qt::Key_Y:
-			if (!shift) {
-				this->setSubMode(SUBMODE_y);
+			{
+				QTextCursor cursor = this->textCursor();
+				if (cursor.hasSelection()) {
+					this->copy();
+					cursor.clearSelection();
+					this->setTextCursor(cursor);
+					this->setMode(MODE_NORMAL);
+					return;
+				}
+				if (!shift) {
+					this->setSubMode(SUBMODE_y);
+				}
 			}
 			return;
 
@@ -53,7 +66,9 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 				this->goToOccurrence("", false);
 			}
 			return;
-
+		case Qt::Key_Comma:
+			this->goToOccurrence(this->getWordUnderCursor(), false);
+			return;
 
 		case Qt::Key_F:
 			if (shift) {
@@ -178,19 +193,36 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
 		case Qt::Key_P:
 			{
+				QClipboard* clipboard = QGuiApplication::clipboard();
+				bool newline = false;
+				if (clipboard != nullptr) {
+					newline = clipboard->text().endsWith("\n");
+				}
 				QTextCursor cursor = this->textCursor();
+				QScrollBar* vscroll = this->verticalScrollBar();
+				int value = vscroll->value();
 				cursor.beginEditBlock();
 				if (shift) {
-					this->moveCursor(QTextCursor::StartOfBlock);
+					if (newline) {
+						this->moveCursor(QTextCursor::StartOfBlock);
+					}
 					this->paste();
-					this->moveCursor(QTextCursor::Left);
+					if (newline) {
+						this->moveCursor(QTextCursor::Left);
+					}
 				} else {
-					this->moveCursor(QTextCursor::Down);
-					this->moveCursor(QTextCursor::StartOfBlock);
+					if (newline) {
+						this->moveCursor(QTextCursor::Down);
+						this->moveCursor(QTextCursor::StartOfBlock);
+					} else {
+						this->moveCursor(QTextCursor::Right);
+					}
 					this->paste();
 					this->moveCursor(QTextCursor::Left);
 				}
 				cursor.endEditBlock();
+				vscroll->setValue(value);
+				this->ensureCursorVisible();
 			}
 			return;
 

@@ -3,8 +3,6 @@
 #include "command.h"
 #include "window.h"
 
-#include "qdebug.h"
-
 Command::Command(Window* window) :
 	window(window) {
 	Q_ASSERT(window != NULL);
@@ -134,6 +132,5 @@ void Command::openFile(const QString& filename) {
 	}
 
 	// this will automatically creates a buffer if needed.
-	// FIXME(remy): there is a bug with :e
 	editor->selectOrCreateBuffer(filename);
 }
