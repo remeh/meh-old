@@ -91,12 +91,15 @@ Editor::Editor(Window* window) :
 }
 
 Editor::~Editor() {
-    // TODO(remy): delete the buffers
-    delete this->selectionTimer;
-    this->selectionTimer = nullptr;
+    delete this->currentBuffer;
+    QList<Buffer*> buf = this->buffers.values();
+    for (int i = 0; i < buf.size(); i++) {
+        delete buf.at(i);
+    }
 
+    delete this->selectionTimer;
     delete this->modeLabel;
-    this->modeLabel = nullptr;
+    delete this->lineLabel;
 }
 
 void Editor::onWindowResized(QResizeEvent*) {
