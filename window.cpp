@@ -8,103 +8,103 @@
 #include "window.h"
 
 Window::Window(QWidget* parent) :
-	QWidget(parent),
-	editor(nullptr) {
-	// widgets
-	// ----------------------
-	this->command = new Command(this);
-	this->command->hide();
-	this->filesLookup = new FilesLookup(this);
-	this->filesLookup->hide();
+    QWidget(parent),
+    editor(nullptr) {
+    // widgets
+    // ----------------------
+    this->command = new Command(this);
+    this->command->hide();
+    this->filesLookup = new FilesLookup(this);
+    this->filesLookup->hide();
 
-	// editor
-	// ----------------------
+    // editor
+    // ----------------------
 
-	this->editor = new Editor(this);
+    this->editor = new Editor(this);
 
-	// set base dir
-	// ----------------------
+    // set base dir
+    // ----------------------
 
-	QFileInfo dir(".");
-	this->baseDir = dir.absoluteFilePath();
+    QFileInfo dir(".");
+    this->baseDir = dir.absoluteFilePath();
 
-	// grep instance
-	// ----------------------
+    // grep instance
+    // ----------------------
 
-	this->grep = new Grep(this);
-	this->grep->hide();
+    this->grep = new Grep(this);
+    this->grep->hide();
 
-	// layout
-	// ----------------------
+    // layout
+    // ----------------------
 
-	this->layout = new QGridLayout();
-	this->layout->setContentsMargins(0, 0, 0, 0);
-	this->layout->addWidget(this->editor);
-	this->layout->addWidget(this->command);
-	this->layout->addWidget(this->filesLookup);
-	this->layout->addWidget(this->grep);
-	this->setLayout(layout);
+    this->layout = new QGridLayout();
+    this->layout->setContentsMargins(0, 0, 0, 0);
+    this->layout->addWidget(this->editor);
+    this->layout->addWidget(this->command);
+    this->layout->addWidget(this->filesLookup);
+    this->layout->addWidget(this->grep);
+    this->setLayout(layout);
 }
 
 void Window::openCommand() {
-	this->command->show();
-	this->command->setFocus();
+    this->command->show();
+    this->command->setFocus();
 }
 
 void Window::closeCommand() {
-	this->command->hide();
-	if (this->editor) {
-		this->editor->setMode(MODE_NORMAL);
-	}
+    this->command->hide();
+    if (this->editor) {
+        this->editor->setMode(MODE_NORMAL);
+    }
 }
 
 void Window::openList() {
-	this->filesLookup->show();
+    this->filesLookup->show();
 }
 
 void Window::closeList() {
-	this->filesLookup->hide();
+    this->filesLookup->hide();
 }
 
 void Window::openGrep(const QString& string) {
-	this->openGrep(string, "");
+    this->openGrep(string, "");
 }
 
 void Window::openGrep(const QString& string, const QString& target) {
-	if (target.size() > 0) {
-		this->grep->grep(string, this->baseDir, target);
-	} else {
-		this->grep->grep(string, this->baseDir);
-	}
-	this->grep->show();
+    if (target.size() > 0) {
+        this->grep->grep(string, this->baseDir, target);
+    } else {
+        this->grep->grep(string, this->baseDir);
+    }
+    this->grep->show();
 }
 
 void Window::closeGrep() {
-	this->grep->hide();
+    this->grep->hide();
 }
 
 
 void Window::setCommand(const QString& text) {
-	this->command->setText(text);
+    this->command->setText(text);
 }
 
 void Window::setBaseDir(const QString& dir) {
-	if (dir.startsWith("/")) {
-		this->baseDir = dir;
-		return;
-	}
-	if (!this->baseDir.endsWith("/")) {
-		this->baseDir += "/";
-	}
+    if (dir.startsWith("/")) {
+        this->baseDir = dir;
+        return;
+    }
+    if (!this->baseDir.endsWith("/")) {
+        this->baseDir += "/";
+    }
 
-	this->baseDir += dir;
+    this->baseDir += dir;
 
-	QFileInfo info(this->baseDir);
-	this->baseDir = info.absoluteFilePath();
+    QFileInfo info(this->baseDir);
+    this->baseDir = info.absoluteFilePath();
 }
 
 void Window::resizeEvent(QResizeEvent* event) {
-	if (this->editor != nullptr) {
-		this->editor->onWindowResized(event);
-	}
+    if (this->editor != nullptr) {
+        this->editor->onWindowResized(event);
+    }
 }
