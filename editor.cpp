@@ -406,6 +406,16 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         return;
     }
 
+    if (event->key() == Qt::Key_Backtab) {
+        this->textCursor().insertText("\t");
+        return;
+    }
+
+    if (event->key() == Qt::Key_Tab) {
+        this->textCursor().insertText("    ");
+        return;
+    }
+
     // Otherwise, rely on the original behavior of QTextEdit
     QTextEdit::keyPressEvent(event);
 }
