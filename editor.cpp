@@ -484,8 +484,13 @@ void Editor::removeIndentation() {
     cursor.movePosition(QTextCursor::StartOfLine);
     int i = 0;
     for (i = 0; i < 4; i++) {
-        if (this->document()->characterAt(cursor.position()) == " ") {
+        QChar c = this->document()->characterAt(cursor.position());
+        if (c == " ") {
             cursor.deleteChar();
+        } else if (c == "\t") {
+            cursor.deleteChar();
+            i++;
+            break;
         } else {
             break;
         }
