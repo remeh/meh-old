@@ -4,6 +4,7 @@
 #include <QColor>
 #include <QLabel>
 #include <QMap>
+#include <QMouseEvent>
 #include <QResizeEvent>
 #include <QPaintEvent>
 #include <QVector>
@@ -66,6 +67,7 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent*) override;
+    void mousePressEvent(QMouseEvent*) override;
     void paintEvent(QPaintEvent*) override;
 
 private slots:

@@ -296,10 +296,27 @@ void Editor::deleteCurrentLine() {
 }
 
 void Editor::paintEvent(QPaintEvent* event) {
+    Q_ASSERT(event != NULL);
+
     QTextEdit::paintEvent(event);
     QPainter painter(this->viewport());
     painter.setPen(QPen(QColor(255, 255, 255, 8)));
     painter.drawLine(this->eightyCharsX, 0, eightyCharsX, this->viewport()->rect().height());
+}
+
+void Editor::mousePressEvent(QMouseEvent* event) {
+    Q_ASSERT(event != NULL);
+
+    if (event->button() == Qt::MidButton) {
+        if (this->mode == MODE_NORMAL) {
+            this->setMode(MODE_INSERT);
+        } else if (this->mode == MODE_INSERT) {
+            this->setMode(MODE_NORMAL);
+        }
+        return;
+    }
+
+    QTextEdit::mousePressEvent(event);
 }
 
 void Editor::keyPressEvent(QKeyEvent* event) {
