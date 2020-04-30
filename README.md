@@ -1,4 +1,6 @@
-`meh` is my personal code editor.
+# meh
+
+`meh` is remeh's personal code editor.
 
 ## Features
 
@@ -46,7 +48,8 @@
     * Fuzzy search in the file opener (it is just a `startsWith` for now)
     * Icons on macOS (missing in the file opener)
     * Syntax highlighting per file extension
+    * May implement the file opener with FZF if this one annoys me, but so far I'm happy with it
 
 ## License
 
-Apache License 2.0
+GNU General Public License v3.0

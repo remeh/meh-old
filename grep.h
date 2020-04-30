@@ -31,8 +31,6 @@ public:
     // TODO(remy): comment me
     void readAndAppendResult(const QString& result);
 
-    // TODO(remy): remove entry from the tree
-
     void show();
     void hide();
 

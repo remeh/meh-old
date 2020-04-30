@@ -29,7 +29,7 @@ private:
     QVector<HighlightingRule> highlightingRules;
 
     QString selection;
-    QRegularExpression selectionRx; // TODO(remy): naming
+    QRegularExpression selectionRx;
 
     QTextCharFormat keywordFormat;
     QTextCharFormat classFormat;
