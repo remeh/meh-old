@@ -1,4 +1,5 @@
 #include <QFileInfo>
+#include <QSettings>
 
 #include "buffer.h"
 #include "editor.h"
@@ -44,9 +45,12 @@ void Buffer::save(Editor* editor) {
 void Buffer::onLeave(Editor* editor) {
     Q_ASSERT(editor != NULL);
 
-    // store the last cursor position
-    this->lastCursorPosition = editor->textCursor().position();
+    // store the last data from the document in the buffer
     this->data = editor->document()->toPlainText().toUtf8();
+
+    // store last cursor position in settings
+    QSettings settings("mehteor", "meh");
+    settings.setValue("buffer/" + this->filename, editor->textCursor().position());
 }
 
 void Buffer::onEnter(Editor* editor) {
@@ -59,6 +63,7 @@ void Buffer::onEnter(Editor* editor) {
 
     // restore last cursor position
     auto cursor = editor->textCursor();
-    cursor.setPosition(this->lastCursorPosition);
+    QSettings settings("mehteor", "meh");
+    cursor.setPosition(settings.value("buffer/" + this->filename, 0).toInt());
     editor->setTextCursor(cursor);
 }

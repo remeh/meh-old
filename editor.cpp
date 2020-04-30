@@ -5,6 +5,8 @@
 #include <QFontMetrics>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QSettings>
+#include <QString>
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTextEdit>
@@ -97,10 +99,16 @@ Editor::Editor(Window* window) :
 }
 
 Editor::~Editor() {
-    delete this->currentBuffer;
+    if (this->currentBuffer != nullptr) {
+        this->currentBuffer->onLeave(this); // store settings
+        delete this->currentBuffer;
+    }
     QList<Buffer*> buf = this->buffers.values();
     for (int i = 0; i < buf.size(); i++) {
-        delete buf.at(i);
+        if (buf.at(i) != nullptr) {
+            buf.at(i)->onLeave(this);
+            delete buf.at(i);
+        }
     }
 
     delete this->selectionTimer;
@@ -273,10 +281,11 @@ void Editor::goToLine(int lineNumber) {
 
 void Editor::goToOccurrence(const QString& string, bool backward) {
     QString s = string;
+    QSettings settings("mehteor", "meh");
     if (string == "") {
-        s = this->lastValueGoToOccurrence;
+        s = settings.value("editor/last_value_go_to_occurrence", "").toString();
     } else {
-        this->lastValueGoToOccurrence = string;
+        settings.setValue("editor/last_value_go_to_occurrence", string);
     }
 
     if (backward) {

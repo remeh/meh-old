@@ -132,9 +132,5 @@ private:
     int eightyCharsX;
 
     QColor highlightedLine;
-
-    // lastValueGoToOccurrence stores the last time a search has been done, to be
-    // able to repeat it with n or N.
-    QString lastValueGoToOccurrence;
 };
 
