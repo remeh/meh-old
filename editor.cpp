@@ -177,6 +177,7 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
         }
     }
 
+    this->window->setWindowTitle("meh - " + filename);
     this->setCurrentBuffer(buffer);
 }
 

@@ -7,6 +7,9 @@ int main(int argv, char **args)
 {
     QApplication app(argv, args);
     app.setCursorFlashTime(0);
+    QCoreApplication::setOrganizationName("mehteor");
+    QCoreApplication::setOrganizationDomain("remy.io");
+    QCoreApplication::setApplicationName("meh");
 
     Window window;
     window.setWindowTitle(QObject::tr("meh"));
