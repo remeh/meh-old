@@ -65,6 +65,9 @@ public:
     // called by the window when it is resized.
     void onWindowResized(QResizeEvent*);
 
+    // removeIndentation remove one layer of indentation on the current line.
+    void removeIndentation();
+
 protected:
     void keyPressEvent(QKeyEvent*) override;
     void mousePressEvent(QMouseEvent*) override;

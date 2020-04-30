@@ -465,8 +465,33 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         return;
     }
 
+    if (event->text() == "}") {
+        if (this->currentLineIsOnlyWhitespaces() >= 0) {
+            this->removeIndentation();
+        }
+        QTextEdit::keyPressEvent(event);
+        return;
+    }
+
     // Otherwise, rely on the original behavior of QTextEdit
     QTextEdit::keyPressEvent(event);
+}
+
+void Editor::removeIndentation() {
+    // remove one layer of indentation
+    QTextCursor cursor = this->textCursor();
+    int position = cursor.position();
+    cursor.movePosition(QTextCursor::StartOfLine);
+    int i = 0;
+    for (i = 0; i < 4; i++) {
+        if (this->document()->characterAt(cursor.position()) == " ") {
+            cursor.deleteChar();
+        } else {
+            break;
+        }
+    }
+    cursor.setPosition(position - i);
+    this->setTextCursor(cursor);
 }
 
 QString Editor::currentLineIndent() {

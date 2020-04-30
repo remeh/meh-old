@@ -106,17 +106,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             return;
         case Qt::Key_Less:
             {
-                int position = this->textCursor().position();
-                this->moveCursor(QTextCursor::StartOfBlock);
-                QTextCursor cursor = this->textCursor();
-                for (int i = 0; i < 4; i++) {
-                    if (this->document()->characterAt(cursor.position()) == ' ') {
-                        cursor.deleteChar();
-                        position--;
-                    }
-                }
-                cursor.setPosition(position);
-                this->setTextCursor(cursor);
+                this->removeIndentation();
             }
             return;
 
