@@ -49,6 +49,11 @@ public:
     // goToLine moves the cursor to a given position in the buffer.
     void goToLine(int lineNumber);
 
+    void up();
+    void down();
+    void left();
+    void right();
+
     // goToOccurrence goes to the next occurence of string if any, previous one
     // if backward is set.
     void goToOccurrence(const QString& string, bool backward);

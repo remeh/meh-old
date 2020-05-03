@@ -143,9 +143,8 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
                 }
             }
             return;
-
         case Qt::Key_K:
-            this->moveCursor(QTextCursor::Up);
+            this->up();
             return;
         case Qt::Key_J:
             if (shift) {
@@ -163,23 +162,16 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
                 cursor.endEditBlock();
                 return;
             } else {
-                this->moveCursor(QTextCursor::Down);
+                this->down();
             }
             return;
         case Qt::Key_Backspace:
         case Qt::Key_H:
-            this->moveCursor(QTextCursor::Left);
+            this->left();
             return;
         case Qt::Key_L:
-            {
-                QTextCursor cursor = this->textCursor();
-                QChar c = this->document()->characterAt(cursor.position()+1);
-                if (c != "\u2029") {
-                    this->moveCursor(QTextCursor::Right);
-                }
-            }
+            this->right();
             return;
-
         case Qt::Key_P:
             {
                 QClipboard* clipboard = QGuiApplication::clipboard();

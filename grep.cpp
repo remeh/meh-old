@@ -4,8 +4,6 @@
 #include "grep.h"
 #include "window.h"
 
-#include "qdebug.h"
-
 Grep::Grep(Window* window) :
     QWidget(window),
     window(window) {

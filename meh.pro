@@ -1,4 +1,4 @@
-QT += widgets
+QT += widgets concurrent
 
 HEADERS     =   buffer.h \
                 command.h \

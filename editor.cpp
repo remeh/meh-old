@@ -24,7 +24,7 @@ Editor::Editor(Window* window) :
     window(window),
     currentBuffer(NULL),
     mode(MODE_NORMAL),
-    highlightedLine(QColor::fromRgb(40, 40, 40)) {
+    highlightedLine(QColor::fromRgb(50, 50, 50)) {
     Q_ASSERT(window != NULL);
 
     // we don't want a rich text editor
@@ -302,6 +302,34 @@ void Editor::goToOccurrence(const QString& string, bool backward) {
     }
 }
 
+void Editor::up() {
+    this->moveCursor(QTextCursor::Up);
+}
+
+void Editor::down() {
+    this->moveCursor(QTextCursor::Down);
+}
+
+void Editor::right() {
+    {
+        QTextCursor cursor = this->textCursor();
+        QChar c = this->document()->characterAt(cursor.position()+1);
+        if (c != "\u2029") {
+            this->moveCursor(QTextCursor::Right);
+        }
+    }
+}
+
+void Editor::left() {
+    {
+        QTextCursor cursor = this->textCursor();
+        QChar c = this->document()->characterAt(cursor.position()-1);
+        if (c != "\u2029") {
+            this->moveCursor(QTextCursor::Left);
+        }
+    }
+}
+
 void Editor::deleteCurrentLine() {
     QTextCursor cursor = this->textCursor();
     cursor.movePosition(QTextCursor::StartOfBlock);
@@ -363,6 +391,18 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                     QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageDown, Qt::NoModifier);
                     QTextEdit::keyPressEvent(&pageEvent);
                 }
+                return;
+            case Qt::Key_H:
+                this->left();
+                return;
+            case Qt::Key_J:
+                this->down();
+                return;
+            case Qt::Key_K:
+                this->up();
+                return;
+            case Qt::Key_L:
+                this->right();
                 return;
 
             // switch to the other buffer

@@ -83,7 +83,6 @@ void Window::closeGrep() {
     this->grep->hide();
 }
 
-
 void Window::setCommand(const QString& text) {
     this->command->setText(text);
 }

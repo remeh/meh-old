@@ -112,7 +112,7 @@ void Command::execute(QString text) {
     // save a file
     if (command == ":w") {
         if (list.size() > 1) {
-            // TODO(remy):  save to another file
+            // TODO(remy): save to another file
         }
         this->window->getEditor()->save();
     }
