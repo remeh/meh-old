@@ -6,7 +6,7 @@
 
     * C++/Qt5, tested on Linux and macOS (will most likely work on Windows as well)
     * Vim-like movements: `h`, `j`, `k`, `l`, `f`, `F`, `o`, `O`, `a`, `A`, `I`, `g`, `G`, ...
-    * Insert, normal, replace, command and visual mode are implemented (`i`, `Esc`, `R`, `:`, `v`)
+    * Insert, normal, replace, command, visual and visual-line mode are implemented (`i`, `Esc`, `R`, `:`, `v` and `V`)
     * Open multiple files
         * Ctrl-O (other) to go back to previous buffer
         * Ctrl-P to use the file opener
@@ -44,7 +44,6 @@
 ## Roadmap
 
     * Interface with an LSP server for "go to reference" feature / auto-completion
-    * VISUAL-LINE mode
     * Fuzzy search in the file opener (it is just a `startsWith` for now)
     * Icons on macOS (missing in the file opener)
     * Syntax highlighting per file extension
