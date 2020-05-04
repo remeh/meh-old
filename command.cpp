@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QMessageBox>
 
 #include "command.h"
 #include "window.h"
@@ -33,6 +34,20 @@ void Command::execute(QString text) {
 
     // quit
     // ----------------------
+
+    if (command == ":q" || command == ":qa") {
+        QStringList modifiedBuffers = this->window->getEditor()->modifiedBuffers();
+        if (modifiedBuffers.size() > 0) {
+            QString msg = "Some opened buffers have not been saved:\n\n";
+            for (int i = 0; i < modifiedBuffers.size(); i++) {
+                msg += modifiedBuffers.at(i) + "\n";
+            }
+            QMessageBox::warning(this->window, "Unsaved buffers", msg);
+            return;
+        }
+        QCoreApplication::quit();
+        return;
+    }
 
     if (command == ":q!" || command == ":qa!") {
         QCoreApplication::quit();

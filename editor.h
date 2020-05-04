@@ -73,6 +73,10 @@ public:
     // removeIndentation remove one layer of indentation on the current line.
     void removeIndentation();
 
+    // modifiedBuffers returns a list of the loaded and modified buffers that
+    // would need to be stored on disk.
+    QStringList modifiedBuffers();
+
 protected:
     void keyPressEvent(QKeyEvent*) override;
     void mousePressEvent(QMouseEvent*) override;

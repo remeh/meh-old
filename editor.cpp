@@ -308,6 +308,23 @@ void Editor::setSubMode(int subMode) {
     this->subMode = subMode;
 }
 
+QStringList Editor::modifiedBuffers() {
+    QStringList rv;
+
+    if (this->currentBuffer != nullptr && this->currentBuffer->modified) {
+        rv << this->currentBuffer->getFilename();
+    }
+
+    QList<Buffer*> buff = this->buffers.values();
+    for (int i = 0; i < buff.size(); i++) {
+        if (buff.at(i)->modified) {
+            rv << buff.at(i)->getFilename();
+        }
+    }
+
+    return rv;
+}
+
 void Editor::goToLine(int lineNumber) {
     // note that the findBlockByLineNumber starts with 0
     QTextBlock block = this->document()->findBlockByLineNumber(lineNumber - 1);
