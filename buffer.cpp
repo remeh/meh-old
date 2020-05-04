@@ -7,10 +7,12 @@
 #include "qdebug.h"
 
 Buffer::Buffer() :
+    modified(false),
     readFromDisk(false) {
 }
 
 Buffer::Buffer(QString filename) :
+    modified(false),
     readFromDisk(false) {
     // resolve the absolute path of this
     QFileInfo info(filename);
