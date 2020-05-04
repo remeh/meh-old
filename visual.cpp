@@ -87,3 +87,40 @@ void Editor::keyPressEventVisual(QKeyEvent* event, bool ctrl, bool shift) {
             return;
     }
 }
+
+
+void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool) {
+    Q_ASSERT(event != NULL);
+
+    switch (event->key()) {
+        case Qt::Key_Escape:
+            {
+                this->setMode(MODE_NORMAL);
+                QTextCursor cursor = this->textCursor();
+                cursor.clearSelection();
+                this->setTextCursor(cursor);
+            }
+            break;
+        case Qt::Key_Y:
+            {
+                this->copy();
+                QTextCursor cursor = this->textCursor();
+                cursor.clearSelection();
+                this->setTextCursor(cursor);
+                this->setMode(MODE_NORMAL);
+            }
+            return;
+        case Qt::Key_X:
+            this->cut();
+            this->setMode(MODE_NORMAL);
+            return;
+        case Qt::Key_K:
+            this->moveCursor(QTextCursor::Up, QTextCursor::KeepAnchor);
+            this->moveCursor(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+            return;
+        case Qt::Key_J:
+            this->moveCursor(QTextCursor::Down, QTextCursor::KeepAnchor);
+            this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+            return;
+    }
+}

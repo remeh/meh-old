@@ -215,6 +215,11 @@ void Editor::setMode(int mode, QString command) {
         this->modeLabel->setText("VISUAL");
         this->setMidCursor();
         break;
+    case MODE_VISUAL_LINE:
+        this->modeLabel->setText("V-LINE");
+        this->moveCursor(QTextCursor::StartOfBlock);
+        this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        break;
     case MODE_INSERT:
         this->modeLabel->setText("INSERT");
         this->setLineCursor();
@@ -451,6 +456,11 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 
     if (this->mode == MODE_VISUAL) {
         this->keyPressEventVisual(event, ctrl, shift);
+        return;
+    }
+
+    if (this->mode == MODE_VISUAL_LINE) {
+        this->keyPressEventVisualLine(event, ctrl, shift);
         return;
     }
 

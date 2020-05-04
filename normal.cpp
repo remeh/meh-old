@@ -50,7 +50,8 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
         case Qt::Key_V:
             if (shift) {
-                // TODO(remy): implement me
+                this->setMode(MODE_VISUAL_LINE);
+                return;
             }
             this->setMode(MODE_VISUAL);
             return;
