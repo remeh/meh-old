@@ -67,6 +67,9 @@ public:
     // save saves the current buffer.
     void save();
 
+    // saveAll saves all the loaded buffers.
+    void saveAll();
+
     // called by the window when it is resized.
     void onWindowResized(QResizeEvent*);
 

@@ -179,6 +179,21 @@ void Editor::save() {
     this->modifiedLabel->setText(" ");
 }
 
+void Editor::saveAll() {
+    // save the current buffer.
+    this->save();
+
+    // save other buffers
+    QList<Buffer*> buff = this->buffers.values();
+    for (int i = 0; i < buff.size(); i++) {
+        if (buff.at(i)->modified) {
+            buff.at(i)->save(this);
+        }
+    }
+
+    this->modifiedLabel->setText(" ");
+}
+
 void Editor::setCurrentBuffer(Buffer* buffer) {
     Q_ASSERT(buffer != NULL);
     disconnect(this->document(), &QTextDocument::modificationChanged, this, &Editor::onChange);

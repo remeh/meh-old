@@ -63,6 +63,15 @@ void Command::execute(QString text) {
         return;
     }
 
+    if (command == ":xa" || command == ":xa!") {
+        if (list.size() > 1) {
+            // TODO(remy):  save to another file
+        }
+        this->window->getEditor()->saveAll();
+        QCoreApplication::quit();
+        return;
+    }
+
     if (command == ":basedir") {
         this->window->setBaseDir(list[1]);
         return;
@@ -124,12 +133,18 @@ void Command::execute(QString text) {
         return;
     }
 
-    // save a file
+    // save
+    // ----------------------
+
     if (command == ":w") {
         if (list.size() > 1) {
             // TODO(remy): save to another file
         }
         this->window->getEditor()->save();
+    }
+
+    if (command == ":wa") {
+        this->window->getEditor()->saveAll();
     }
 }
 
