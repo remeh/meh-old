@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QObject>
 
 #include "editor.h"
 #include "window.h"

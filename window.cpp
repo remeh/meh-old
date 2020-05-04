@@ -7,6 +7,8 @@
 #include "grep.h"
 #include "window.h"
 
+#include "qdebug.h"
+
 Window::Window(QWidget* parent) :
     QWidget(parent),
     editor(nullptr) {
@@ -44,6 +46,11 @@ Window::Window(QWidget* parent) :
     this->layout->addWidget(this->filesLookup);
     this->layout->addWidget(this->grep);
     this->setLayout(layout);
+}
+
+void Window::closeEvent(QCloseEvent* event) {
+    this->command->execute(":q");
+    event->ignore();
 }
 
 void Window::openCommand() {

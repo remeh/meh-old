@@ -11,13 +11,14 @@ class Command : public QLineEdit
 public:
     Command(Window* window);
 
+    void execute(QString text);
+
 protected:
     void keyPressEvent(QKeyEvent* event);
 
 private slots:
 
 private:
-    void execute(QString text);
     void openFile(const QString& filename);
 
     Window* window;

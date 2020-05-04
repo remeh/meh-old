@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QCloseEvent>
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QListWidget>
@@ -53,6 +54,7 @@ protected:
 
 private slots:
     void resizeEvent(QResizeEvent*);
+    void closeEvent(QCloseEvent*);
 
 private:
     Editor* editor;
