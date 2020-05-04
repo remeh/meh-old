@@ -30,11 +30,9 @@ public:
     // onEnter is called when the window is starting to display this buffer.
     void onEnter(Editor* editor);
 
-    // lastCursorPosition is the last cursor position when the user has either
-    // moved to another buffer or closed the editor, etc.
-    // Use QTextCursor::setPosition() to set it back to the QTextCursor and then
-    // QTextEditr::setTextCursor() to restore it in the editor.
-    int lastCursorPosition;
+    // modified is true if something has changed in the buffer which has not be
+    // stored on disk.
+    bool modified;
 
 protected:
 

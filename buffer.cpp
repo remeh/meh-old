@@ -7,12 +7,10 @@
 #include "qdebug.h"
 
 Buffer::Buffer() :
-    lastCursorPosition(0),
     readFromDisk(false) {
 }
 
 Buffer::Buffer(QString filename) :
-    lastCursorPosition(0),
     readFromDisk(false) {
     // resolve the absolute path of this
     QFileInfo info(filename);
@@ -38,6 +36,7 @@ void Buffer::save(Editor* editor) {
     QFile file(filename);
     file.open(QIODevice::Truncate | QIODevice::ReadWrite);
     file.write(editor->toPlainText().toUtf8());
+    this->modified = false;
 
     // TODO(remy): error management
 }

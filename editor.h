@@ -65,7 +65,7 @@ public:
     QString getWordUnderCursor();
 
     // save saves the current buffer.
-    void save() { this->currentBuffer->save(this); }
+    void save();
 
     // called by the window when it is resized.
     void onWindowResized(QResizeEvent*);
@@ -82,6 +82,7 @@ private slots:
     void onSelectionChanged();
     void onCursorPositionChanged();
     void onTriggerSelectionHighlight();
+    void onChange(bool changed);
 
 private:
     // keyPressEventNormal handles this event in normal mode.
@@ -115,6 +116,7 @@ private:
     QTimer* selectionTimer;
     QLabel* modeLabel;
     QLabel* lineLabel;
+    QLabel* modifiedLabel;
 
     Window* window;
 

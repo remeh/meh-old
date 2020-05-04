@@ -72,10 +72,15 @@ Editor::Editor(Window* window) :
     this->modeLabel->setFont(labelFont);
     this->modeLabel->show();
 
-    this->lineLabel = new QLabel("  1", this);
+    this->lineLabel = new QLabel("       1", this);
     this->lineLabel->setStyleSheet("color: rgba(255, 255, 255, 30); background-color: rgba(0, 0, 0, 0);");
     this->lineLabel->setFont(labelFont);
     this->lineLabel->show();
+
+    this->modifiedLabel = new QLabel("", this);
+    this->modifiedLabel->setStyleSheet("color: rgba(255, 255, 255, 30); background-color: rgba(0, 0, 0, 0);");
+    this->modifiedLabel->setFont(labelFont);
+    this->modifiedLabel->show();
 
     // tab space size
     // ----------------------
@@ -118,12 +123,14 @@ Editor::~Editor() {
     delete this->selectionTimer;
     delete this->modeLabel;
     delete this->lineLabel;
+    delete this->modifiedLabel;
 }
 
 void Editor::onWindowResized(QResizeEvent*) {
     int x = this->window->rect().width() - 90;
     this->modeLabel->move(x, 2);
     this->lineLabel->move(x, 20);
+    this->modifiedLabel->move(x, 38);
 }
 
 void Editor::onCursorPositionChanged() {
@@ -158,10 +165,24 @@ void Editor::onTriggerSelectionHighlight() {
     this->selectionTimer->stop();
 }
 
+void Editor::onChange(bool changed) {
+    if (this->currentBuffer != nullptr && changed) {
+        this->currentBuffer->modified = true;
+        this->modifiedLabel->setText("*");
+    }
+}
+
+void Editor::save() {
+    if (!this->currentBuffer) { return; }
+
+    this->currentBuffer->save(this);
+    this->modifiedLabel->setText(" ");
+}
+
 void Editor::setCurrentBuffer(Buffer* buffer) {
     Q_ASSERT(buffer != NULL);
-
-    if (this->currentBuffer != NULL) {
+    disconnect(this->document(), &QTextDocument::modificationChanged, this, &Editor::onChange);
+    if (this->currentBuffer != nullptr) {
         this->currentBuffer->onLeave(this);
         // we're leaving this one, append it to the end of the buffers list.
         this->buffersPos.append(this->currentBuffer->getFilename());
@@ -170,6 +191,13 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
 
     this->currentBuffer = buffer;
     this->currentBuffer->onEnter(this);
+    this->document()->setModified(false);
+    if (this->currentBuffer->modified) {
+        this->modifiedLabel->setText("*");
+    } else {
+        this->modifiedLabel->setText("");
+    }
+    connect(this->document(), &QTextDocument::modificationChanged, this, &Editor::onChange);
 }
 
 void Editor::selectOrCreateBuffer(const QString& filename) {
