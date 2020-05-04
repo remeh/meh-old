@@ -6,6 +6,7 @@
 #define MODE_COMMAND 4
 #define MODE_VISUAL 5
 #define MODE_VISUAL_LINE 6
+#define MODE_REPLACE_ONE 7
 
 #define NO_SUBMODE 0
 #define SUBMODE_c 1

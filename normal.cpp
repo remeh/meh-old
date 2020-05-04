@@ -57,7 +57,11 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             return;
 
         case Qt::Key_R:
-            this->setMode(MODE_REPLACE);
+            if (shift) {
+                this->setMode(MODE_REPLACE);
+                return;
+            }
+            this->setMode(MODE_REPLACE_ONE);
             return;
 
         case Qt::Key_N:

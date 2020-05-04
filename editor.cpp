@@ -261,6 +261,7 @@ void Editor::setMode(int mode, QString command) {
         }
         break;
     case MODE_REPLACE:
+    case MODE_REPLACE_ONE:
         this->modeLabel->setText("REPLACE");
         this->setMidCursor();
         this->setOverwriteMode(true);
@@ -486,13 +487,16 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     // Replace mode
     // ----------------------
 
-    if (this->mode == MODE_REPLACE) {
+    if (this->mode == MODE_REPLACE || this->mode == MODE_REPLACE_ONE) {
         if (event->key() == Qt::Key_Escape) {
             this->setMode(MODE_NORMAL);
             return;
         }
 
         QTextEdit::keyPressEvent(event);
+        if (this->mode == MODE_REPLACE_ONE && event->text()[0] != '\x0') {
+            this->setMode(MODE_NORMAL);
+        }
         return;
     }
 
