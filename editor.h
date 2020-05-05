@@ -8,6 +8,7 @@
 #include <QResizeEvent>
 #include <QPaintEvent>
 #include <QVector>
+#include <QTextBlock>
 #include <QTextEdit>
 #include <QTimer>
 
@@ -101,6 +102,12 @@ private:
 
     // currentLineIndent returns the current line indentation.
     QString currentLineIndent();
+
+    // toggleComments comments or uncomments the given blocks.
+    void toggleComments(QList<QTextBlock> blocks, const QString& commentChars);
+
+    // selectedBlocks returns all the block contained in the current selection.
+    QList<QTextBlock> selectedBlocks();
 
     // currentLineIsOnlyWhitespaces return -1 if this is wrong and returns how
     // many whitespaces (' ' or '\t') are composing this line.

@@ -490,6 +490,20 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                     this->window->openList();
                 }
                 return;
+
+            case Qt::Key_C:
+                {
+                    QList<QTextBlock> blocks = this->selectedBlocks();
+                    if (blocks.size() == 0) {
+                        blocks.append(this->textCursor().block());
+                    }
+                    if (shift) {
+                        this->toggleComments(blocks, "#");
+                    } else {
+                        this->toggleComments(blocks, "//");
+                    }
+                }
+                return;
         }
     }
 
@@ -607,6 +621,30 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     QTextEdit::keyPressEvent(event);
 }
 
+void Editor::toggleComments(QList<QTextBlock> blocks, const QString& commentChars) {
+    QTextCursor cursor = this->textCursor();
+    int position = cursor.position();
+
+    cursor.beginEditBlock();
+
+    for (int i = 0; i < blocks.size(); i++) {
+        QTextBlock block = blocks.at(i);
+        QString text = block.text();
+        cursor.setPosition(block.position());
+        if (text.startsWith(commentChars)) {
+            // uncomment
+            for (int j = 0; j < commentChars.size(); j++) {
+                cursor.deleteChar();
+            }
+        } else {
+            // comment
+            cursor.insertText(commentChars);
+        }
+    }
+
+    cursor.endEditBlock();
+}
+
 void Editor::removeIndentation() {
     // remove one layer of indentation
     QTextCursor cursor = this->textCursor();
@@ -664,6 +702,32 @@ QChar Editor::currentLineLastChar(bool moveUp) {
     }
     cursor.movePosition(QTextCursor::EndOfBlock);
     return QChar(this->document()->characterAt(cursor.position()-1));
+}
+
+QList<QTextBlock> Editor::selectedBlocks() {
+    QList<QTextBlock> rv;
+
+    QTextCursor cursor = this->textCursor();
+    if (!cursor.hasSelection()) {
+        return rv;
+    }
+
+    QTextBlock start = this->document()->findBlock(cursor.selectionStart());
+    QTextBlock end = this->document()->findBlock(cursor.selectionEnd());
+
+    if (start != end) {
+        rv.append(end);
+    }
+
+    while (true) {
+        rv.append(start);
+        start = start.next();
+        if (start == end) {
+            break;
+        }
+    }
+
+    return rv;
 }
 
 QString Editor::getWordUnderCursor() {

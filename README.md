@@ -16,6 +16,7 @@
         * Filtering while typing
         * `Ctrl-n` next entry, `Ctrl-p` previous entry, `Return` open the file / move to the directory
     * Search in file with `/`, next occurrences with `n` and `N`. `,` to search for the word under the cursor
+    * Toggle `//` comments with Ctrl-C on selected lines (or current line of no selection), `#` with Ctrl-Shift-C
     * Search in current/all files with `ripgrep` integration
         * `:rg` search in all files with ripgrep for the word under the cursor
         * `:rg <pattern>` search in all files with ripgrep for the given pattern
