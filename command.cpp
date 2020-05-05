@@ -26,6 +26,19 @@ void Command::keyPressEvent(QKeyEvent* event) {
     QLineEdit::keyPressEvent(event);
 }
 
+bool Command::warningModifiedBuffers() {
+	QStringList modifiedBuffers = this->window->getEditor()->modifiedBuffers();
+	if (modifiedBuffers.size() > 0) {
+		QString msg = "Some opened buffers have not been saved:\n\n";
+		for (int i = 0; i < modifiedBuffers.size(); i++) {
+			msg += modifiedBuffers.at(i) + "\n";
+		}
+		QMessageBox::warning(this->window, "Unsaved buffers", msg);
+		return true;
+	}
+	return false;
+}
+
 void Command::execute(QString text) {
     this->clear();
 
@@ -36,15 +49,9 @@ void Command::execute(QString text) {
     // ----------------------
 
     if (command == ":q" || command == ":qa") {
-        QStringList modifiedBuffers = this->window->getEditor()->modifiedBuffers();
-        if (modifiedBuffers.size() > 0) {
-            QString msg = "Some opened buffers have not been saved:\n\n";
-            for (int i = 0; i < modifiedBuffers.size(); i++) {
-                msg += modifiedBuffers.at(i) + "\n";
-            }
-            QMessageBox::warning(this->window, "Unsaved buffers", msg);
-            return;
-        }
+		if (this->warningModifiedBuffers()) {
+			return;
+		}
         QCoreApplication::quit();
         return;
     }
@@ -59,6 +66,9 @@ void Command::execute(QString text) {
             // TODO(remy):  save to another file
         }
         this->window->getEditor()->save();
+		if (this->warningModifiedBuffers()) {
+			return;
+		}
         QCoreApplication::quit();
         return;
     }

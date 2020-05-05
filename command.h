@@ -12,6 +12,9 @@ public:
     Command(Window* window);
 
     void execute(QString text);
+    // warningModifiedBuffers displays a warning if we're trying to close while
+    // some buffers were not saved. Return true only when there is buffers not saved.
+    bool warningModifiedBuffers();
 
 protected:
     void keyPressEvent(QKeyEvent* event);
