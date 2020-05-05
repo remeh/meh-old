@@ -554,6 +554,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         QString indent = this->currentLineIndent();
         QTextCursor cursor = this->textCursor();
 
+        cursor.beginEditBlock();
+
         // remove all indentation if nothing has been written on the line
         for (int v = this->currentLineIsOnlyWhitespaces(); v > 0; v--) {
             cursor.deletePreviousChar();
@@ -568,9 +570,18 @@ void Editor::keyPressEvent(QKeyEvent* event) {
             if (lastChar == ":" || lastChar == "{") {
                 indent += "    ";
             }
+
+            // If next chars are white spaces we'll want to remove them before
+            // going to the next line.
+            QChar c = this->document()->characterAt(cursor.position());
+            while (c == " " || c == "\t") {
+                cursor.deleteChar();
+                c = this->document()->characterAt(cursor.position());
+            }
         }
 
         this->insertPlainText("\n" + indent);
+        cursor.endEditBlock();
         return;
     }
 
