@@ -511,6 +511,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         QTextEdit::keyPressEvent(event);
         if (this->mode == MODE_REPLACE_ONE && event->text()[0] != '\x0') {
             this->setMode(MODE_NORMAL);
+            this->left();
         }
         return;
     }
