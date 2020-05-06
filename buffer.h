@@ -2,6 +2,7 @@
 
 #include <QByteArray>
 #include <QFile>
+#include <QProcess>
 #include <QTextEdit>
 #include <QString>
 
@@ -29,6 +30,10 @@ public:
 
     // onEnter is called when the window is starting to display this buffer.
     void onEnter(Editor* editor);
+
+    // postProcess applies post processing to the current file.
+    // Returns true if the file has changed since saving and should be reloaded.
+    bool postProcess(Editor* editor);
 
     // modified is true if something has changed in the buffer which has not be
     // stored on disk.

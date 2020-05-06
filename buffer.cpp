@@ -1,4 +1,6 @@
 #include <QFileInfo>
+#include <QTextCursor>
+#include <QScrollBar>
 #include <QSettings>
 
 #include "buffer.h"
@@ -26,9 +28,9 @@ QByteArray Buffer::read() {
 
     QFile file(this->filename);
     // TODO(remy): it creates the file
-    file.open(QIODevice::ReadWrite);
-
+    file.open(QIODevice::ReadOnly);
     this->data = file.readAll();
+    file.close();
     this->readFromDisk = true;
     return this->data;
 }
@@ -42,9 +44,41 @@ void Buffer::save(Editor* editor) {
     } else {
         file.write(this->data);
     }
-    this->modified = false;
+    file.close();
 
+    if (this->postProcess(editor)) {
+        this->readFromDisk = false;
+        if (editor->getCurrentBuffer() == this) {
+            // refresh the data of this buffer, update the editor content
+            QTextCursor cursor = editor->textCursor();
+            int position = cursor.position();
+            QScrollBar* vscroll = editor->verticalScrollBar();
+            int value = vscroll->value();
+            editor->setText(this->read());
+            cursor.setPosition(position);
+            editor->setTextCursor(cursor);
+            vscroll->setValue(value);
+            editor->ensureCursorVisible();
+        } else {
+            // refresh the data of this buffer
+            this->read();
+        }
+    }
+
+    this->modified = false;
     // TODO(remy): error management
+}
+
+bool Buffer::postProcess(Editor*) {
+    if (this->filename.endsWith(".go")) {
+        QProcess process;
+        process.start("gofmt", QStringList() << "-l" << "-w" << this->filename);
+        if (!process.waitForFinished(10000)) {
+            qWarning() << "while running: gofmt";
+        }
+        return true;
+    }
+    return false;
 }
 
 void Buffer::onLeave(Editor* editor) {
@@ -53,9 +87,12 @@ void Buffer::onLeave(Editor* editor) {
     // store the last data from the document in the buffer
     this->data = editor->document()->toPlainText().toUtf8();
 
+    QScrollBar* vscroll = editor->verticalScrollBar();
+
     // store last cursor position in settings
     QSettings settings("mehteor", "meh");
-    settings.setValue("buffer/" + this->filename, editor->textCursor().position());
+    settings.setValue("buffer/" + this->filename + "/cursor", editor->textCursor().position());
+    settings.setValue("buffer/" + this->filename + "/vscroll", vscroll->value());
 }
 
 void Buffer::onEnter(Editor* editor) {
@@ -67,8 +104,11 @@ void Buffer::onEnter(Editor* editor) {
     editor->setText(this->read());
 
     // restore last cursor position
-    auto cursor = editor->textCursor();
+    QTextCursor cursor = editor->textCursor();
     QSettings settings("mehteor", "meh");
-    cursor.setPosition(settings.value("buffer/" + this->filename, 0).toInt());
+    cursor.setPosition(settings.value("buffer/" + this->filename + "/cursor", 0).toInt());
     editor->setTextCursor(cursor);
+    QScrollBar* vscroll = editor->verticalScrollBar();
+    vscroll->setValue(settings.value("buffer/" + this->filename + "/vscroll", 0).toInt());
+    editor->ensureCursorVisible();
 }

@@ -6,7 +6,7 @@
 
     * C++/Qt5, tested on Linux and macOS (will most likely work on Windows as well)
     * Vim-like movements: `h`, `j`, `k`, `l`, `f`, `F`, `o`, `O`, `a`, `A`, `I`, `g`, `G`, ...
-    * Insert, normal, replace, command, visual and visual-line mode are implemented (`i`, `Esc`, `R`, `:`, `v` and `V`)
+    * Insert, normal, replace, command, visual and visual-line mode are implemented (`i`, `Esc`, `r`, `R`, `:`, `v` and `V`)
     * Open multiple files
         * Ctrl-O (other) to go back to previous buffer
         * Ctrl-P to use the file opener
@@ -21,17 +21,18 @@
         * `:rg` search in all files with ripgrep for the word under the cursor
         * `:rg <pattern>` search in all files with ripgrep for the given pattern
         * `:rgf` search in current file with ripgrep for the word under the cursor
-        * `:rgf <pattern>` search in current files with ripgrep for the given pattern
+        * `:rgf <pattern>` search in current file with ripgrep for the given pattern
         * In results
             * `Ctrl-n` for next result, `Ctrl-p` for previous result, `Return` to open the file at the matching line
             * use `x` or `Backspace` to remove entries from the results to remove the noise
-    * Auto-indentation (respect previous line indentation, automatically changes it depending on `{` and `}`)
+    * Auto-indentation (respect previous line indentation, automatically changes it depending on `{`, `}`, and `:`)
     * Simple syntax highlighting (regexp based)
     * Highlight the selection / word under the cursor
     * Remember cursor position in files previously opened
     * Current-line visual emphasizing
     * 80 chars line indicator
-    * Next/previous occurrence of a char on the line (`fa` go to next `a`, `F(` go to previous `(`)
+    * Toggle // comments on selection with `Ctrl-c`, toggle # comments with `Ctrl-C`.
+    * Next/previous occurrence of a char on the line (e.g. `fa` go to next `a`, `F(` go to previous `(`)
     * Copy / paste
         * Visual mode to copy with `y` or cut with `x`
         * Paste with `Ctrl-V` in insert mode or `p` and `P` in normal mode
@@ -40,6 +41,7 @@
     * Undo `u` / Redo `U`
     * Page up (Ctrl-u) / Page down (Ctrl-d)
     * Go to line with `:<line number>`
+    * Automatically runs `gofmt` on Go files (on save), `zig fmt` on Zig files.
     * Others: `J`, `C`, `D`, `ct` `cT` `cf` `cF`, `vf`, `vF`, `<`, `>`, ...
 
 ## Roadmap
