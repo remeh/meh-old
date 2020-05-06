@@ -37,7 +37,11 @@ void Buffer::save(Editor* editor) {
     Q_ASSERT(editor != NULL);
     QFile file(filename);
     file.open(QIODevice::Truncate | QIODevice::ReadWrite);
-    file.write(editor->toPlainText().toUtf8());
+    if (editor->getCurrentBuffer() == this) {
+        file.write(editor->toPlainText().toUtf8());
+    } else {
+        file.write(this->data);
+    }
     this->modified = false;
 
     // TODO(remy): error management
