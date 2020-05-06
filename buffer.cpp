@@ -89,6 +89,14 @@ bool Buffer::postProcess(Editor*) {
         }
         return true;
     }
+    if (this->filename.endsWith(".zig")) {
+        QProcess process;
+        process.start("zig", QStringList() << "fmt" << this->filename);
+        if (!process.waitForFinished(10000)) {
+            qWarning() << "while running: zig fmt";
+        }
+        return true;
+    }
     return false;
 }
 
