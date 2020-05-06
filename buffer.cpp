@@ -49,12 +49,23 @@ void Buffer::save(Editor* editor) {
     if (this->postProcess(editor)) {
         this->readFromDisk = false;
         if (editor->getCurrentBuffer() == this) {
-            // refresh the data of this buffer, update the editor content
+            // store some cursor / scroll positions
             QTextCursor cursor = editor->textCursor();
             int position = cursor.position();
             QScrollBar* vscroll = editor->verticalScrollBar();
             int value = vscroll->value();
-            editor->setText(this->read());
+
+            // reset the content by re-reading the text
+            // we do it this way instead of a simple setText in order
+            // to keep the editor history.
+            cursor.beginEditBlock();
+            cursor.movePosition(QTextCursor::Start);
+            cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+            cursor.deleteChar();
+            cursor.insertText(this->read());
+            cursor.endEditBlock();
+
+            // reposition the scroll and the cursor
             cursor.setPosition(position);
             editor->setTextCursor(cursor);
             vscroll->setValue(value);
