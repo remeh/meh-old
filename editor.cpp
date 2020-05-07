@@ -5,6 +5,10 @@
 #include <QFontMetrics>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
+#include <QSet>
 #include <QSettings>
 #include <QString>
 #include <QTextBlock>
@@ -458,6 +462,9 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                     QTextEdit::keyPressEvent(&pageEvent);
                 }
                 return;
+            case Qt::Key_Space:
+                this->autocomplete();
+                return;
             case Qt::Key_H:
                 this->left();
                 return;
@@ -766,6 +773,33 @@ QString Editor::getWordUnderCursor() {
     }
 
     return rv;
+}
+
+void Editor::autocomplete() {
+    const QString& base = this->getWordUnderCursor();
+
+    qDebug() << "base:" << base;
+
+    QRegularExpression rx = QRegularExpression("("+base + "\\w+)");
+
+    QSet<QString> set;
+
+    QRegularExpressionMatchIterator it = rx.globalMatch(this->document()->toPlainText());
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        set << match.captured();
+    }
+
+    if (set.size() == 1) {
+        QTextCursor cursor = this->textCursor();
+        cursor.beginEditBlock();
+        cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, base.size());
+        cursor.deleteChar();
+        cursor.insertText(set.values().at(0));
+        cursor.endEditBlock();
+    }
+
+    qDebug() << set;
 }
 
 int Editor::findPreviousOneInCurrentLine(QChar c) {

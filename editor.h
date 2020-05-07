@@ -81,6 +81,9 @@ public:
     // would need to be stored on disk.
     QStringList modifiedBuffers();
 
+    // XXX(remy):
+    void autocomplete();
+
 protected:
     void keyPressEvent(QKeyEvent*) override;
     void mousePressEvent(QMouseEvent*) override;
