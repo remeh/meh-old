@@ -737,12 +737,16 @@ QString Editor::getWordUnderCursor() {
     QString text = cursor.block().text();
 
     int pos = cursor.positionInBlock();
+    bool leftOnly = false;
     if (text[pos].isNumber() || text[pos].isLetter() || text[pos] == '_') {
         rv.append(text[pos]);
     } else {
-        return "";
+        // we may be at the end of a word, on a point or anything, in this case
+        // use only the left of the cursor.
+        leftOnly = true;
     }
 
+    // go left first, if we find something will go with that
     for (int i = pos-1; i >= 0; i--) {
         if (text[i].isNumber() || text[i].isLetter() || text[i] == '_') {
             rv.prepend(text[i]);
@@ -750,12 +754,15 @@ QString Editor::getWordUnderCursor() {
         }
         break;
     }
-    for (int i = pos+1; i <= text.size(); i++) {
-        if (text[i].isNumber() || text[i].isLetter() || text[i] == '_') {
-            rv.append(text[i]);
-            continue;
+
+    if (!leftOnly) {
+        for (int i = pos+1; i <= text.size(); i++) {
+            if (text[i].isNumber() || text[i].isLetter() || text[i] == '_') {
+                rv.append(text[i]);
+                continue;
+            }
+            break;
         }
-        break;
     }
 
     return rv;
