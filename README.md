@@ -25,6 +25,7 @@
         * In results
             * `Ctrl-n` for next result, `Ctrl-p` for previous result, `Return` to open the file at the matching line
             * use `x` or `Backspace` to remove entries from the results to remove the noise
+    * Auto-complete with words in opened buffers with `Ctrl-Space`
     * Auto-indentation (respect previous line indentation, automatically changes it depending on `{`, `}`, and `:`)
     * Simple syntax highlighting (regexp based)
     * Highlight the selection / word under the cursor
