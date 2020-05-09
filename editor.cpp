@@ -809,6 +809,7 @@ void Editor::autocomplete() {
         return;
     }
 
+    this->selectionTimer->stop();
     this->window->openCompleter(base, list);
 }
 
