@@ -2,16 +2,19 @@
 
 #include <QChar>
 #include <QColor>
+#include <QFocusEvent>
 #include <QLabel>
+#include <QListWidget>
 #include <QMap>
 #include <QMouseEvent>
-#include <QResizeEvent>
 #include <QPaintEvent>
-#include <QVector>
+#include <QResizeEvent>
+#include <QStringList>
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTextEdit>
 #include <QTimer>
+#include <QVector>
 
 #include "buffer.h"
 #include "fileslookup.h"
@@ -60,6 +63,9 @@ public:
     // if backward is set.
     void goToOccurrence(const QString& string, bool backward);
 
+    // TODO(remy): comment me
+    void setCompleter(const QStringList& completer);
+
     // deleteCurrentLine removes the current line of the buffer.
     void deleteCurrentLine();
 
@@ -87,6 +93,7 @@ public:
 
     // XXX(remy):
     void autocomplete();
+    void applyAutocomplete(const QString& base, const QString& word);
 
 protected:
     void keyPressEvent(QKeyEvent*) override;
@@ -138,6 +145,7 @@ private:
     QLabel* modeLabel;
     QLabel* lineLabel;
     QLabel* modifiedLabel;
+    QListWidget* currentCompleter;
 
     Window* window;
 

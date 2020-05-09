@@ -24,6 +24,8 @@ public:
 
     const QString& getFilename() { return this->filename; }
 
+    const QByteArray& getData() { return this->data; }
+
     // onLeave is called when the Window is leaving this Buffer (either to show
     // another or because we're closing the application for instance).
     void onLeave(Editor* editor);

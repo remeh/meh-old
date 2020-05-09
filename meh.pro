@@ -2,6 +2,7 @@ QT += widgets
 
 HEADERS     =   buffer.h \
                 command.h \
+                completer.h \
                 editor.h \
                 fileslookup.h \
                 grep.h \
@@ -9,6 +10,7 @@ HEADERS     =   buffer.h \
                 window.h
 SOURCES     =   buffer.cpp \
                 command.cpp \
+                completer.cpp \
                 editor.cpp \
                 fileslookup.cpp \
                 grep.cpp \
@@ -21,6 +23,6 @@ SOURCES     =   buffer.cpp \
 
 # CONFIG += sanitizer sanitize_address
 # Debug symbols
-# QMAKE_CXXFLAGS += -g
+QMAKE_CXXFLAGS += -g
 # Remove optimizations
-# QMAKE_CXXFLAGS_RELEASE -= -O2
+QMAKE_CXXFLAGS_RELEASE -= -O2
