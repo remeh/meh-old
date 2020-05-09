@@ -4,6 +4,7 @@
 #include <QGuiApplication>
 #include <QKeyEvent>
 #include <QScrollBar>
+#include <QTextBlock>
 #include <QTextCursor>
 #include <QTextDocument>
 
@@ -99,19 +100,13 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             return;
 
         case Qt::Key_Greater:
-            // TODO(remy): when multilines are selected
             {
-                QTextCursor cursor = this->textCursor();
-                int position = cursor.position();
-                this->moveCursor(QTextCursor::StartOfBlock);
-                this->insertPlainText("    ");
-                cursor.setPosition(position+4);
-                this->setTextCursor(cursor);
+                this->insertIndentation(this->textCursor());
             }
             return;
         case Qt::Key_Less:
             {
-                this->removeIndentation();
+                this->removeIndentation(this->textCursor());
             }
             return;
 

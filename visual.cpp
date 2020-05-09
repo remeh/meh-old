@@ -85,7 +85,27 @@ void Editor::keyPressEventVisual(QKeyEvent* event, bool ctrl, bool shift) {
             // TODO(remy): confirm this is the wanted behavior
             this->moveCursor(QTextCursor::PreviousWord, QTextCursor::KeepAnchor);
             return;
-    }
+        case Qt::Key_Less:
+            {
+                this->textCursor().beginEditBlock();
+                QList<QTextBlock> blocks = this->selectedBlocks();
+                for (int i = 0; i < blocks.size(); i++) {
+                    this->removeIndentation(QTextCursor(blocks.at(i)));
+                }
+                this->textCursor().endEditBlock();
+            }
+            return;
+        case Qt::Key_Greater:
+            {
+                this->textCursor().beginEditBlock();
+                QList<QTextBlock> blocks = this->selectedBlocks();
+                for (int i = 0; i < blocks.size(); i++) {
+                    this->insertIndentation(QTextCursor(blocks.at(i)));
+                }
+                this->textCursor().endEditBlock();
+            }
+            return;
+        }
 }
 
 
@@ -121,6 +141,26 @@ void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool) {
         case Qt::Key_J:
             this->moveCursor(QTextCursor::Down, QTextCursor::KeepAnchor);
             this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+            return;
+        case Qt::Key_Less:
+            {
+                this->textCursor().beginEditBlock();
+                QList<QTextBlock> blocks = this->selectedBlocks();
+                for (int i = 0; i < blocks.size(); i++) {
+                    this->removeIndentation(QTextCursor(blocks.at(i)));
+                }
+                this->textCursor().endEditBlock();
+            }
+            return;
+        case Qt::Key_Greater:
+            {
+                this->textCursor().beginEditBlock();
+                QList<QTextBlock> blocks = this->selectedBlocks();
+                for (int i = 0; i < blocks.size(); i++) {
+                    this->insertIndentation(QTextCursor(blocks.at(i)));
+                }
+                this->textCursor().endEditBlock();
+            }
             return;
     }
 }

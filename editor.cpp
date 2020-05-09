@@ -618,7 +618,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 
     if (event->text() == "}") {
         if (this->currentLineIsOnlyWhitespaces() >= 0) {
-            this->removeIndentation();
+            this->removeIndentation(this->textCursor());
         }
         QTextEdit::keyPressEvent(event);
         return;
@@ -630,10 +630,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
 
 void Editor::toggleComments(QList<QTextBlock> blocks, const QString& commentChars) {
     QTextCursor cursor = this->textCursor();
-    int position = cursor.position();
 
     cursor.beginEditBlock();
-
     for (int i = 0; i < blocks.size(); i++) {
         QTextBlock block = blocks.at(i);
         QString text = block.text();
@@ -648,14 +646,16 @@ void Editor::toggleComments(QList<QTextBlock> blocks, const QString& commentChar
             cursor.insertText(commentChars);
         }
     }
-
     cursor.endEditBlock();
 }
 
-void Editor::removeIndentation() {
+void Editor::insertIndentation(QTextCursor cursor) {
+    cursor.movePosition(QTextCursor::StartOfBlock);
+    cursor.insertText("    ");
+}
+
+void Editor::removeIndentation(QTextCursor cursor) {
     // remove one layer of indentation
-    QTextCursor cursor = this->textCursor();
-    int position = cursor.position();
     cursor.movePosition(QTextCursor::StartOfLine);
     int i = 0;
     for (i = 0; i < 4; i++) {
@@ -670,8 +670,6 @@ void Editor::removeIndentation() {
             break;
         }
     }
-    cursor.setPosition(position - i);
-    this->setTextCursor(cursor);
 }
 
 QString Editor::currentLineIndent() {

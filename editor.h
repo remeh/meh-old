@@ -9,6 +9,7 @@
 #include <QPaintEvent>
 #include <QVector>
 #include <QTextBlock>
+#include <QTextCursor>
 #include <QTextEdit>
 #include <QTimer>
 
@@ -74,8 +75,11 @@ public:
     // called by the window when it is resized.
     void onWindowResized(QResizeEvent*);
 
-    // removeIndentation remove one layer of indentation on the current line.
-    void removeIndentation();
+    // removeIndentation removes one level of indentation on the line of the given cursor..
+    void removeIndentation(QTextCursor cursor);
+
+    // insertIndentation adds one level of indentation on the line of the given cursor.
+    void insertIndentation(QTextCursor cursor);
 
     // modifiedBuffers returns a list of the loaded and modified buffers that
     // would need to be stored on disk.
