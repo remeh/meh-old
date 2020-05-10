@@ -504,7 +504,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                 }
                 return;
 
-            case Qt::Key_C:
+            case Qt::Key_M:
                 {
                     QList<QTextBlock> blocks = this->selectedBlocks();
                     if (blocks.size() == 0) {

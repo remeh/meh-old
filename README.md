@@ -32,7 +32,7 @@
     * Remember cursor position in files previously opened
     * Current-line visual emphasizing
     * 80 chars line indicator
-    * Toggle // comments on selection with `Ctrl-c`, toggle # comments with `Ctrl-C`.
+    * Toggle // comments on selection with `Ctrl-m`, toggle # comments with `Ctrl-Shift-m`.
     * Next/previous occurrence of a char on the line (e.g. `fa` go to next `a`, `F(` go to previous `(`)
     * Copy / paste
         * Visual mode to copy with `y` or cut with `x`
