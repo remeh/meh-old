@@ -727,16 +727,12 @@ QList<QTextBlock> Editor::selectedBlocks() {
     QTextBlock start = this->document()->findBlock(cursor.selectionStart());
     QTextBlock end = this->document()->findBlock(cursor.selectionEnd());
 
-    if (start != end) {
-        rv.append(end);
-    }
-
     while (true) {
         rv.append(start);
-        start = start.next();
         if (start == end) {
             break;
         }
+        start = start.next();
     }
 
     return rv;
