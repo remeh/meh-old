@@ -3,6 +3,8 @@
 #include <QFileInfo>
 #include <QFont>
 #include <QFontMetrics>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QRegularExpression>
@@ -25,6 +27,7 @@
 
 Editor::Editor(Window* window) :
     QTextEdit(window),
+    currentCompleter(nullptr),
     window(window),
     currentBuffer(NULL),
     mode(MODE_NORMAL),
@@ -128,6 +131,9 @@ Editor::~Editor() {
     delete this->modeLabel;
     delete this->lineLabel;
     delete this->modifiedLabel;
+    if (this->currentCompleter) {
+        delete this->currentCompleter;
+    }
 }
 
 void Editor::onWindowResized(QResizeEvent*) {
@@ -518,6 +524,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Escape) {
         this->window->closeList();
         this->window->closeGrep();
+        this->window->closeCompleter();
     }
 
     // Replace mode
@@ -776,28 +783,43 @@ QString Editor::getWordUnderCursor() {
 void Editor::autocomplete() {
     const QString& base = this->getWordUnderCursor();
 
-    qDebug() << "base:" << base;
-
     QRegularExpression rx = QRegularExpression("("+base + "\\w+)");
 
-    QSet<QString> set;
+    QStringList list;
 
     QRegularExpressionMatchIterator it = rx.globalMatch(this->document()->toPlainText());
     while (it.hasNext()) {
         QRegularExpressionMatch match = it.next();
-        set << match.captured();
+        list << match.captured();
     }
 
-    if (set.size() == 1) {
-        QTextCursor cursor = this->textCursor();
-        cursor.beginEditBlock();
-        cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, base.size());
-        cursor.deleteChar();
-        cursor.insertText(set.values().at(0));
-        cursor.endEditBlock();
+    QList<Buffer*> buffers = this->buffers.values();
+    for (int i = 0; i < buffers.size(); i++) {
+        QRegularExpressionMatchIterator it = rx.globalMatch(buffers[i]->getData());
+        while (it.hasNext()) {
+            QRegularExpressionMatch match = it.next();
+            list << match.captured();
+        }
     }
 
-    qDebug() << set;
+    list.removeDuplicates();
+
+    if (list.size() == 1) {
+        this->applyAutocomplete(base, list[0]);
+        return;
+    }
+
+    this->selectionTimer->stop();
+    this->window->openCompleter(base, list);
+}
+
+void Editor::applyAutocomplete(const QString& base, const QString& word) {
+    QTextCursor cursor = this->textCursor();
+    cursor.beginEditBlock();
+    cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, base.size());
+    cursor.deleteChar();
+    cursor.insertText(word);
+    cursor.endEditBlock();
 }
 
 int Editor::findPreviousOneInCurrentLine(QChar c) {

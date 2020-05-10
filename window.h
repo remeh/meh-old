@@ -11,6 +11,7 @@
 #include "editor.h"
 
 class Command;
+class Completer;
 class Editor;
 class Grep;
 
@@ -25,6 +26,11 @@ public:
     // closeCommand hides the command line and set the editor in normal mode
     // if it has been instanciated.
     void closeCommand();
+
+    // TODO(remy): comment me
+    void openCompleter(const QString& base, const QStringList& list);
+    // TODO(remy): comment me
+    void closeCompleter();
 
     // setCommand sets the text in the command to the given value.
     void setCommand(const QString& text);
@@ -62,6 +68,7 @@ private:
     Command* command;
     FilesLookup* filesLookup;
     Grep* grep;
+    Completer* completer;
 
     // baseDir on which the FilesLookup should be opened.
     QString baseDir;

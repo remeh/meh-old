@@ -2,12 +2,11 @@
 #include <QString>
 
 #include "command.h"
+#include "completer.h"
 #include "editor.h"
 #include "fileslookup.h"
 #include "grep.h"
 #include "window.h"
-
-#include "qdebug.h"
 
 Window::Window(QWidget* parent) :
     QWidget(parent),
@@ -18,6 +17,9 @@ Window::Window(QWidget* parent) :
     this->command->hide();
     this->filesLookup = new FilesLookup(this);
     this->filesLookup->hide();
+    this->completer = new Completer(this);
+    this->completer->setMaximumHeight(100);
+    this->completer->hide();
 
     // editor
     // ----------------------
@@ -45,6 +47,7 @@ Window::Window(QWidget* parent) :
     this->layout->addWidget(this->command);
     this->layout->addWidget(this->filesLookup);
     this->layout->addWidget(this->grep);
+    this->layout->addWidget(this->completer);
     this->setLayout(layout);
 }
 
@@ -71,6 +74,19 @@ void Window::openList() {
 
 void Window::closeList() {
     this->filesLookup->hide();
+}
+
+void Window::openCompleter(const QString& base, const QStringList& list) {
+    this->completer->clear();
+    this->completer->setItems(base, list);
+    QPoint p; this->mapToParent(p);
+    this->completer->setGeometry(p.x(), p.y(), 200, 60);
+    this->completer->show();
+    this->completer->setFocus();
+}
+
+void Window::closeCompleter() {
+    this->completer->hide();
 }
 
 void Window::openGrep(const QString& string) {
