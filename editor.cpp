@@ -832,7 +832,7 @@ int Editor::findPreviousOneInCurrentLine(QChar c) {
 
     if (cursor.positionInBlock() == 0) { return 0; }
 
-    for (int i = cursor.positionInBlock(); i >= 0; i--) {
+    for (int i = cursor.positionInBlock()-1; i >= 0; i--) {
         if (text[i] == c) {
             return cursor.positionInBlock() - i;
         }
