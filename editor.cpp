@@ -164,6 +164,9 @@ void Editor::onSelectionChanged() {
 }
 
 void Editor::onTriggerSelectionHighlight() {
+    if (this->document()->blockCount() > 3000) {
+        return;
+    }
     QTextCursor cursor = this->textCursor();
     QString text = cursor.selectedText();
     if (text.size() == 0) {
