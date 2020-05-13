@@ -130,13 +130,21 @@ void FilesLookup::keyPressEvent(QKeyEvent* event) {
 
         case Qt::Key_N:
             if (ctrl) {
-                this->list->setCurrentRow(this->list->currentRow() + 1);
+                if (this->list->currentRow() == this->list->count() - 1) {
+                    this->list->setCurrentRow(0);
+                } else {
+                    this->list->setCurrentRow(this->list->currentRow() + 1);
+                }
             }
             return;
 
         case Qt::Key_P:
             if (ctrl) {
-                this->list->setCurrentRow(this->list->currentRow() - 1);
+                if (this->list->currentRow() <= 0) {
+                    this->list->setCurrentRow(this->list->count() - 1);
+                } else {
+                    this->list->setCurrentRow(this->list->currentRow() - 1);
+                }
             }
             return;
 

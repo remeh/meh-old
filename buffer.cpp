@@ -6,6 +6,8 @@
 #include "buffer.h"
 #include "editor.h"
 
+#include "qdebug.h"
+
 Buffer::Buffer() :
     modified(false),
     readFromDisk(false) {
