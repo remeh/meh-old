@@ -6,8 +6,6 @@
 #include "buffer.h"
 #include "editor.h"
 
-#include "qdebug.h"
-
 Buffer::Buffer() :
     modified(false),
     readFromDisk(false) {
@@ -26,12 +24,14 @@ QByteArray Buffer::read() {
         return this->data;
     }
 
-    QFile file(this->filename);
-    // TODO(remy): it creates the file
-    file.open(QIODevice::ReadOnly);
-    this->data = file.readAll();
-    file.close();
-    this->readFromDisk = true;
+    if (QFile::exists(this->filename)) {
+        QFile file(this->filename);
+        file.open(QIODevice::ReadOnly);
+        this->data = file.readAll();
+        file.close();
+        this->readFromDisk = true;
+    }
+
     return this->data;
 }
 
