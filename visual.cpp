@@ -109,7 +109,7 @@ void Editor::keyPressEventVisual(QKeyEvent* event, bool ctrl, bool shift) {
 }
 
 
-void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool) {
+void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool shift) {
     Q_ASSERT(event != NULL);
 
     switch (event->key()) {
@@ -141,6 +141,13 @@ void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool) {
         case Qt::Key_J:
             this->moveCursor(QTextCursor::Down, QTextCursor::KeepAnchor);
             this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+            return;
+        case Qt::Key_G:
+            if (shift) {
+                this->moveCursor(QTextCursor::End, QTextCursor::KeepAnchor);
+            } else {
+                this->moveCursor(QTextCursor::Start, QTextCursor::KeepAnchor);
+            }
             return;
         case Qt::Key_Less:
             {
