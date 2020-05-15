@@ -68,8 +68,12 @@ void Window::closeCommand() {
     }
 }
 
-void Window::openList() {
-    this->filesLookup->show();
+void Window::openListFiles() {
+    this->filesLookup->showFiles();
+}
+
+void Window::openListBuffers() {
+    this->filesLookup->showBuffers();
 }
 
 void Window::closeList() {

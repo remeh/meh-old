@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
 #include <QListWidgetItem>
 
 #include "qdebug.h"
@@ -46,10 +47,21 @@ void FilesLookup::onEditChanged() {
     this->list->setCurrentRow(0);
 }
 
-void FilesLookup::show() {
+void FilesLookup::showFiles() {
     this->base = "";
     this->edit->setText("");
     this->lookupDir(this->window->getBaseDir());
+    this->show();
+}
+
+void FilesLookup::showBuffers() {
+    this->base = "";
+    this->edit->setText("");
+    this->lookupBuffers();
+    this->show();
+}
+
+void FilesLookup::show() {
     this->edit->show();
     this->label->show();
     this->list->show();
@@ -63,6 +75,19 @@ void FilesLookup::hide() {
     this->label->hide();
     this->list->hide();
     QWidget::hide();
+}
+
+void FilesLookup::lookupBuffers() {
+    this->filenames.clear();
+    this->filteredFiles.clear();
+    this->directories.clear();
+    this->filteredDirs.clear();
+
+    QList<Buffer*> buffers = this->window->getEditor()->getBuffers().values();
+    for (int i = 0; i < buffers.size(); i++) {
+        this->filenames.insert(buffers.at(i)->getFilename());
+        this->filteredFiles.insert(buffers.at(i)->getFilename());
+    }
 }
 
 void FilesLookup::lookupDir(QString filepath) {

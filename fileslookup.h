@@ -22,6 +22,9 @@ public:
     // TODO(remy): comment me
     void lookupDir(QString filepath);
 
+    // TODO(remy): comment me
+    void lookupBuffers();
+
     // resetFiltered resets the list with filetered results (they again
     // contain all entries).
     void resetFiltered();
@@ -39,6 +42,8 @@ public:
     void filter(QString string);
 
     void show();
+    void showFiles();
+    void showBuffers();
     void hide();
 
 public slots:

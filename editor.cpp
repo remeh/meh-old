@@ -503,7 +503,13 @@ void Editor::keyPressEvent(QKeyEvent* event) {
             // open a file with the FilesLookup
             case Qt::Key_P:
                 {
-                    this->window->openList();
+                    if (shift) {
+                        // buffers list
+                        this->window->openListBuffers();
+                    } else {
+                        // files list
+                        this->window->openListFiles();
+                    }
                 }
                 return;
 

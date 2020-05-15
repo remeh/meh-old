@@ -91,6 +91,8 @@ public:
     // would need to be stored on disk.
     QStringList modifiedBuffers();
 
+    QMap<QString, Buffer*>& getBuffers() { return this->buffers; }
+
     // XXX(remy):
     void autocomplete();
     void applyAutocomplete(const QString& base, const QString& word);

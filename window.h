@@ -35,9 +35,10 @@ public:
     // setCommand sets the text in the command to the given value.
     void setCommand(const QString& text);
 
-    // showList shows the list below the command field at the bottom of the window.
-    // TODO(remy): rename me
-    void openList();
+    // TODO(remy): rename and comment me
+    void openListFiles();
+    // TODO(remy): rename and comment me
+    void openListBuffers();
 
     // closeList removes all entries in the list and hides it.
     // TODO(remy): rename me
