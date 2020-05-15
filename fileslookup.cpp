@@ -38,11 +38,8 @@ FilesLookup::FilesLookup(Window* window) :
 }
 
 void FilesLookup::onEditChanged() {
-    if (this->edit->text() == "") {
-        this->resetFiltered();
-    } else {
-        this->filter(this->edit->text());
-    }
+    this->resetFiltered();
+    this->filter();
     this->refreshList();
     this->list->setCurrentRow(0);
 }
@@ -205,7 +202,8 @@ void FilesLookup::resetFiltered() {
 
 }
 
-void FilesLookup::filter(QString string) {
+void FilesLookup::filter() {
+    QString string = this->edit->text();
     auto it = this->filteredDirs.constBegin();
     while (it != this->filteredDirs.constEnd()) {
         // TODO(remy): fuzzy search

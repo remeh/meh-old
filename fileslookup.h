@@ -39,7 +39,7 @@ public:
     bool openSelection();
 
     // TODO(remy): comment me
-    void filter(QString string);
+    void filter();
 
     void show();
     void showFiles();
