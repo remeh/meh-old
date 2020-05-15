@@ -209,7 +209,7 @@ void FilesLookup::filter(QString string) {
     auto it = this->filteredDirs.constBegin();
     while (it != this->filteredDirs.constEnd()) {
         // TODO(remy): fuzzy search
-        if (!(it->startsWith(string))) {
+        if (!(it->contains(string))) {
             it = this->filteredDirs.erase(it);
         } else {
             ++it;
@@ -219,7 +219,7 @@ void FilesLookup::filter(QString string) {
     it = this->filteredFiles.begin();
     while (it != this->filteredFiles.end()) {
         // TODO(remy): fuzzy search
-        if (!it->startsWith(string)) {
+        if (!it->contains(string)) {
             it = this->filteredFiles.erase(it);
         } else {
             ++it;
