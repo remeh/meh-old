@@ -207,7 +207,7 @@ void FilesLookup::filter() {
     auto it = this->filteredDirs.constBegin();
     while (it != this->filteredDirs.constEnd()) {
         // TODO(remy): fuzzy search
-        if (!(it->contains(string))) {
+        if (!(it->contains(QRegularExpression(string)))) {
             it = this->filteredDirs.erase(it);
         } else {
             ++it;
@@ -217,7 +217,7 @@ void FilesLookup::filter() {
     it = this->filteredFiles.begin();
     while (it != this->filteredFiles.end()) {
         // TODO(remy): fuzzy search
-        if (!it->contains(string)) {
+        if (!it->contains(QRegularExpression(string))) {
             it = this->filteredFiles.erase(it);
         } else {
             ++it;
