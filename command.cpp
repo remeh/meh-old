@@ -104,8 +104,13 @@ void Command::execute(QString text) {
     // ----------------------
 
     if (command.size() > 1 && command.at(0) == "/") {
-        QStringRef search = command.rightRef(command.size() - 1);
-        this->window->getEditor()->goToOccurrence(search.toString(), false);
+        QStringList search;
+        QStringRef first = command.rightRef(command.size() - 1);
+        search << first.toString();
+        for (int i = 1; i < list.size(); i++) {
+           search << list.at(i);
+        }
+        this->window->getEditor()->goToOccurrence(search.join(" "), false);
         return;
     }
 
