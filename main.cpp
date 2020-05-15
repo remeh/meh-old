@@ -14,7 +14,7 @@ int main(int argv, char **args)
     QCoreApplication::setApplicationName("meh");
 
     Window window;
-    window.setWindowTitle(QObject::tr("meh"));
+    window.setWindowTitle(QObject::tr("meh - no file"));
     window.resize(800, 700);
     window.show();
 

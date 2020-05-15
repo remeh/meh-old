@@ -82,6 +82,26 @@ void Command::execute(QString text) {
         return;
     }
 
+    if (command == ":bd") {
+        if (this->window->getEditor()->getCurrentBuffer() == nullptr) {
+            return;
+        }
+        if (this->window->getEditor()->getCurrentBuffer()->modified) {
+            QMessageBox::warning(this->window, "Unsaved buffer", "The buffer you want to close has modifications.");
+            return;
+        }
+        this->window->getEditor()->closeCurrentBuffer();
+        return;
+    }
+
+    if (command == ":bd!") {
+        if (this->window->getEditor()->getCurrentBuffer() == nullptr) {
+            return;
+        }
+        this->window->getEditor()->closeCurrentBuffer();
+        return;
+    }
+
     if (command == ":basedir") {
         this->window->setBaseDir(list[1]);
         return;

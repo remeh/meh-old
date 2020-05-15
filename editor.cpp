@@ -249,6 +249,27 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
     this->setCurrentBuffer(buffer);
 }
 
+void Editor::closeCurrentBuffer() {
+    if (this->currentBuffer == nullptr) {
+        return;
+    }
+
+    this->currentBuffer->onLeave(this); // store settings
+    delete this->currentBuffer;
+    this->currentBuffer = nullptr;
+
+    if (this->buffers.size() == 0) {
+        this->setText(""); // clear
+        this->window->setWindowTitle("meh - no file");
+        return;
+    }
+
+    // NOTE(remy): don't remove it here, just take a ref,
+    // the selectOrCreateBuffer takes care of the list order etc.
+    const QString& filename = this->buffersPos.last();
+    this->selectOrCreateBuffer(filename);
+}
+
 bool Editor::hasBuffer(const QString& filename) {
     if (this->currentBuffer == nullptr) {
         return false;
@@ -494,7 +515,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                         return;
                     }
                     // NOTE(remy): don't remove it here, just take a ref,
-                    // the selectBuffer takes care of the list order etc.
+                    // the selectOrCreateBuffer takes care of the list order etc.
                     const QString& filename = this->buffersPos.last();
                     this->selectOrCreateBuffer(filename);
                 }
