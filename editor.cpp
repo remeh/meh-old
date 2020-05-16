@@ -449,11 +449,20 @@ void Editor::paintEvent(QPaintEvent* event) {
 void Editor::mousePressEvent(QMouseEvent* event) {
     Q_ASSERT(event != NULL);
 
-    if (event->button() == Qt::MidButton) {
+    if (event->button() == Qt::ForwardButton) {
         if (this->mode == MODE_NORMAL) {
             this->setMode(MODE_INSERT);
         } else if (this->mode == MODE_INSERT) {
             this->setMode(MODE_NORMAL);
+        }
+        return;
+    }
+    if (event->button() == Qt::BackButton) {
+        if (this->buffers.size() > 0) {
+            // NOTE(remy): don't remove it here, just take a ref,
+            // the selectOrCreateBuffer takes care of the list order etc.
+            const QString& filename = this->buffersPos.last();
+            this->selectOrCreateBuffer(filename);
         }
         return;
     }
