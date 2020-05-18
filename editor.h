@@ -18,6 +18,7 @@
 
 #include "buffer.h"
 #include "fileslookup.h"
+#include "lsp.h"
 #include "mode.h"
 #include "syntax.h"
 
@@ -65,6 +66,9 @@ public:
     void left();
     void right();
 
+    int currentLineNumber();
+    int currentColumn();
+
     // goToOccurrence goes to the next occurence of string if any, previous one
     // if backward is set.
     void goToOccurrence(const QString& string, bool backward);
@@ -102,6 +106,8 @@ public:
     // XXX(remy):
     void autocomplete();
     void applyAutocomplete(const QString& base, const QString& word);
+
+    LSPManager lspManager;
 
 protected:
     void keyPressEvent(QKeyEvent*) override;

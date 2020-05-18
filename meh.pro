@@ -1,4 +1,4 @@
-QT += widgets
+QT += widgets network
 
 HEADERS     =   buffer.h \
                 command.h \
@@ -6,6 +6,7 @@ HEADERS     =   buffer.h \
                 editor.h \
                 fileslookup.h \
                 grep.h \
+                lsp.h \
                 syntax.h \
                 window.h
 SOURCES     =   buffer.cpp \
@@ -14,6 +15,7 @@ SOURCES     =   buffer.cpp \
                 editor.cpp \
                 fileslookup.cpp \
                 grep.cpp \
+                lsp.cpp \
                 main.cpp \
                 normal.cpp \
                 submode.cpp \
@@ -23,6 +25,6 @@ SOURCES     =   buffer.cpp \
 
 # CONFIG += sanitizer sanitize_address
 # Debug symbols
-QMAKE_CXXFLAGS += -g
+# QMAKE_CXXFLAGS += -g
 # Remove optimizations
-QMAKE_CXXFLAGS_RELEASE -= -O2
+# QMAKE_CXXFLAGS_RELEASE -= -O2

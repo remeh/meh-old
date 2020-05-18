@@ -29,10 +29,10 @@ Editor::Editor(Window* window) :
     QTextEdit(window),
     currentCompleter(nullptr),
     window(window),
-    currentBuffer(NULL),
+    currentBuffer(nullptr),
     mode(MODE_NORMAL),
     highlightedLine(QColor::fromRgb(50, 50, 50)) {
-    Q_ASSERT(window != NULL);
+    Q_ASSERT(window != nullptr);
 
     // we don't want a rich text editor
     // ----------------------
@@ -246,6 +246,7 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
     }
 
     this->window->setWindowTitle("meh - " + filename);
+    lspManager.manageBuffer(this->window, buffer);
     this->setCurrentBuffer(buffer);
 }
 
@@ -735,6 +736,14 @@ QString Editor::currentLineIndent() {
         }
     }
     return rv;
+}
+
+int Editor::currentLineNumber() {
+    return this->textCursor().blockNumber();
+}
+
+int Editor::currentColumn() {
+    return this->textCursor().positionInBlock();
 }
 
 int Editor::currentLineIsOnlyWhitespaces() {

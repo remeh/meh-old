@@ -2,6 +2,7 @@
 #include <QMessageBox>
 
 #include "command.h"
+#include "lsp.h"
 #include "window.h"
 
 Command::Command(Window* window) :
@@ -80,6 +81,18 @@ void Command::execute(QString text) {
         this->window->getEditor()->saveAll();
         QCoreApplication::quit();
         return;
+    }
+
+    if (command == ":goto") {
+        Buffer* currentBuffer = this->window->getEditor()->getCurrentBuffer();
+        LSP* lsp = this->window->getEditor()->lspManager.getLSP(currentBuffer);
+        if (lsp == nullptr) {
+            // TODO(remy):
+            return;
+        }
+
+        lsp->definition(currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        // TODO(remy): finish me
     }
 
     if (command == ":bd") {
