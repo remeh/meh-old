@@ -38,11 +38,11 @@ void LSPGopls::initialize() {
     qDebug() << this->lspServer.readAll();
 }
 
-void LSPGopls::openFile(const QString& filename) {
+void LSPGopls::openFile(Buffer* buffer) {
     // gopls wants directories and not files
-    QFileInfo fi(filename);
+    QFileInfo fi(buffer->getFilename());
     qDebug() << "directory:" << fi.absoluteDir().absolutePath();
-    const QString& msg = this->writer.openFile(fi.absoluteDir().absolutePath(), "go");
+    const QString& msg = this->writer.openFile(buffer, fi.absoluteDir().absolutePath(), "go");
     qDebug() << "sending:" << msg;
     int written = this->lspServer.write(msg.toUtf8());
     qDebug() << written << "bytes written";

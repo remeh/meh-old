@@ -36,7 +36,7 @@ LSP* LSPManager::start(Window* window, const QString& language) {
         lsp->initialize();
         this->lsps.append(lsp);
         return lsp;
-    } else if (language == "cpp") {
+    } else if (language == "cpp" || language == "h") {
         qDebug() << "Starting LSPClangd";
         LSP* lsp = new LSPClangd(window->getBaseDir());
         if (!lsp->start()) {
@@ -83,7 +83,7 @@ bool LSPManager::manageBuffer(Window* window, Buffer* buffer) {
         qDebug() << "for" << buffer->getFilename() << "use lsp" << lsp;
         this->lspsPerFile.insert(buffer->getFilename(), lsp);
         // TODO(remy): sends the message to the LSP server to open this file
-        lsp->openFile(buffer->getFilename());
+        lsp->openFile(buffer);
         return true;
     }
 
@@ -114,7 +114,7 @@ QString LSPWriter::initialize(const QString& baseDir) {
     QJsonObject workspace {
         {"definition", dynReg},
         {"references", dynReg},
-        {"", dynReg}
+        {"declaration", dynReg}
     };
     QJsonObject capabilities {
         {"workspace", workspace}
@@ -144,14 +144,19 @@ QString LSPWriter::initialized() {
     return this->payload(str);
 }
 
-QString LSPWriter::openFile(const QString& filename, const QString& language) {
-    QJsonObject params {
+QString LSPWriter::openFile(Buffer* buffer, const QString& filename, const QString& language) {
+    QJsonObject textDocument {
         {"uri", "file://" + filename },
-        {"language", language}
+        {"version", 1},
+        {"languageId", language},
+        {"text", QString(buffer->getData())}
+    };
+    QJsonObject params {
+        {"textDocument", textDocument}
     };
     QJsonObject object {
         {"jsonrpc", "2.0"},
-        {"id", 1}, // XXX(remy):
+//        {"id", 1}, // XXX(remy):
         {"method", "textDocument/didOpen"},
         {"params", params}
     };
@@ -167,10 +172,10 @@ QString LSPWriter::definition(const QString& filename, int line, int column) {
     };
     QJsonObject textDocument {
         {"uri", "file://" + filename },
-        {"position", position}
     };
     QJsonObject params {
-        {"textDocument", textDocument}
+        {"textDocument", textDocument},
+        {"position", position}
     };
     QJsonObject object {
         {"jsonrpc", "2.0"},

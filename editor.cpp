@@ -246,8 +246,8 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
     }
 
     this->window->setWindowTitle("meh - " + filename);
-    lspManager.manageBuffer(this->window, buffer);
     this->setCurrentBuffer(buffer);
+    lspManager.manageBuffer(this->window, buffer);
 }
 
 void Editor::closeCurrentBuffer() {

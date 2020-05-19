@@ -38,8 +38,8 @@ void LSPClangd::initialize() {
     qDebug() << this->lspServer.readAll();
 }
 
-void LSPClangd::openFile(const QString& filename) {
-    const QString& msg = this->writer.openFile(filename, this->language);
+void LSPClangd::openFile(Buffer* buffer) {
+    const QString& msg = this->writer.openFile(buffer, buffer->getFilename(), this->language);
     qDebug() << "sending:" << msg;
     int written = this->lspServer.write(msg.toUtf8());
     qDebug() << written << "bytes written";

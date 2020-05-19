@@ -17,7 +17,7 @@ class LSPWriter
 public:
     QString initialize(const QString& baseDir);
     QString initialized();
-    QString openFile(const QString& filename, const QString& language);
+    QString openFile(Buffer* buffer, const QString& filepath, const QString& language);
     QString definition(const QString& filename, int line, int column);
 
 protected:
@@ -57,7 +57,7 @@ class LSP
 public:
     virtual ~LSP();
     virtual bool start() = 0;
-    virtual void openFile(const QString& filename) = 0;
+    virtual void openFile(Buffer* buffer) = 0;
     virtual void initialize() = 0;
     virtual void definition(const QString& filename, int line, int column) = 0;
 
