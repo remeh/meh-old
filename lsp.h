@@ -9,7 +9,6 @@
 #include "buffer.h"
 
 class LSP;
-class LSPGo;
 class Window;
 
 // LSPWriter is used to generate the LSP messages.
@@ -69,18 +68,4 @@ protected:
     bool serverSpawned;
     QString language;
 private:
-};
-
-class LSPGo : public LSP
-{
-public:
-    LSPGo(const QString& baseDir);
-    ~LSPGo() override;
-    bool start() override;
-    void openFile(const QString& filename) override;
-    void initialize() override;
-    void definition(const QString& filename, int line, int column);
-private:
-    QString baseDir;
-    LSPWriter writer;
 };
