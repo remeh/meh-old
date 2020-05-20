@@ -53,12 +53,16 @@ void Command::execute(QString text) {
 		if (this->warningModifiedBuffers()) {
 			return;
 		}
-        QCoreApplication::quit();
+        if (QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes) {
+            QCoreApplication::quit();
+        }
         return;
     }
 
     if (command == ":q!" || command == ":qa!") {
-        QCoreApplication::quit();
+        if (QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes) {
+            QCoreApplication::quit();
+        }
         return;
     }
 
@@ -70,7 +74,9 @@ void Command::execute(QString text) {
 		if (this->warningModifiedBuffers()) {
 			return;
 		}
-        QCoreApplication::quit();
+        if (QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes) {
+            QCoreApplication::quit();
+        }
         return;
     }
 
@@ -79,7 +85,9 @@ void Command::execute(QString text) {
             // TODO(remy):  save to another file
         }
         this->window->getEditor()->saveAll();
-        QCoreApplication::quit();
+        if (QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes) {
+            QCoreApplication::quit();
+        }
         return;
     }
 
