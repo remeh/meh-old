@@ -108,16 +108,102 @@ QString LSPWriter::initialize(const QString& baseDir) {
     QString content;
     QFileInfo fi(baseDir);
     QJsonObject params;
-    QJsonObject dynReg {
-        {"dynamicRegistration", true}
-    };
-    QJsonObject workspace {
-        {"definition", dynReg},
-        {"references", dynReg},
-        {"declaration", dynReg}
-    };
+    QJsonObject workspace = QJsonDocument::fromJson(" \
+        { \
+            \"applyEdit\": true, \
+            \"workspaceEdit\": { \
+                \"documentChanges\": true \
+            }, \
+            \"didChangeConfiguration\": { \
+                \"dynamicRegistration\": true \
+            }, \
+            \"didChangeWatchedFiles\": { \
+                \"dynamicRegistration\": true \
+            }, \
+            \"symbol\": { \
+                \"dynamicRegistration\": true, \
+                \"symbolKind\": { \
+                    \"valueSet\": [ \
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, \
+                        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 \
+                    ] \
+                } \
+            }, \
+            \"executeCommand\": { \
+                \"dynamicRegistration\": true \
+            }, \
+            \"configuration\": true, \
+            \"workspaceFolders\": true \
+        } \
+    ").object();
+    QJsonObject textDocument = QJsonDocument::fromJson(" \
+        \"textDocument\": { \
+            \"publishDiagnostics\": { \
+                \"relatedInformation\": true \
+            }, \
+            \"synchronization\": { \
+                \"dynamicRegistration\": true, \
+                \"willSave\": true, \
+                \"willSaveWaitUntil\": true, \
+                \"didSave\": true \
+            }, \
+            \"completion\": { \
+                \"dynamicRegistration\": true, \
+                \"contextSupport\": true, \
+                \"completionItem\": { \
+                    \"snippetSupport\": true, \
+                    \"commitCharactersSupport\": true, \
+                    \"documentationFormat\": [ \
+                        \"markdown\", \
+                        \"plaintext\" \
+                    ], \
+                    \"deprecatedSupport\": true \
+                }, \
+                \"completionItemKind\": { \
+                    \"valueSet\": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, \
+                        14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ] \
+                } \
+            }, \
+            \"hover\": { \
+                \"dynamicRegistration\": true, \
+                \"contentFormat\": [ \"markdown\", \"plaintext\" ] \
+            }, \
+            \"signatureHelp\": { \
+                \"dynamicRegistration\": true, \
+                \"signatureInformation\": { \
+                    \"documentationFormat\": [ \"markdown\", \"plaintext\" ] \
+                } \
+            }, \
+            \"definition\": { \"dynamicRegistration\": true }, \
+            \"references\": { \"dynamicRegistration\": true }, \
+            \"documentHighlight\": { \"dynamicRegistration\": true }, \
+            \"documentSymbol\": { \
+                \"dynamicRegistration\": true, \
+                \"symbolKind\": { \
+                    \"valueSet\": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, \
+                        14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 ] \
+                } \
+            }, \
+            \"codeAction\": { \"dynamicRegistration\": true }, \
+            \"codeLens\": { \"dynamicRegistration\": true }, \
+            \"formatting\": { \"dynamicRegistration\": true }, \
+            \"rangeFormatting\": { \"dynamicRegistration\": true }, \
+            \"onTypeFormatting\": { \"dynamicRegistration\": true }, \
+            \"rename\": { \"dynamicRegistration\": true }, \
+            \"documentLink\": { \"dynamicRegistration\": true }, \
+            \"typeDefinition\": { \"dynamicRegistration\": true }, \
+            \"implementation\": { \"dynamicRegistration\": true }, \
+            \"colorProvider\": { \"dynamicRegistration\": true }, \
+            \"foldingRange\": { \
+                \"dynamicRegistration\": false, \
+                \"rangeLimit\": 5000, \
+                \"lineFoldingOnly\": true \
+            } \
+        } \
+    ").object();
     QJsonObject capabilities {
-        {"workspace", workspace}
+        {"workspace", workspace},
+        {"textDocument", textDocument}
     };
     QJsonObject object {
         {"jsonrpc", "2.0"},

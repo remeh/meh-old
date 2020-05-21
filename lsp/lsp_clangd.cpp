@@ -18,7 +18,7 @@ LSPClangd::~LSPClangd() {
 }
 
 bool LSPClangd::start() {
-    this->lspServer.start("/usr/local/Cellar/llvm/10.0.0_3/bin/clangd");
+    this->lspServer.start("clangd");
     this->serverSpawned = this->lspServer.waitForStarted(5000);
     qDebug() << "LSPClangd started";
     // TODO(remy): send the initialize command
