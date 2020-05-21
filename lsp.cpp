@@ -137,7 +137,7 @@ QString LSPWriter::initialize(const QString& baseDir) {
         } \
     ").object();
     QJsonObject textDocument = QJsonDocument::fromJson(" \
-        \"textDocument\": { \
+        { \
             \"publishDiagnostics\": { \
                 \"relatedInformation\": true \
             }, \
