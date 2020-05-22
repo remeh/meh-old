@@ -178,6 +178,7 @@ private:
 
     // eightCharsX is the X position where the eighty chars line must be drawn.
     int eightyCharsX;
+    int hundredTwentyCharsX;
 
     QColor highlightedLine;
 };

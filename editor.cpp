@@ -99,9 +99,11 @@ Editor::Editor(Window* window) :
     // 80 chars separator
     // ----------------------
 
-    QString eightyChars;
-    for (int i = 0; i < 80; i++) { eightyChars += "#"; }
-    this->eightyCharsX = metrics.horizontalAdvance(eightyChars);
+    QString chars;
+    for (int i = 0; i < 80; i++) { chars += "#"; }
+    this->eightyCharsX = metrics.horizontalAdvance(chars);
+    for (int i = 0; i < 40; i++) { chars += "#"; }
+    this->hundredTwentyCharsX = metrics.horizontalAdvance(chars);
 
     // start in normal mode
     // ----------------------
@@ -443,7 +445,9 @@ void Editor::paintEvent(QPaintEvent* event) {
     QTextEdit::paintEvent(event);
     QPainter painter(this->viewport());
     painter.setPen(QPen(QColor(255, 255, 255, 8)));
-    painter.drawLine(this->eightyCharsX, 0, eightyCharsX, this->viewport()->rect().height());
+    painter.drawLine(this->eightyCharsX, 0, this->eightyCharsX, this->viewport()->rect().height());
+    painter.setPen(QPen(QColor(255, 255, 255, 3)));
+    painter.drawLine(this->hundredTwentyCharsX, 0, this->hundredTwentyCharsX, this->viewport()->rect().height());
 }
 
 void Editor::mousePressEvent(QMouseEvent* event) {
