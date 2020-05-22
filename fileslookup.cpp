@@ -231,16 +231,20 @@ void FilesLookup::refreshList() {
     this->list->clear();
     auto it = this->filteredDirs.begin();
     while (it != this->filteredDirs.end()) {
-        new QListWidgetItem(QIcon::fromTheme("folder"), *it, this->list);
+        QIcon icon = QIcon(":/res/directory-in.png");
+        if (*it == "..") {
+            icon = QIcon(":/res/directory-out.png");
+        }
+        new QListWidgetItem(icon, *it, this->list);
         ++it;
     }
     it = this->filteredFiles.begin();
     while (it != this->filteredFiles.end()) {
-        QString icon = "document-new";
+        QIcon icon = QIcon(":/res/plus.png");
         if (this->window->getEditor()->hasBuffer(*it)) {
-            icon = "document-edit";
+            icon = QIcon(":/res/edit.png");
         }
-        new QListWidgetItem(QIcon::fromTheme(icon), *it, this->list);
+        new QListWidgetItem(icon, *it, this->list);
         ++it;
     }
 }

@@ -27,6 +27,8 @@ SOURCES     =   buffer.cpp \
                 visual.cpp \
                 window.cpp
 
+RESOURCES   =   resources.qrc
+
 # CONFIG += sanitizer sanitize_address
 # Debug symbols
 # QMAKE_CXXFLAGS += -g
