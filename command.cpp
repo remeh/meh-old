@@ -39,6 +39,21 @@ bool Command::warningModifiedBuffers() {
 	return false;
 }
 
+bool Command::areYouSure() {
+    Q_ASSERT(this->window != nullptr);
+    Q_ASSERT(this->window->getEditor() != nullptr);
+
+    if (this->window->getEditor()->getCurrentBuffer() == nullptr) {
+        return false;
+    }
+
+    if (this->window->getEditor()->getCurrentBuffer()->getFilename().endsWith(".git/COMMIT_EDITMSG")) {
+        return true;
+    }
+
+    return QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes;
+}
+
 void Command::execute(QString text) {
     this->clear();
 
@@ -52,14 +67,14 @@ void Command::execute(QString text) {
 		if (this->warningModifiedBuffers()) {
 			return;
 		}
-        if (QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes) {
+        if (this->areYouSure()) {
             QCoreApplication::quit();
         }
         return;
     }
 
     if (command == ":q!" || command == ":qa!") {
-        if (QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes) {
+        if (this->areYouSure()) {
             QCoreApplication::quit();
         }
         return;
@@ -73,7 +88,7 @@ void Command::execute(QString text) {
 		if (this->warningModifiedBuffers()) {
 			return;
 		}
-        if (QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes) {
+        if (this->areYouSure()) {
             QCoreApplication::quit();
         }
         return;
@@ -84,7 +99,7 @@ void Command::execute(QString text) {
             // TODO(remy):  save to another file
         }
         this->window->getEditor()->saveAll();
-        if (QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes) {
+        if (this->areYouSure()) {
             QCoreApplication::quit();
         }
         return;

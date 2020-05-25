@@ -24,5 +24,7 @@ private slots:
 private:
     void openFile(const QString& filename);
 
+    bool areYouSure();
+
     Window* window;
 };
