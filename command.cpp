@@ -45,7 +45,7 @@ bool Command::areYouSure() {
     Q_ASSERT(this->window->getEditor() != nullptr);
 
     if (this->window->getEditor()->getCurrentBuffer() == nullptr) {
-        return false;
+        return true;
     }
 
     if (this->window->getEditor()->getCurrentBuffer()->getFilename().endsWith(".git/COMMIT_EDITMSG")) {
