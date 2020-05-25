@@ -52,7 +52,11 @@ bool Command::areYouSure() {
         return true;
     }
 
-    return QMessageBox::question(this->window, "Sure?", "Sure to close?") == QMessageBox::Yes;
+    QMessageBox msgBox;
+    msgBox.setText("Are you sure to close the app?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    return msgBox.exec() == QMessageBox::Yes;
 }
 
 void Command::execute(QString text) {
