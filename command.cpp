@@ -47,7 +47,8 @@ bool Command::areYouSure() {
         return true;
     }
 
-    if (this->window->getEditor()->getCurrentBuffer()->getFilename().endsWith(".git/COMMIT_EDITMSG")) {
+    QString filename = this->window->getEditor()->getCurrentBuffer()->getFilename();
+    if (filename.endsWith(".git/COMMIT_EDITMSG") || filename.endsWith(".git/MERGE_MSG")) {
         return true;
     }
 
