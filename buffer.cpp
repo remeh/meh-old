@@ -89,6 +89,10 @@ bool Buffer::postProcess(Editor*) {
         if (!process.waitForFinished(10000)) {
             qWarning() << "while running: gofmt";
         }
+        process.start("goimports", QStringList() << "-w" << this->filename);
+        if (!process.waitForFinished(10000)) {
+            qWarning() << "while running: goimports";
+        }
         return true;
     }
     if (this->filename.endsWith(".zig")) {
