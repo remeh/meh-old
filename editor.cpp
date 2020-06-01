@@ -858,6 +858,10 @@ void Editor::autocomplete() {
         return;
     }
 
+    if (list.size() == 0) {
+        return;
+    }
+
     this->selectionTimer->stop();
     this->window->openCompleter(base, list);
 }
