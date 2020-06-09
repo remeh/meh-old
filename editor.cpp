@@ -521,6 +521,17 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                 this->right();
                 return;
 
+            // delete previous word
+            case Qt::Key_W:
+                {
+                    QTextCursor cursor = this->textCursor();
+                    cursor.beginEditBlock();
+                    cursor.movePosition(QTextCursor::PreviousWord, QTextCursor::KeepAnchor);
+                    cursor.removeSelectedText();
+                    cursor.endEditBlock();
+                }
+                return;
+
             // switch to the other buffer
             case Qt::Key_O:
                 {
