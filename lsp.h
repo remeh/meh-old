@@ -52,17 +52,25 @@ private:
     QList<LSP*> lsps;
 };
 
-class LSP
+class LSP : public QObject
 {
+    Q_OBJECT
 public:
+    LSP(Window* window);
     virtual ~LSP();
+
+    // readStandardOutput is called when the LSP server has sent new data to read.
+    virtual void readStandardOutput() = 0;
+
+    // lsp protocol
     virtual bool start() = 0;
     virtual void openFile(Buffer* buffer) = 0;
     virtual void initialize() = 0;
     virtual void definition(const QString& filename, int line, int column) = 0;
 
     const QString& getLanguage() { return this->language; }
-
+private slots:
+    void readyReadStandardOutput();
 protected:
     QProcess lspServer;
     bool serverSpawned;

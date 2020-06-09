@@ -8,7 +8,7 @@ HEADERS     =   buffer.h \
                 grep.h \
                 lsp.h \
                 lsp/lsp_clangd.h \
-                lsp/lsp_gopls.h \
+                # lsp/lsp_gopls.h \
                 syntax.h \
                 window.h
 SOURCES     =   buffer.cpp \
@@ -19,7 +19,7 @@ SOURCES     =   buffer.cpp \
                 grep.cpp \
                 lsp.cpp \
                 lsp/lsp_clangd.cpp \
-                lsp/lsp_gopls.cpp \
+                # lsp/lsp_gopls.cpp \
                 main.cpp \
                 normal.cpp \
                 submode.cpp \

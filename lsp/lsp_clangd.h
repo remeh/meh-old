@@ -4,12 +4,16 @@
 
 class LSP;
 class LSPWriter;
+class Window;
 
 class LSPClangd : public LSP
 {
 public:
-    LSPClangd(const QString& baseDir);
+    LSPClangd(Window* window, const QString& baseDir);
     ~LSPClangd() override;
+    void readStandardOutput() override;
+
+    // protocol
     bool start() override;
     void openFile(Buffer* buffer) override;
     void initialize() override;

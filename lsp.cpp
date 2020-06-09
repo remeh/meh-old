@@ -26,19 +26,19 @@ LSPManager::~LSPManager() {
 
 LSP* LSPManager::start(Window* window, const QString& language) {
     if (language == "go") {
-        qDebug() << "Starting LSPGopls";
-        LSP* lsp = new LSPGopls(window->getBaseDir());
-        if (!lsp->start()) {
-            // TODO(remy): warning here
-            delete lsp;
-            return nullptr;
-        }
-        lsp->initialize();
-        this->lsps.append(lsp);
-        return lsp;
+    //     qDebug() << "Starting LSPGopls";
+    //     LSP* lsp = new LSPGopls(window->getBaseDir());
+    //     if (!lsp->start()) {
+    //         // TODO(remy): warning here
+    //         delete lsp;
+    //         return nullptr;
+    //     }
+    //     lsp->initialize();
+    //     this->lsps.append(lsp);
+    //     return lsp;
     } else if (language == "cpp" || language == "h") {
         qDebug() << "Starting LSPClangd";
-        LSP* lsp = new LSPClangd(window->getBaseDir());
+        LSP* lsp = new LSPClangd(window, window->getBaseDir());
         if (!lsp->start()) {
             // TODO(remy): warning here
             delete lsp;
@@ -101,8 +101,20 @@ LSP* LSPManager::getLSP(Buffer* buffer) {
     return this->lspsPerFile.value(buffer->getFilename(), nullptr);
 }
 
+// --------------------------
+
+LSP::LSP(Window* window) : QObject(window) {
+    connect(&this->lspServer, &QProcess::readyReadStandardOutput, this, &LSP::readyReadStandardOutput);
+}
+
+void LSP::readyReadStandardOutput() {
+    this->readStandardOutput();
+}
+
 LSP::~LSP() {
 }
+
+// --------------------------
 
 QString LSPWriter::initialize(const QString& baseDir) {
     QString content;

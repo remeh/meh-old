@@ -2,9 +2,7 @@
 
 #include "syntax.h"
 
-#include "qdebug.h"
-
-Syntax::Syntax(QTextDocument *parent)    : QSyntaxHighlighter(parent)
+Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
 
@@ -30,7 +28,7 @@ Syntax::Syntax(QTextDocument *parent)    : QSyntaxHighlighter(parent)
         highlightingRules.append(rule);
     }
 
-    selectionFormat.setForeground(Qt::yellow);
+    selectionFormat.setForeground(QColor::fromRgb(153,215,0));
 
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::gray);
@@ -56,7 +54,8 @@ Syntax::Syntax(QTextDocument *parent)    : QSyntaxHighlighter(parent)
     highlightingRules.append(rule);
 
     markdownTitleFormat.setFontWeight(QFont::Bold);
-    markdownTitleFormat.setForeground(QColor::fromRgb(153,215,0));
+//    markdownTitleFormat.setForeground(QColor::fromRgb(153,215,0)); // green
+    markdownTitleFormat.setForeground(Qt::gray);
     rule.pattern = QRegularExpression(QStringLiteral("^\\s*#+[^\n]*"));
     rule.format = markdownTitleFormat;
     highlightingRules.append(rule);
