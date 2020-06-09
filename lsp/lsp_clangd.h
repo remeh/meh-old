@@ -18,6 +18,10 @@ public:
     void openFile(Buffer* buffer) override;
     void initialize() override;
     void definition(const QString& filename, int line, int column) override;
+    void declaration(const QString& filename, int line, int column) override;
+    void signatureHelp(const QString& filename, int line, int column) override;
+    void references(const QString& filename, int line, int column) override;
+
 private:
     QString baseDir;
     LSPWriter writer;

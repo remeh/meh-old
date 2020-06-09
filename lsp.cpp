@@ -262,7 +262,6 @@ QString LSPWriter::openFile(Buffer* buffer, const QString& filename, const QStri
     return this->payload(str);
 }
 
-
 QString LSPWriter::definition(const QString& filename, int line, int column) {
     QJsonObject position {
         {"line", line},
@@ -279,6 +278,73 @@ QString LSPWriter::definition(const QString& filename, int line, int column) {
         {"jsonrpc", "2.0"},
         {"id", 1}, // XXX(remy):
         {"method", "textDocument/definition"},
+        {"params", params}
+    };
+    QString str = QString(QJsonDocument(object).toJson(QJsonDocument::Compact));
+    return this->payload(str);
+}
+
+QString LSPWriter::declaration(const QString& filename, int line, int column) {
+    QJsonObject position {
+        {"line", line},
+        {"character", column}
+    };
+    QJsonObject textDocument {
+        {"uri", "file://" + filename },
+    };
+    QJsonObject params {
+        {"textDocument", textDocument},
+        {"position", position}
+    };
+    QJsonObject object {
+        {"jsonrpc", "2.0"},
+        {"id", 1}, // XXX(remy):
+        {"method", "textDocument/declaration"},
+        {"params", params}
+    };
+    QString str = QString(QJsonDocument(object).toJson(QJsonDocument::Compact));
+    return this->payload(str);
+}
+
+QString LSPWriter::signatureHelp(const QString& filename, int line, int column) {
+    QJsonObject position {
+        {"line", line},
+        {"character", column}
+    };
+    QJsonObject textDocument {
+        {"uri", "file://" + filename },
+    };
+    QJsonObject params {
+        {"textDocument", textDocument},
+        {"position", position}
+    };
+    QJsonObject object {
+        {"jsonrpc", "2.0"},
+        {"id", 1}, // XXX(remy):
+        {"method", "textDocument/signatureHelp"},
+        {"params", params}
+    };
+    QString str = QString(QJsonDocument(object).toJson(QJsonDocument::Compact));
+    return this->payload(str);
+}
+
+
+QString LSPWriter::references(const QString& filename, int line, int column) {
+    QJsonObject position {
+        {"line", line},
+        {"character", column}
+    };
+    QJsonObject textDocument {
+        {"uri", "file://" + filename },
+    };
+    QJsonObject params {
+        {"textDocument", textDocument},
+        {"position", position}
+    };
+    QJsonObject object {
+        {"jsonrpc", "2.0"},
+        {"id", 1}, // XXX(remy):
+        {"method", "textDocument/references"},
         {"params", params}
     };
     QString str = QString(QJsonDocument(object).toJson(QJsonDocument::Compact));

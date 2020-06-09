@@ -19,6 +19,9 @@ public:
     QString initialized();
     QString openFile(Buffer* buffer, const QString& filepath, const QString& language);
     QString definition(const QString& filename, int line, int column);
+    QString declaration(const QString& filename, int line, int column);
+    QString signatureHelp(const QString& filename, int line, int column);
+    QString references(const QString& filename, int line, int column);
 
 protected:
 private:
@@ -67,6 +70,9 @@ public:
     virtual void openFile(Buffer* buffer) = 0;
     virtual void initialize() = 0;
     virtual void definition(const QString& filename, int line, int column) = 0;
+    virtual void declaration(const QString& filename, int line, int column) = 0;
+    virtual void signatureHelp(const QString& filename, int line, int column) = 0;
+    virtual void references(const QString& filename, int line, int column) = 0;
 
     const QString& getLanguage() { return this->language; }
 private slots:

@@ -111,17 +111,36 @@ void Command::execute(QString text) {
         return;
     }
 
-    if (command == ":goto") {
-        Buffer* currentBuffer = this->window->getEditor()->getCurrentBuffer();
-        LSP* lsp = this->window->getEditor()->lspManager.getLSP(currentBuffer);
-        if (lsp == nullptr) {
-            // TODO(remy):
-            return;
-        }
+    // lsp
+    // ----------------------
 
+    Buffer* currentBuffer = this->window->getEditor()->getCurrentBuffer();
+    LSP* lsp = this->window->getEditor()->lspManager.getLSP(currentBuffer);
+
+    if (command == ":def") {
+        if (lsp == nullptr) { return; }
         lsp->definition(currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
         // TODO(remy): finish me
     }
+
+    if (command == ":dec") {
+        if (lsp == nullptr) { return; }
+        lsp->declaration(currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        // TODO(remy): finish me
+    }
+
+    if (command == ":sig") {
+        if (lsp == nullptr) { return; }
+        lsp->signatureHelp(currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        // TODO(remy): finish me
+    }
+
+    if (command == ":ref") {
+        if (lsp == nullptr) { return; }
+        lsp->references(currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        // TODO(remy): finish me
+    }
+    // ----------------------
 
     if (command == ":bd") {
         if (this->window->getEditor()->getCurrentBuffer() == nullptr) {

@@ -48,3 +48,18 @@ void LSPClangd::definition(const QString& filename, int line, int column) {
     const QString& msg = this->writer.definition(filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
+
+void LSPClangd::declaration(const QString& filename, int line, int column) {
+    const QString& msg = this->writer.declaration(filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}
+
+void LSPClangd::signatureHelp(const QString& filename, int line, int column) {
+    const QString& msg = this->writer.signatureHelp(filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}
+
+void LSPClangd::references(const QString& filename, int line, int column) {
+    const QString& msg = this->writer.references(filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}
