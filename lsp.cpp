@@ -26,16 +26,16 @@ LSPManager::~LSPManager() {
 
 LSP* LSPManager::start(Window* window, const QString& language) {
     if (language == "go") {
-    //     qDebug() << "Starting LSPGopls";
-    //     LSP* lsp = new LSPGopls(window->getBaseDir());
-    //     if (!lsp->start()) {
-    //         // TODO(remy): warning here
-    //         delete lsp;
-    //         return nullptr;
-    //     }
-    //     lsp->initialize();
-    //     this->lsps.append(lsp);
-    //     return lsp;
+         qDebug() << "Starting LSPGopls";
+         LSP* lsp = new LSPGopls(window, window->getBaseDir());
+         if (!lsp->start()) {
+             // TODO(remy): warning here
+             delete lsp;
+             return nullptr;
+         }
+         lsp->initialize();
+         this->lsps.append(lsp);
+         return lsp;
     } else if (language == "cpp" || language == "h") {
         qDebug() << "Starting LSPClangd";
         LSP* lsp = new LSPClangd(window, window->getBaseDir());

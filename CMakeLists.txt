@@ -25,7 +25,7 @@ add_executable(meh
     grep.cpp
     lsp.cpp
     lsp/lsp_clangd.cpp
-    # lsp/lsp_gopls.cpp
+    lsp/lsp_gopls.cpp
     normal.cpp
     submode.cpp
     syntax.cpp
