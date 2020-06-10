@@ -1,8 +1,8 @@
 #include <QDir>
 #include <QFileInfo>
 
-#include "lsp.h"
-#include "lsp/lsp_clangd.h"
+#include "../lsp.h"
+#include "lsp_clangd.h"
 
 #include "qdebug.h"
 

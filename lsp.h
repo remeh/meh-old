@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QProcess>
 #include <QString>
-#include <QTcpSocket>
 
 #include "buffer.h"
 

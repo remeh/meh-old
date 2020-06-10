@@ -1,6 +1,6 @@
 #include <QString>
 
-#include "buffer.h"
+#include "../buffer.h"
 
 class LSP;
 class LSPWriter;
