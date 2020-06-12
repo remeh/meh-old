@@ -101,11 +101,21 @@ public:
     // would need to be stored on disk.
     QStringList modifiedBuffers();
 
+    // setLastLSPCommand sets the last LSP command typed by the user.
+    void setLastLSPCommand(int lspCommand);
+
+    // getLastLSPCommand returns the last LSP command typed by the user.
+    int getLastLSPCommand() { return this->lspCommand; }
+
     QMap<QString, Buffer*>& getBuffers() { return this->buffers; }
 
     // XXX(remy):
     void autocomplete();
     void applyAutocomplete(const QString& base, const QString& word);
+
+    // lspInterpret is called by the LSP server to let the Editor interpret
+    // the result.
+    void lspInterpret(QByteArray data);
 
     LSPManager lspManager;
 
@@ -118,7 +128,9 @@ private slots:
     void onSelectionChanged();
     void onCursorPositionChanged();
     void onTriggerSelectionHighlight();
+    void onTriggerLspRefresh();
     void onChange(bool changed);
+    void onContentsChange(int position, int charsRemoved, int charsAdded);
 
 private:
     // keyPressEventNormal handles this event in normal mode.
@@ -156,6 +168,7 @@ private:
     // ----------------------
 
     QTimer* selectionTimer;
+    QTimer* lspRefreshTimer;
     QLabel* modeLabel;
     QLabel* lineLabel;
     QLabel* modifiedLabel;
@@ -185,6 +198,12 @@ private:
     // eightCharsX is the X position where the eighty chars line must be drawn.
     int eightyCharsX;
 
+
     QColor highlightedLine;
+
+    int lspCommand;
+    // lspBuffer is the buffer for whom a LSP command has been executed.
+    // Should not be freed.
+    Buffer* lspBuffer;
 };
 

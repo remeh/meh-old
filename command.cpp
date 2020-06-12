@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <QMessageBox>
+#include <QRandomGenerator>
 
 #include "command.h"
 #include "lsp.h"
@@ -116,30 +117,38 @@ void Command::execute(QString text) {
 
     Buffer* currentBuffer = this->window->getEditor()->getCurrentBuffer();
     LSP* lsp = this->window->getEditor()->lspManager.getLSP(currentBuffer);
+    int reqId = QRandomGenerator::global()->generate();
 
     if (command == ":def") {
         if (lsp == nullptr) { return; }
-        lsp->definition(currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        // TODO(remy): finish me
+        lsp->definition(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_DEFINITION, currentBuffer);
     }
 
     if (command == ":dec") {
         if (lsp == nullptr) { return; }
-        lsp->declaration(currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        // TODO(remy): finish me
+        lsp->declaration(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_DECLARATION, currentBuffer);
     }
 
     if (command == ":sig") {
         if (lsp == nullptr) { return; }
-        lsp->signatureHelp(currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        // TODO(remy): finish me
+        lsp->signatureHelp(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_SIGNATURE_HELP, currentBuffer);
     }
 
     if (command == ":ref") {
         if (lsp == nullptr) { return; }
-        lsp->references(currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        // TODO(remy): finish me
+        lsp->references(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_REFERENCES, currentBuffer);
     }
+
+    if (command == ":com") {
+        if (lsp == nullptr) { return; }
+        lsp->completion(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
+    }
+
     // ----------------------
 
     if (command == ":bd") {

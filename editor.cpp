@@ -31,7 +31,8 @@ Editor::Editor(Window* window) :
     window(window),
     currentBuffer(nullptr),
     mode(MODE_NORMAL),
-    highlightedLine(QColor::fromRgb(50, 50, 50)) {
+    highlightedLine(QColor::fromRgb(50, 50, 50)),
+    lspCommand(0) {
     Q_ASSERT(window != nullptr);
 
     // we don't want a rich text editor
@@ -71,6 +72,7 @@ Editor::Editor(Window* window) :
     // ----------------------
 
     this->selectionTimer = new QTimer;
+    this->lspRefreshTimer = new QTimer;
 
     QFont labelFont = font;
     labelFont.setPointSize(14);
@@ -100,6 +102,7 @@ Editor::Editor(Window* window) :
     // ----------------------
 
     QString eightyChars;
+
     for (int i = 0; i < 80; i++) { eightyChars += "#"; }
     this->eightyCharsX = metrics.horizontalAdvance(eightyChars);
 
@@ -112,6 +115,7 @@ Editor::Editor(Window* window) :
     connect(this, &QTextEdit::selectionChanged, this, &Editor::onSelectionChanged);
     connect(this, &QTextEdit::cursorPositionChanged, this, &Editor::onCursorPositionChanged);
     connect(this->selectionTimer, &QTimer::timeout, this, &Editor::onTriggerSelectionHighlight);
+    connect(this->lspRefreshTimer, &QTimer::timeout, this, &Editor::onTriggerLspRefresh);
 }
 
 Editor::~Editor() {
@@ -128,6 +132,7 @@ Editor::~Editor() {
     }
 
     delete this->selectionTimer;
+    delete this->lspRefreshTimer;
     delete this->modeLabel;
     delete this->lineLabel;
     delete this->modifiedLabel;
@@ -163,6 +168,15 @@ void Editor::onSelectionChanged() {
     this->selectionTimer->start(500);
 }
 
+void Editor::onTriggerLspRefresh() {
+    if (this->currentBuffer == nullptr) {
+        return;
+    }
+    this->currentBuffer->refreshData(this);
+    this->lspManager.manageBuffer(this->window, this->currentBuffer);
+    this->lspRefreshTimer->stop();
+}
+
 void Editor::onTriggerSelectionHighlight() {
     if (this->document()->blockCount() > 3000) {
         return;
@@ -183,6 +197,10 @@ void Editor::onChange(bool changed) {
         this->currentBuffer->modified = true;
         this->modifiedLabel->setText("*");
     }
+}
+
+void Editor::onContentsChange(int position, int charsRemoved, int charsAdded) {
+    this->lspRefreshTimer->start(500);
 }
 
 void Editor::save() {
@@ -210,6 +228,7 @@ void Editor::saveAll() {
 void Editor::setCurrentBuffer(Buffer* buffer) {
     Q_ASSERT(buffer != NULL);
     disconnect(this->document(), &QTextDocument::modificationChanged, this, &Editor::onChange);
+    disconnect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
     if (this->currentBuffer != nullptr) {
         this->currentBuffer->onLeave(this);
         // we're leaving this one, append it to the end of the buffers list.
@@ -226,6 +245,7 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
         this->modifiedLabel->setText("");
     }
     connect(this->document(), &QTextDocument::modificationChanged, this, &Editor::onChange);
+    connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
 }
 
 void Editor::selectOrCreateBuffer(const QString& filename) {
@@ -910,4 +930,9 @@ int Editor::findNextOneInCurrentLine(QChar c) {
         }
     }
     return 0;
+}
+
+void Editor::lspInterpret(QByteArray data) {
+    qDebug() << "received data for the last command executed" << this->lspCommand;
+    
 }

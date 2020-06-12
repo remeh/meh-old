@@ -16,11 +16,13 @@ public:
     // protocol
     bool start() override;
     void openFile(Buffer* buffer) override;
+    void refreshFile(Buffer* buffer) override;
     void initialize() override;
-    void definition(const QString& filename, int line, int column) override;
-    void declaration(const QString& filename, int line, int column) override;
-    void signatureHelp(const QString& filename, int line, int column) override;
-    void references(const QString& filename, int line, int column) override;
+    void definition(int reqId, const QString& filename, int line, int column) override;
+    void declaration(int reqId, const QString& filename, int line, int column) override;
+    void signatureHelp(int reqId, const QString& filename, int line, int column) override;
+    void references(int reqId, const QString& filename, int line, int column) override;
+    void completion(int reqId, const QString& filename, int line, int column) override;
 
 private:
     QString baseDir;

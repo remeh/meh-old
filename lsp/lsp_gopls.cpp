@@ -25,7 +25,7 @@ void LSPGopls::readStandardOutput() {
 // --------------------------
 
 bool LSPGopls::start() {
-    this->lspServer.start("gopls");
+    this->lspServer.start("gopls", QStringList());
     this->serverSpawned = this->lspServer.waitForStarted(5000);
     qDebug() << "LSPGopls started";
     // TODO(remy): send the initialize command
@@ -46,22 +46,31 @@ void LSPGopls::openFile(Buffer* buffer) {
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPGopls::definition(const QString& filename, int line, int column) {
-    const QString& msg = this->writer.definition(filename, line, column);
+void LSPGopls::refreshFile(Buffer* buffer) {
+    // TODO(remy): implement me
+}
+
+void LSPGopls::definition(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.definition(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPGopls::declaration(const QString& filename, int line, int column) {
-    const QString& msg = this->writer.declaration(filename, line, column);
+void LSPGopls::declaration(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.declaration(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPGopls::signatureHelp(const QString& filename, int line, int column) {
-    const QString& msg = this->writer.signatureHelp(filename, line, column);
+void LSPGopls::signatureHelp(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.signatureHelp(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPGopls::references(const QString& filename, int line, int column) {
-    const QString& msg = this->writer.references(filename, line, column);
+void LSPGopls::references(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.references(reqId, filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}
+
+void LSPGopls::completion(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.completion(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }

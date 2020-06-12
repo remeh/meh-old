@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStringList>
@@ -69,25 +70,26 @@ bool LSPManager::manageBuffer(Window* window, Buffer* buffer) {
     Q_ASSERT(buffer != nullptr);
 
     // already managed
+    bool refresh = false;
     if (this->lspsPerFile.contains(buffer->getFilename())) {
-        return true;
+        refresh = true;
     }
 
     QFileInfo fi(buffer->getFilename());
     LSP* lsp = this->forLanguage(fi.suffix());
     if (lsp == nullptr) {
-        qDebug() << "Has to start an LSP";
         lsp = this->start(window, fi.suffix());
     }
     if (lsp != nullptr) {
-        qDebug() << "for" << buffer->getFilename() << "use lsp" << lsp;
-        this->lspsPerFile.insert(buffer->getFilename(), lsp);
-        // TODO(remy): sends the message to the LSP server to open this file
-        lsp->openFile(buffer);
+        if (refresh) {
+            lsp->refreshFile(buffer);
+        } else {
+            this->lspsPerFile.insert(buffer->getFilename(), lsp);
+            // TODO(remy): sends the message to the LSP server to open this file
+            lsp->openFile(buffer);
+        }
         return true;
     }
-
-    qDebug() << "No LSP available";
     return false;
 }
 
@@ -101,9 +103,29 @@ LSP* LSPManager::getLSP(Buffer* buffer) {
     return this->lspsPerFile.value(buffer->getFilename(), nullptr);
 }
 
+void LSPManager::setExecutedAction(int reqId, int command, Buffer* buffer) {
+    LSPAction action;
+    action.requestId = reqId;
+    action.command = command;
+    action.buffer = buffer;
+    this->executedActions.insert(reqId, action);
+}
+
+LSPAction LSPManager::getExecutedAction(int reqId) {
+    if (!this->executedActions.contains(reqId)) {
+        LSPAction action;
+        action.requestId = 0;
+        action.buffer = nullptr;
+        action.command = LSP_ACTION_UNKNOWN;
+        return action;
+    }
+    return this->executedActions.value(reqId);
+}
+
 // --------------------------
 
 LSP::LSP(Window* window) : QObject(window) {
+    this->window = window;
     connect(&this->lspServer, &QProcess::readyReadStandardOutput, this, &LSP::readyReadStandardOutput);
 }
 
@@ -254,7 +276,6 @@ QString LSPWriter::openFile(Buffer* buffer, const QString& filename, const QStri
     };
     QJsonObject object {
         {"jsonrpc", "2.0"},
-//        {"id", 1}, // XXX(remy):
         {"method", "textDocument/didOpen"},
         {"params", params}
     };
@@ -262,7 +283,31 @@ QString LSPWriter::openFile(Buffer* buffer, const QString& filename, const QStri
     return this->payload(str);
 }
 
-QString LSPWriter::definition(const QString& filename, int line, int column) {
+QString LSPWriter::refreshFile(Buffer* buffer, const QString& filename) {
+    QJsonObject textDocument {
+        {"uri", "file://" + filename },
+        // NOTE(remy): is file version mandatory?
+    };
+    QJsonObject contentChange {
+        {"text", QString(buffer->getData())},
+    };
+    QJsonArray contentChanges {
+        contentChange,
+    };
+    QJsonObject params {
+        {"textDocument", textDocument},
+        {"contentChanges", contentChanges },
+    };
+    QJsonObject object {
+        {"jsonrpc", "2.0"},
+        {"method", "textDocument/didChange"},
+        {"params", params}
+    };
+    QString str = QString(QJsonDocument(object).toJson(QJsonDocument::Compact));
+    return this->payload(str);
+}
+
+QString LSPWriter::definition(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
         {"line", line},
         {"character", column}
@@ -276,7 +321,7 @@ QString LSPWriter::definition(const QString& filename, int line, int column) {
     };
     QJsonObject object {
         {"jsonrpc", "2.0"},
-        {"id", 1}, // XXX(remy):
+        {"id", reqId},
         {"method", "textDocument/definition"},
         {"params", params}
     };
@@ -284,7 +329,7 @@ QString LSPWriter::definition(const QString& filename, int line, int column) {
     return this->payload(str);
 }
 
-QString LSPWriter::declaration(const QString& filename, int line, int column) {
+QString LSPWriter::declaration(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
         {"line", line},
         {"character", column}
@@ -298,7 +343,7 @@ QString LSPWriter::declaration(const QString& filename, int line, int column) {
     };
     QJsonObject object {
         {"jsonrpc", "2.0"},
-        {"id", 1}, // XXX(remy):
+        {"id", reqId},
         {"method", "textDocument/declaration"},
         {"params", params}
     };
@@ -306,7 +351,7 @@ QString LSPWriter::declaration(const QString& filename, int line, int column) {
     return this->payload(str);
 }
 
-QString LSPWriter::signatureHelp(const QString& filename, int line, int column) {
+QString LSPWriter::signatureHelp(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
         {"line", line},
         {"character", column}
@@ -320,7 +365,7 @@ QString LSPWriter::signatureHelp(const QString& filename, int line, int column) 
     };
     QJsonObject object {
         {"jsonrpc", "2.0"},
-        {"id", 1}, // XXX(remy):
+        {"id", reqId},
         {"method", "textDocument/signatureHelp"},
         {"params", params}
     };
@@ -328,8 +373,7 @@ QString LSPWriter::signatureHelp(const QString& filename, int line, int column) 
     return this->payload(str);
 }
 
-
-QString LSPWriter::references(const QString& filename, int line, int column) {
+QString LSPWriter::references(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
         {"line", line},
         {"character", column}
@@ -343,8 +387,30 @@ QString LSPWriter::references(const QString& filename, int line, int column) {
     };
     QJsonObject object {
         {"jsonrpc", "2.0"},
-        {"id", 1}, // XXX(remy):
+        {"id", reqId},
         {"method", "textDocument/references"},
+        {"params", params}
+    };
+    QString str = QString(QJsonDocument(object).toJson(QJsonDocument::Compact));
+    return this->payload(str);
+}
+
+QString LSPWriter::completion(int reqId, const QString& filename, int line, int column) {
+    QJsonObject position {
+        {"line", line},
+        {"character", column}
+    };
+    QJsonObject textDocument {
+        {"uri", "file://" + filename },
+    };
+    QJsonObject params {
+        {"textDocument", textDocument},
+        {"position", position}
+    };
+    QJsonObject object {
+        {"jsonrpc", "2.0"},
+        {"id", reqId},
+        {"method", "textDocument/completion"},
         {"params", params}
     };
     QString str = QString(QJsonDocument(object).toJson(QJsonDocument::Compact));

@@ -106,6 +106,12 @@ bool Buffer::postProcess(Editor*) {
     return false;
 }
 
+void Buffer::refreshData(Editor* editor) {
+    Q_ASSERT(editor != NULL);
+    // store the last data from the document in the buffer
+    this->data = editor->document()->toPlainText().toUtf8();
+}
+
 void Buffer::onLeave(Editor* editor) {
     Q_ASSERT(editor != NULL);
 
