@@ -2,6 +2,7 @@
 #include <QFileInfo>
 
 #include "../lsp.h"
+#include "../window.h"
 #include "lsp_gopls.h"
 
 #include "qdebug.h"
@@ -18,17 +19,18 @@ LSPGopls::~LSPGopls() {
 }
 
 void LSPGopls::readStandardOutput() {
-    qDebug() << "received";
-    qDebug() << this->lspServer.readAll();
+    if (this->window == nullptr) {
+        return;
+    }
+    QByteArray data = this->lspServer.readAll();
+    this->window->getEditor()->lspInterpret(data);
 }
 
 // --------------------------
 
 bool LSPGopls::start() {
-    this->lspServer.start("gopls", QStringList());
+    this->lspServer.start("gopls");
     this->serverSpawned = this->lspServer.waitForStarted(5000);
-    qDebug() << "LSPGopls started";
-    // TODO(remy): send the initialize command
     return this->serverSpawned;
 }
 
@@ -40,14 +42,14 @@ void LSPGopls::initialize() {
 }
 
 void LSPGopls::openFile(Buffer* buffer) {
-    // gopls wants directories and not files
     QFileInfo fi(buffer->getFilename());
     const QString& msg = this->writer.openFile(buffer, fi.absoluteDir().absolutePath(), "go");
     this->lspServer.write(msg.toUtf8());
 }
 
 void LSPGopls::refreshFile(Buffer* buffer) {
-    // TODO(remy): implement me
+    const QString& msg = this->writer.refreshFile(buffer, buffer->getFilename());
+    this->lspServer.write(msg.toUtf8());
 }
 
 void LSPGopls::definition(int reqId, const QString& filename, int line, int column) {

@@ -31,19 +31,18 @@ LSP::~LSP() {
 QString LSPWriter::initialize(const QString& baseDir) {
     QString content;
     QFileInfo fi(baseDir);
-    QJsonObject params;
     QJsonObject workspace = QJsonDocument::fromJson(" \
         { \
             \"applyEdit\": true, \
-            \"workspaceEdit\": { \
-                \"documentChanges\": true \
-            }, \
-            \"didChangeConfiguration\": { \
-                \"dynamicRegistration\": true \
-            }, \
-            \"didChangeWatchedFiles\": { \
-                \"dynamicRegistration\": true \
-            }, \
+//            \"workspaceEdit\": { \
+//                \"documentChanges\": true \
+//            }, \
+//            \"didChangeConfiguration\": { \
+//                \"dynamicRegistration\": true \
+//            }, \
+//            \"didChangeWatchedFiles\": { \
+//                \"dynamicRegistration\": true \
+//            }, \
             \"symbol\": { \
                 \"dynamicRegistration\": true, \
                 \"symbolKind\": { \
@@ -65,12 +64,12 @@ QString LSPWriter::initialize(const QString& baseDir) {
             \"publishDiagnostics\": { \
                 \"relatedInformation\": true \
             }, \
-            \"synchronization\": { \
-                \"dynamicRegistration\": true, \
-                \"willSave\": true, \
-                \"willSaveWaitUntil\": true, \
-                \"didSave\": true \
-            }, \
+//            \"synchronization\": { \
+//                \"dynamicRegistration\": true, \
+//                \"willSave\": true, \
+//                \"willSaveWaitUntil\": true, \
+//                \"didSave\": true \
+//            }, \
             \"completion\": { \
                 \"dynamicRegistration\": true, \
                 \"contextSupport\": true, \
@@ -117,7 +116,7 @@ QString LSPWriter::initialize(const QString& baseDir) {
             \"documentLink\": { \"dynamicRegistration\": true }, \
             \"typeDefinition\": { \"dynamicRegistration\": true }, \
             \"implementation\": { \"dynamicRegistration\": true }, \
-            \"colorProvider\": { \"dynamicRegistration\": true }, \
+//            \"colorProvider\": { \"dynamicRegistration\": true }, \
             \"foldingRange\": { \
                 \"dynamicRegistration\": false, \
                 \"rangeLimit\": 5000, \
@@ -129,13 +128,15 @@ QString LSPWriter::initialize(const QString& baseDir) {
         {"workspace", workspace},
         {"textDocument", textDocument}
     };
-    QJsonObject object {
-        {"jsonrpc", "2.0"},
-        {"id", 1},
+    QJsonObject params {
         {"rootPath", fi.absoluteFilePath()},
         {"rootUri", "file://" + fi.absoluteFilePath()},
         {"processId", QCoreApplication::applicationPid()},
         {"capabilities", capabilities},
+    };
+    QJsonObject object {
+        {"jsonrpc", "2.0"},
+        {"id", 1},
         {"method", "initialize"},
         {"params", params}
     };
