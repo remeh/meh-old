@@ -118,6 +118,7 @@ void Command::execute(QString text) {
     Buffer* currentBuffer = this->window->getEditor()->getCurrentBuffer();
     LSP* lsp = this->window->getEditor()->lspManager.getLSP(currentBuffer);
     int reqId = QRandomGenerator::global()->generate();
+    if (reqId < 0) { reqId *= -1; }
 
     if (command == ":def") {
         if (lsp == nullptr) { return; }

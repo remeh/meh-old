@@ -19,6 +19,7 @@
 #include "buffer.h"
 #include "fileslookup.h"
 #include "lsp.h"
+#include "lsp_manager.h"
 #include "mode.h"
 #include "syntax.h"
 
@@ -61,6 +62,9 @@ public:
     // goToLine moves the cursor to a given position in the buffer.
     void goToLine(int lineNumber);
 
+    // goToColumn moves the cursor to the given column.
+    void goToColumn(int column);
+
     void up();
     void down();
     void left();
@@ -100,12 +104,6 @@ public:
     // modifiedBuffers returns a list of the loaded and modified buffers that
     // would need to be stored on disk.
     QStringList modifiedBuffers();
-
-    // setLastLSPCommand sets the last LSP command typed by the user.
-    void setLastLSPCommand(int lspCommand);
-
-    // getLastLSPCommand returns the last LSP command typed by the user.
-    int getLastLSPCommand() { return this->lspCommand; }
 
     QMap<QString, Buffer*>& getBuffers() { return this->buffers; }
 
@@ -200,10 +198,5 @@ private:
 
 
     QColor highlightedLine;
-
-    int lspCommand;
-    // lspBuffer is the buffer for whom a LSP command has been executed.
-    // Should not be freed.
-    Buffer* lspBuffer;
 };
 

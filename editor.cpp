@@ -31,8 +31,7 @@ Editor::Editor(Window* window) :
     window(window),
     currentBuffer(nullptr),
     mode(MODE_NORMAL),
-    highlightedLine(QColor::fromRgb(50, 50, 50)),
-    lspCommand(0) {
+    highlightedLine(QColor::fromRgb(50, 50, 50)) {
     Q_ASSERT(window != nullptr);
 
     // we don't want a rich text editor
@@ -401,6 +400,18 @@ void Editor::goToLine(int lineNumber) {
     QTextBlock block = this->document()->findBlockByLineNumber(lineNumber - 1);
     QTextCursor cursor = this->textCursor();
     cursor.setPosition(block.position());
+    this->setTextCursor(cursor);
+}
+
+void Editor::goToColumn(int column) {
+    QTextCursor cursor = this->textCursor();
+    if (cursor.block().text().size() <= column) {
+        cursor.movePosition(QTextCursor::EndOfBlock);
+        this->setTextCursor(cursor);
+        return;
+    }
+    cursor.movePosition(QTextCursor::StartOfBlock);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, column);
     this->setTextCursor(cursor);
 }
 
@@ -933,6 +944,28 @@ int Editor::findNextOneInCurrentLine(QChar c) {
 }
 
 void Editor::lspInterpret(QByteArray data) {
-    qDebug() << "received data for the last command executed" << this->lspCommand;
-    
+    QJsonDocument json = LSPReader::readMessage(data);
+    if (json.isEmpty()) {
+        return;
+    }
+
+    LSPAction action = this->lspManager.getExecutedAction(json["id"].toInt());
+    if (action.requestId == 0) {
+        // TODO(remy): implement the publishDiagnostic and others?
+        return;
+    }
+
+    switch (action.action) {
+        case LSP_ACTION_DECLARATION:
+        case LSP_ACTION_DEFINITION:
+            // TODO(remy): deal with multiple results
+            int line = json["result"][0]["range"]["start"]["line"].toInt();
+            int column = json["result"][0]["range"]["start"]["character"].toInt();
+            QString file = json["result"][0]["uri"].toString();
+            file.remove(0,7); // remove the file://
+            this->selectOrCreateBuffer(file);
+            this->goToLine(line + 1);
+            this->goToColumn(column);
+            return;
+    }
 }

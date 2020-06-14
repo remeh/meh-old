@@ -24,6 +24,7 @@ add_executable(meh
     fileslookup.cpp
     grep.cpp
     lsp.cpp
+    lsp_manager.cpp
     lsp/lsp_clangd.cpp
     lsp/lsp_gopls.cpp
     normal.cpp
