@@ -82,6 +82,10 @@ void Buffer::save(Editor* editor) {
     // TODO(remy): error management
 }
 
+bool Buffer::isGitTempFile() {
+    return filename.endsWith(".git/COMMIT_EDITMSG") || filename.endsWith(".git/MERGE_MSG");
+}
+
 bool Buffer::postProcess(Editor*) {
     if (this->filename.endsWith(".go")) {
         QProcess process;
@@ -134,12 +138,14 @@ void Buffer::onEnter(Editor* editor) {
     // restore the text in the editor
     editor->setText(this->read());
 
-    // restore last cursor position
-    QTextCursor cursor = editor->textCursor();
-    QSettings settings("mehteor", "meh");
-    cursor.setPosition(settings.value("buffer/" + this->filename + "/cursor", 0).toInt());
-    editor->setTextCursor(cursor);
-    QScrollBar* vscroll = editor->verticalScrollBar();
-    vscroll->setValue(settings.value("buffer/" + this->filename + "/vscroll", 0).toInt());
-    editor->ensureCursorVisible();
+    // restore last cursor position, but do not do that for git messages
+    if (!this->isGitTempFile()) {
+        QTextCursor cursor = editor->textCursor();
+        QSettings settings("mehteor", "meh");
+        cursor.setPosition(settings.value("buffer/" + this->filename + "/cursor", 0).toInt());
+        editor->setTextCursor(cursor);
+        QScrollBar* vscroll = editor->verticalScrollBar();
+        vscroll->setValue(settings.value("buffer/" + this->filename + "/vscroll", 0).toInt());
+        editor->ensureCursorVisible();
+    }
 }

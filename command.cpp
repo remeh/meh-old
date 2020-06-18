@@ -49,8 +49,7 @@ bool Command::areYouSure() {
         return true;
     }
 
-    QString filename = this->window->getEditor()->getCurrentBuffer()->getFilename();
-    if (filename.endsWith(".git/COMMIT_EDITMSG") || filename.endsWith(".git/MERGE_MSG")) {
+    if (this->window->getEditor()->getCurrentBuffer()->isGitTempFile()) {
         return true;
     }
 

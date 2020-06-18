@@ -45,6 +45,9 @@ public:
     // stored on disk.
     bool modified;
 
+    // isGitTempFile returns true if the currently opened file is a git tmp file.
+    bool isGitTempFile();
+
 protected:
 
 private:
