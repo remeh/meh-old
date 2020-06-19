@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QMouseEvent>
 #include <QPaintEvent>
+#include <QPlainTextEdit>
 #include <QResizeEvent>
 #include <QStringList>
 #include <QTextBlock>
@@ -18,18 +19,23 @@
 
 #include "buffer.h"
 #include "fileslookup.h"
+#include "lsp.h"
+#include "lsp_manager.h"
 #include "mode.h"
 #include "syntax.h"
 
 class Window;
 
-class Editor : public QTextEdit
+class Editor : public QPlainTextEdit
 {
     Q_OBJECT
 
 public:
     Editor(Window* window);
     ~Editor();
+
+    // buffer manipulation
+    // -------------------
 
     // setCurrentBuffer sets the editor to use the given buffer.
     void setCurrentBuffer(Buffer* buffer);
@@ -47,6 +53,21 @@ public:
     // hasBuffer returns true if a buffer has already been loaded.
     bool hasBuffer(const QString& filename);
 
+    // save saves the current buffer.
+    void save();
+
+    // saveAll saves all the loaded buffers.
+    void saveAll();
+
+    // modifiedBuffers returns a list of the loaded and modified buffers that
+    // would need to be stored on disk.
+    QStringList modifiedBuffers();
+
+    QMap<QString, Buffer*>& getBuffers() { return this->buffers; }
+
+    // mode
+    // ----
+
     void setMode(int mode, QString command = "");
     int getMode() { return this->mode; }
 
@@ -57,20 +78,29 @@ public:
     void setMidCursor() { this->setCursorWidth(4); } // FIXME(remy):
     void setLineCursor() { this->setCursorWidth(1); }
 
+    // movements
+    // ---------
+
     // goToLine moves the cursor to a given position in the buffer.
     void goToLine(int lineNumber);
+
+    // goToColumn moves the cursor to the given column.
+    void goToColumn(int column);
+
+    // goToOccurrence goes to the next occurence of string if any, previous one
+    // if backward is set.
+    void goToOccurrence(const QString& string, bool backward);
 
     void up();
     void down();
     void left();
     void right();
 
-    // goToOccurrence goes to the next occurence of string if any, previous one
-    // if backward is set.
-    void goToOccurrence(const QString& string, bool backward);
+    int currentLineNumber();
+    int currentColumn();
 
-    // TODO(remy): comment me
-    void setCompleter(const QStringList& completer);
+    // text manipulation
+    // -----------------
 
     // deleteCurrentLine removes the current line of the buffer.
     void deleteCurrentLine();
@@ -78,30 +108,36 @@ public:
     // getWordUnderCursor returns the word under the cursor if any.
     QString getWordUnderCursor();
 
-    // save saves the current buffer.
-    void save();
-
-    // saveAll saves all the loaded buffers.
-    void saveAll();
-
-    // called by the window when it is resized.
-    void onWindowResized(QResizeEvent*);
-
     // removeIndentation removes one level of indentation on the line of the given cursor..
     void removeIndentation(QTextCursor cursor);
 
     // insertIndentation adds one level of indentation on the line of the given cursor.
     void insertIndentation(QTextCursor cursor);
 
-    // modifiedBuffers returns a list of the loaded and modified buffers that
-    // would need to be stored on disk.
-    QStringList modifiedBuffers();
+    // auto-complete
+    // -------------
 
-    QMap<QString, Buffer*>& getBuffers() { return this->buffers; }
-
+    // TODO(remy): comment me
+    void setCompleter(const QStringList& completer);
     // XXX(remy):
     void autocomplete();
     void applyAutocomplete(const QString& base, const QString& word);
+
+    // lspInterpret is called by the LSP server to let the Editor interpret
+    // the result.
+    void lspInterpret(QByteArray data);
+
+    LSPManager lspManager;
+
+    // widget related
+    // --------------
+
+    // called by the window when it is resized.
+    void onWindowResized(QResizeEvent*);
+
+    void lineNumberAreaPaintEvent(QPaintEvent *event);
+
+    int lineNumberAreaWidth();
 
 protected:
     void keyPressEvent(QKeyEvent*) override;
@@ -112,7 +148,11 @@ private slots:
     void onSelectionChanged();
     void onCursorPositionChanged();
     void onTriggerSelectionHighlight();
+    void onTriggerLspRefresh();
     void onChange(bool changed);
+    void onContentsChange(int position, int charsRemoved, int charsAdded);
+    void onUpdateLineNumberAreaWidth(int newBlockCount);
+    void onUpdateLineNumberArea(const QRect &rect, int dy);
 
 private:
     // keyPressEventNormal handles this event in normal mode.
@@ -150,10 +190,12 @@ private:
     // ----------------------
 
     QTimer* selectionTimer;
+    QTimer* lspRefreshTimer;
     QLabel* modeLabel;
     QLabel* lineLabel;
     QLabel* modifiedLabel;
     QListWidget* currentCompleter;
+    QWidget* lineNumberArea;
 
     Window* window;
 
@@ -180,6 +222,24 @@ private:
     int eightyCharsX;
     int hundredTwentyCharsX;
 
+
     QColor highlightedLine;
 };
 
+class LineNumberArea : public QWidget
+{
+public:
+    LineNumberArea(Editor *editor) : QWidget(editor), editor(editor) {}
+
+    QSize sizeHint() const override {
+        return QSize(this->editor->lineNumberAreaWidth(), 0);
+    }
+
+protected:
+    void paintEvent(QPaintEvent *event) override {
+        this->editor->lineNumberAreaPaintEvent(event);
+    }
+
+private:
+    Editor *editor;
+};

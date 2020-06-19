@@ -1,7 +1,9 @@
 #include <QCoreApplication>
 #include <QMessageBox>
+#include <QRandomGenerator>
 
 #include "command.h"
+#include "lsp.h"
 #include "window.h"
 
 Command::Command(Window* window) :
@@ -47,8 +49,7 @@ bool Command::areYouSure() {
         return true;
     }
 
-    QString filename = this->window->getEditor()->getCurrentBuffer()->getFilename();
-    if (filename.endsWith(".git/COMMIT_EDITMSG") || filename.endsWith(".git/MERGE_MSG")) {
+    if (this->window->getEditor()->getCurrentBuffer()->isGitTempFile()) {
         return true;
     }
 
@@ -109,6 +110,46 @@ void Command::execute(QString text) {
         }
         return;
     }
+
+    // lsp
+    // ----------------------
+
+    Buffer* currentBuffer = this->window->getEditor()->getCurrentBuffer();
+    LSP* lsp = this->window->getEditor()->lspManager.getLSP(currentBuffer);
+    int reqId = QRandomGenerator::global()->generate();
+    if (reqId < 0) { reqId *= -1; }
+
+    if (command == ":def") {
+        if (lsp == nullptr) { return; }
+        lsp->definition(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_DEFINITION, currentBuffer);
+    }
+
+    if (command == ":dec") {
+        if (lsp == nullptr) { return; }
+        lsp->declaration(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_DECLARATION, currentBuffer);
+    }
+
+    if (command == ":sig") {
+        if (lsp == nullptr) { return; }
+        lsp->signatureHelp(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_SIGNATURE_HELP, currentBuffer);
+    }
+
+    if (command == ":ref") {
+        if (lsp == nullptr) { return; }
+        lsp->references(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_REFERENCES, currentBuffer);
+    }
+
+    if (command == ":com") {
+        if (lsp == nullptr) { return; }
+        lsp->completion(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
+    }
+
+    // ----------------------
 
     if (command == ":bd") {
         if (this->window->getEditor()->getCurrentBuffer() == nullptr) {

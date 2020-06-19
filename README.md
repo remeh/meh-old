@@ -48,8 +48,6 @@
 ## Roadmap
 
     * Interface with an LSP server for "go to reference" feature / auto-completion
-    * Fuzzy search in the file opener (it is just a `startsWith` for now)
-    * Icons on macOS (missing in the file opener)
     * Syntax highlighting per file extension
     * May implement the file opener with FZF if this one annoys me, but so far I'm happy with it
 

@@ -26,6 +26,10 @@ public:
 
     const QByteArray& getData() { return this->data; }
 
+    // refreshData refreshes the data of the current buffer with what's available
+    // in the editor data.
+    void refreshData(Editor* editor);
+
     // onLeave is called when the Window is leaving this Buffer (either to show
     // another or because we're closing the application for instance).
     void onLeave(Editor* editor);
@@ -40,6 +44,9 @@ public:
     // modified is true if something has changed in the buffer which has not be
     // stored on disk.
     bool modified;
+
+    // isGitTempFile returns true if the currently opened file is a git tmp file.
+    bool isGitTempFile();
 
 protected:
 

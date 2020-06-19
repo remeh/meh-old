@@ -1,0 +1,79 @@
+#include <QDir>
+#include <QFileInfo>
+
+#include "../lsp.h"
+#include "../window.h"
+#include "lsp_clangd.h"
+
+#include "qdebug.h"
+
+LSPClangd::LSPClangd(Window* window, const QString& baseDir) : LSP(window) {
+    this->serverSpawned = false;
+    this->language = "cpp";
+    this->baseDir = baseDir;
+}
+
+LSPClangd::~LSPClangd() {
+    this->lspServer.terminate();
+    this->lspServer.waitForFinished(5000);
+}
+
+void LSPClangd::readStandardOutput() {
+    if (this->window == nullptr) {
+        return;
+    }
+    QByteArray data = this->lspServer.readAll();
+    this->window->getEditor()->lspInterpret(data);
+}
+
+// --------------------------
+
+bool LSPClangd::start() {
+    this->lspServer.start("clangd");
+    this->serverSpawned = this->lspServer.waitForStarted(5000);
+    qDebug() << "LSPClangd started";
+    // TODO(remy): send the initialize command
+    return this->serverSpawned;
+}
+
+void LSPClangd::initialize() {
+    const QString& initialize = this->writer.initialize(this->baseDir);
+    const QString& initialized = this->writer.initialized();
+    this->lspServer.write(initialize.toUtf8());
+    this->lspServer.write(initialized.toUtf8());
+}
+
+void LSPClangd::openFile(Buffer* buffer) {
+    const QString& msg = this->writer.openFile(buffer, buffer->getFilename(), this->language);
+    this->lspServer.write(msg.toUtf8());
+}
+
+void LSPClangd::refreshFile(Buffer* buffer) {
+    const QString& msg = this->writer.refreshFile(buffer, buffer->getFilename());
+    this->lspServer.write(msg.toUtf8());
+}
+
+void LSPClangd::definition(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.definition(reqId, filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}
+
+void LSPClangd::declaration(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.declaration(reqId, filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}
+
+void LSPClangd::signatureHelp(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.signatureHelp(reqId, filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}
+
+void LSPClangd::references(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.references(reqId, filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}
+
+void LSPClangd::completion(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.completion(reqId, filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}

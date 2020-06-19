@@ -119,6 +119,7 @@ bool FilesLookup::openSelection() {
     QListWidgetItem* item = this->list->currentItem();
     if (item == nullptr) {
         qDebug() << "item == nullptr in FilesLookup::keyPressEvent";
+        return false;
     }
 
     QFileInfo info(this->base + item->text());
