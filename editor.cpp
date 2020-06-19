@@ -26,7 +26,7 @@
 #include "window.h"
 
 Editor::Editor(Window* window) :
-    QTextEdit(window),
+    QPlainTextEdit(window),
     currentCompleter(nullptr),
     window(window),
     currentBuffer(nullptr),
@@ -34,10 +34,11 @@ Editor::Editor(Window* window) :
     highlightedLine(QColor::fromRgb(50, 50, 50)) {
     Q_ASSERT(window != nullptr);
 
-    // we don't want a rich text editor
+    // line number area
     // ----------------------
 
-    this->setAcceptRichText(false);
+    this->lineNumberArea = new LineNumberArea(this);
+    this->onUpdateLineNumberAreaWidth(0);
 
     // editor font
     // ----------------------
@@ -52,6 +53,7 @@ Editor::Editor(Window* window) :
     font.setPointSize(11);
     #endif
     this->setFont(font);
+
 
     // basic theming
     // ----------------------
@@ -72,6 +74,9 @@ Editor::Editor(Window* window) :
 
     this->selectionTimer = new QTimer;
     this->lspRefreshTimer = new QTimer;
+
+    // status line
+    // ----------------------
 
     QFont labelFont = font;
     labelFont.setPointSize(14);
@@ -111,10 +116,13 @@ Editor::Editor(Window* window) :
     this->setSubMode(NO_SUBMODE);
     this->setMode(MODE_NORMAL);
 
-    connect(this, &QTextEdit::selectionChanged, this, &Editor::onSelectionChanged);
-    connect(this, &QTextEdit::cursorPositionChanged, this, &Editor::onCursorPositionChanged);
+    connect(this, &QPlainTextEdit::selectionChanged, this, &Editor::onSelectionChanged);
+    connect(this, &QPlainTextEdit::cursorPositionChanged, this, &Editor::onCursorPositionChanged);
     connect(this->selectionTimer, &QTimer::timeout, this, &Editor::onTriggerSelectionHighlight);
     connect(this->lspRefreshTimer, &QTimer::timeout, this, &Editor::onTriggerLspRefresh);
+    // line area
+    connect(this, &QPlainTextEdit::blockCountChanged, this, &Editor::onUpdateLineNumberAreaWidth);
+    connect(this, &QPlainTextEdit::updateRequest, this, &Editor::onUpdateLineNumberArea);
 }
 
 Editor::~Editor() {
@@ -140,11 +148,16 @@ Editor::~Editor() {
     }
 }
 
-void Editor::onWindowResized(QResizeEvent*) {
+void Editor::onWindowResized(QResizeEvent* event) {
+    QPlainTextEdit::resizeEvent(event);
+
     int x = this->window->rect().width() - 90;
     this->modeLabel->move(x, 2);
     this->lineLabel->move(x, 20);
     this->modifiedLabel->move(x, 38);
+
+    QRect cr = this->contentsRect();
+    this->lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
 void Editor::onCursorPositionChanged() {
@@ -279,7 +292,7 @@ void Editor::closeCurrentBuffer() {
     this->currentBuffer = nullptr;
 
     if (this->buffers.size() == 0) {
-        this->setText(""); // clear
+        this->setPlainText(""); // clear
         this->window->setWindowTitle("meh - no file");
         return;
     }
@@ -472,7 +485,7 @@ void Editor::deleteCurrentLine() {
 void Editor::paintEvent(QPaintEvent* event) {
     Q_ASSERT(event != NULL);
 
-    QTextEdit::paintEvent(event);
+    QPlainTextEdit::paintEvent(event);
     QPainter painter(this->viewport());
     painter.setPen(QPen(QColor(255, 255, 255, 8)));
     painter.drawLine(this->eightyCharsX, 0, eightyCharsX, this->viewport()->rect().height());
@@ -499,7 +512,7 @@ void Editor::mousePressEvent(QMouseEvent* event) {
         return;
     }
 
-    QTextEdit::mousePressEvent(event);
+    QPlainTextEdit::mousePressEvent(event);
 }
 
 void Editor::keyPressEvent(QKeyEvent* event) {
@@ -524,13 +537,13 @@ void Editor::keyPressEvent(QKeyEvent* event) {
             case Qt::Key_U:
                 {
                     QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageUp, Qt::NoModifier);
-                    QTextEdit::keyPressEvent(&pageEvent);
+                    QPlainTextEdit::keyPressEvent(&pageEvent);
                 }
                 return;
             case Qt::Key_D:
                 {
                     QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageDown, Qt::NoModifier);
-                    QTextEdit::keyPressEvent(&pageEvent);
+                    QPlainTextEdit::keyPressEvent(&pageEvent);
                 }
                 return;
             case Qt::Key_Space:
@@ -618,7 +631,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
             return;
         }
 
-        QTextEdit::keyPressEvent(event);
+        QPlainTextEdit::keyPressEvent(event);
         if (this->mode == MODE_REPLACE_ONE && event->text()[0] != '\x0') {
             this->setMode(MODE_NORMAL);
             this->left();
@@ -709,12 +722,12 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         if (this->currentLineIsOnlyWhitespaces() >= 0) {
             this->removeIndentation(this->textCursor());
         }
-        QTextEdit::keyPressEvent(event);
+        QPlainTextEdit::keyPressEvent(event);
         return;
     }
 
-    // Otherwise, rely on the original behavior of QTextEdit
-    QTextEdit::keyPressEvent(event);
+    // Otherwise, rely on the original behavior of QPlainTextEdit
+    QPlainTextEdit::keyPressEvent(event);
 }
 
 void Editor::toggleComments(QList<QTextBlock> blocks, const QString& commentChars) {
@@ -969,3 +982,63 @@ void Editor::lspInterpret(QByteArray data) {
             return;
     }
 }
+
+// line area
+// ---------
+
+void Editor::onUpdateLineNumberAreaWidth(int) {
+    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
+}
+
+void Editor::onUpdateLineNumberArea(const QRect &rect, int dy) {
+    if (dy) {
+        this->lineNumberArea->scroll(0, dy);
+    } else {
+        this->lineNumberArea->update(0, rect.y(), this->lineNumberArea->width(), rect.height());
+    }
+
+    if (rect.contains(viewport()->rect())) {
+        this->onUpdateLineNumberAreaWidth(0);
+    }
+}
+
+void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
+    QPainter painter(lineNumberArea);
+    painter.fillRect(event->rect(), QColor::fromRgb(30, 30, 30));
+
+    QTextBlock block = firstVisibleBlock();
+    int blockNumber = block.blockNumber();
+    int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
+    int bottom = top + qRound(blockBoundingRect(block).height());
+
+    while (block.isValid() && top <= event->rect().bottom()) {
+        if (block.isVisible() && bottom >= event->rect().top()) {
+            QString number = QString::number(blockNumber + 1);
+            painter.setPen(QColor::fromRgb(120, 120, 120));
+            painter.drawText(0, top, lineNumberArea->width()-2, fontMetrics().height(),
+                             Qt::AlignRight, number);
+        }
+
+        block = block.next();
+        top = bottom;
+        bottom = top + qRound(blockBoundingRect(block).height());
+        ++blockNumber;
+    }
+}
+
+int Editor::lineNumberAreaWidth() {
+    // TODO(remy): I don't want this to be dynamic
+
+    int digits = 1;
+    int max = qMax(1, blockCount());
+    while (max >= 10) {
+        max /= 10;
+        ++digits;
+    }
+
+    if (digits < 5) { digits = 5; }
+
+    int space = 3 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
+    return space;
+}
+

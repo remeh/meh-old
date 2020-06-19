@@ -136,7 +136,7 @@ void Buffer::onEnter(Editor* editor) {
     // TODO(remy): check whether the file has changed on disk? compare timestamp?
 
     // restore the text in the editor
-    editor->setText(this->read());
+    editor->setPlainText(this->read());
 
     // restore last cursor position, but do not do that for git messages
     if (!this->isGitTempFile()) {
