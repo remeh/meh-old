@@ -30,6 +30,11 @@ void Completer::keyPressEvent(QKeyEvent* event) {
             this->window->getEditor()->applyAutocomplete(this->base, this->currentItem()->text());
             this->window->closeCompleter();
             return;
+        case Qt::Key_Space:
+            this->window->getEditor()->applyAutocomplete(this->base, this->currentItem()->text());
+            // TODO(remy): should we insert a space here?
+            this->window->closeCompleter();
+            return;
         case Qt::Key_N:
             if (ctrl) {
                 this->setCurrentRow(this->currentRow() + 1);
