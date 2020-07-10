@@ -14,7 +14,7 @@ endif()
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-add_executable(meh
+set(SOURCES
     main.cpp
     resources.qrc
     buffer.cpp
@@ -33,5 +33,16 @@ add_executable(meh
     visual.cpp
     window.cpp
 )
+
+if (APPLE)
+    set(MACOSX_BUNDLE_BUNDLE_NAME meh)
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "io.remy.meh")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+    add_executable(meh MACOSX_BUNDLE ${SOURCES})
+else()
+    add_executable(meh ${SOURCES})
+endif()
 
 target_link_libraries(meh Qt5::Widgets)
