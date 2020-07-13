@@ -444,10 +444,7 @@ void Editor::goToOccurrence(const QString& string, bool backward) {
     if (backward) {
         this->find(s, QTextDocument::FindBackward);
     } else {
-        if (!this->find(s)) {
-            // didn't find anything, look backward
-            this->find(s, QTextDocument::FindBackward);
-        }
+        this->find(s);
     }
 }
 
