@@ -15,7 +15,7 @@ LSPClangd::LSPClangd(Window* window, const QString& baseDir) : LSP(window) {
 
 LSPClangd::~LSPClangd() {
     this->lspServer.terminate();
-    this->lspServer.waitForFinished(5000);
+    this->lspServer.waitForFinished(1000);
 }
 
 void LSPClangd::readStandardOutput() {

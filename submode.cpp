@@ -7,7 +7,7 @@
 
 #include "editor.h"
 
-void Editor::keyPressEventSubMode(QKeyEvent* event, bool, bool shift) {
+void Editor::keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift) {
     if (event->key() ==  Qt::Key_Escape) {
         this->setSubMode(NO_SUBMODE);
         this->setMode(MODE_NORMAL);
@@ -17,6 +17,11 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool, bool shift) {
     // ignore modifiers keys, etc.
     // NOTE(remy): maybe we will have to do that only for some submodes
     if (event->text()[0] == '\x0') {
+        return;
+    }
+
+    if (this->subMode >= 1000) {
+        this->keyPressEventLeaderMode(event, ctrl, shift);
         return;
     }
 

@@ -23,9 +23,11 @@
 #include "editor.h"
 #include "mode.h"
 #include "syntax.h"
+#include "tasks.h"
 #include "window.h"
 
 Editor::Editor(Window* window) :
+    tasksPlugin(nullptr),
     QPlainTextEdit(window),
     currentCompleter(nullptr),
     window(window),
@@ -110,6 +112,11 @@ Editor::Editor(Window* window) :
     this->eightyCharsX = metrics.horizontalAdvance(chars);
     for (int i = 0; i < 40; i++) { chars += "#"; }
     this->hundredTwentyCharsX = metrics.horizontalAdvance(chars);
+
+    // enabled plugins
+    // ---------------
+
+    this->tasksPlugin = new TasksPlugin(window);
 
     // start in normal mode
     // ----------------------
@@ -352,8 +359,13 @@ void Editor::setMode(int mode, QString command) {
         this->setMidCursor();
         this->setOverwriteMode(true);
         break;
-    case NO_SUBMODE:
-        this->modeLabel->setText("");
+    case MODE_LEADER:
+        this->modeLabel->setText("LEADER");
+        this->setMidCursor();
+        this->leaderModeSelectSubMode();
+        return; // we don't want to set the mode below,
+                // leaderModeSelectSubMode takes care of it because it could decide
+                // to go back to NORMAL if the current file doesn't fit any plugin.
     }
     this->mode = mode;
 }
@@ -481,6 +493,23 @@ void Editor::deleteCurrentLine() {
     cursor.movePosition(QTextCursor::StartOfBlock);
     cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     cursor.removeSelectedText();
+}
+
+void Editor::insertNewLine(bool above) {
+    // take the indent now, of the current line.
+    if (above) {
+        this->moveCursor(QTextCursor::Up);
+    }
+    this->moveCursor(QTextCursor::EndOfLine);
+    QString indent = this->currentLineIndent();
+
+    QChar lastChar = this->currentLineLastChar();
+    if (lastChar == ":" || lastChar == "{") {
+        indent += "    ";
+    }
+    this->insertPlainText("\n" + indent);
+    this->setMode(MODE_INSERT);
+    return;
 }
 
 void Editor::paintEvent(QPaintEvent* event) {
@@ -626,7 +655,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     }
 
     // Replace mode
-    // ----------------------
+    // ------------
 
     if (this->mode == MODE_REPLACE || this->mode == MODE_REPLACE_ONE) {
         if (event->key() == Qt::Key_Escape) {
@@ -643,7 +672,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     }
 
     // Visual mode
-    // ----------------------
+    // -----------
 
     if (this->mode == MODE_VISUAL) {
         this->keyPressEventVisual(event, ctrl, shift);
@@ -656,15 +685,23 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     }
 
     // Normal mode
-    // ----------------------
+    // -----------
 
     if (this->mode == MODE_NORMAL) {
         this->keyPressEventNormal(event, ctrl, shift);
         return;
     }
 
+    // Leader mode
+    // -----------
+
+    if (this->mode == MODE_LEADER) {
+        this->keyPressEventLeaderMode(event, ctrl, shift);
+        return;
+    }
+
     // Insert mode
-    // ----------------------
+    // -----------
 
     if (event->key() == Qt::Key_Escape) {
         QTextCursor cursor = this->textCursor();
@@ -692,7 +729,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
             this->moveCursor(QTextCursor::EndOfLine);
         } else {
             // FIXME(remy): doesn't work propery for Shift+Return.
-            QChar lastChar = this->currentLineLastChar(false);
+            QChar lastChar = this->currentLineLastChar();
             if (lastChar == ":" || lastChar == "{") {
                 indent += "    ";
             }
@@ -818,11 +855,8 @@ int Editor::currentLineIsOnlyWhitespaces() {
     return count;
 }
 
-QChar Editor::currentLineLastChar(bool moveUp) {
+QChar Editor::currentLineLastChar() {
     QTextCursor cursor = this->textCursor();
-    if (moveUp) {
-        cursor.movePosition(QTextCursor::Up);
-    }
     cursor.movePosition(QTextCursor::EndOfBlock);
     return QChar(this->document()->characterAt(cursor.position()-1));
 }
@@ -946,6 +980,19 @@ int Editor::findPreviousOneInCurrentLine(QChar c) {
     }
 
     return 0;
+}
+
+QString Editor::currentBufferExtension() {
+    if (this->currentBuffer == nullptr) {
+        return "";
+    }
+
+    QStringList parts = this->currentBuffer->getFilename().split(".");
+    if (parts.size() == 1) {
+        return "";
+    }
+
+    return parts[parts.size() - 1];
 }
 
 int Editor::findNextOneInCurrentLine(QChar c) {

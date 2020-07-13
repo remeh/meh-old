@@ -8,6 +8,8 @@
 #include <QTextCursor>
 #include <QTextDocument>
 
+#include "qdebug.h"
+
 #include "editor.h"
 #include "window.h"
 
@@ -72,9 +74,12 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
                 this->goToOccurrence("", false);
             }
             return;
-            
+
         case Qt::Key_Question:
             this->goToOccurrence(this->getWordUnderCursor(), false);
+            return;
+        case Qt::Key_Comma:
+            this->setMode(MODE_LEADER);
             return;
 
         case Qt::Key_F:
@@ -116,19 +121,10 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
                 // NOTE(remy): we could detect the { at the end of a line
                 // to have another behavior.
                 if (shift) {
-                    this->moveCursor(QTextCursor::Up);
+                    this->insertNewLine(true);
+                    return;
                 }
-                this->moveCursor(QTextCursor::EndOfLine);
-
-                QString indent = this->currentLineIndent();
-
-                QChar lastChar = this->currentLineLastChar(shift ? true : false);
-                if (lastChar == ":" || lastChar == "{") {
-                    indent += "    ";
-                }
-
-                this->insertPlainText("\n" + indent);
-                this->setMode(MODE_INSERT);
+                this->insertNewLine(false);
                 return;
             }
         case Qt::Key_Dollar:

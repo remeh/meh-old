@@ -23,6 +23,7 @@
 #include "lsp_manager.h"
 #include "mode.h"
 #include "syntax.h"
+#include "tasks.h"
 
 class Window;
 
@@ -105,6 +106,10 @@ public:
     // deleteCurrentLine removes the current line of the buffer.
     void deleteCurrentLine();
 
+    // insertNewLine insert a new line either under, or above the current one
+    // and takes care of adding the proper indentation.
+    void insertNewLine(bool above);
+
     // getWordUnderCursor returns the word under the cursor if any.
     QString getWordUnderCursor();
 
@@ -160,6 +165,7 @@ private:
     void keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift);
     void keyPressEventVisual(QKeyEvent* event, bool ctrl, bool shift);
     void keyPressEventVisualLine(QKeyEvent* event, bool ctrl, bool shift);
+    void keyPressEventLeaderMode(QKeyEvent* event, bool ctrl, bool shift);
     void keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift);
 
     // currentLineIndent returns the current line indentation.
@@ -176,8 +182,7 @@ private:
     int currentLineIsOnlyWhitespaces();
 
     // currentLineLastChar returns the last char of the line.
-    // moveUp should be used to move to the line above first. Used for O in normal.
-    QChar currentLineLastChar(bool moveUp);
+    QChar currentLineLastChar();
 
     // findNextOneInCurrentLine returns the distance to the next occurence of the
     // given char in the current line. The distance is from the current cursor position.
@@ -186,6 +191,18 @@ private:
     // findPreviousOneInCurrentLine returns the distance to the previous occurence of
     // the given char in the current line. The distance is from the current cursor position.
     int findPreviousOneInCurrentLine(QChar c);
+
+    // currentBufferExtension returns the extension of the current file.
+    // Returns an empty string if the buffer has no extension.
+    QString currentBufferExtension();
+
+    // leaderModeSelectSubMode sets the subMode we should switch in depending
+    // of the current buffer.
+    void leaderModeSelectSubMode();
+
+    // ----------------------
+
+    TasksPlugin *tasksPlugin;
 
     // ----------------------
 
@@ -221,7 +238,6 @@ private:
     // eightCharsX is the X position where the eighty chars line must be drawn.
     int eightyCharsX;
     int hundredTwentyCharsX;
-
 
     QColor highlightedLine;
 };

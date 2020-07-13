@@ -23,6 +23,7 @@ set(SOURCES
     editor.cpp
     fileslookup.cpp
     grep.cpp
+    leader.cpp
     lsp.cpp
     lsp_manager.cpp
     lsp/lsp_clangd.cpp
@@ -30,6 +31,7 @@ set(SOURCES
     normal.cpp
     submode.cpp
     syntax.cpp
+    tasks.cpp
     visual.cpp
     window.cpp
 )

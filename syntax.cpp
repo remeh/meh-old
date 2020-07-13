@@ -69,6 +69,22 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     rule.pattern = QRegularExpression(QStringLiteral("( |\t)+$"));
     rule.format = trailingWhiteSpaces;
     highlightingRules.append(rule);
+
+    // tasks
+    // -----
+
+    // TODO(remy): should be in the plugin and only runned on .tasks files
+    QTextCharFormat tasksDone, tasksWontDo;
+
+    tasksDone.setForeground(QColor::fromRgb(153,215,0));
+    rule.pattern = QRegularExpression(QStringLiteral("\\[v\\] "));
+    rule.format = tasksDone;
+    highlightingRules.append(rule);
+
+    tasksWontDo.setForeground(Qt::red);
+    rule.pattern = QRegularExpression(QStringLiteral("\\[x\\] "));
+    rule.format = tasksWontDo;
+    highlightingRules.append(rule);
 }
 
 void Syntax::highlightBlock(const QString &text)
