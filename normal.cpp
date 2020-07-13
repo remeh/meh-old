@@ -72,7 +72,8 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
                 this->goToOccurrence("", false);
             }
             return;
-        case Qt::Key_Comma:
+            
+        case Qt::Key_Question:
             this->goToOccurrence(this->getWordUnderCursor(), false);
             return;
 
