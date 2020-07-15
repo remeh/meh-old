@@ -29,6 +29,16 @@ void TasksPlugin::keyPressEvent(QKeyEvent* event, bool ctrl, bool shift) {
             editor->setMode(MODE_INSERT);
             editor->setSubMode(NO_SUBMODE);
             return;
+        case Qt::Key_C:
+            if (shift) {
+                editor->insertNewLine(true);
+            } else {
+                editor->insertNewLine(false);
+            }
+            editor->textCursor().insertText("# ");
+            editor->setMode(MODE_INSERT);
+            editor->setSubMode(NO_SUBMODE);
+            return;
         case Qt::Key_D:
             editor->textCursor().beginEditBlock();
             text = editor->textCursor().block().text();
