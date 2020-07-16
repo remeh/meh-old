@@ -130,6 +130,7 @@ void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool shift) {
                 this->setMode(MODE_NORMAL);
             }
             return;
+        case Qt::Key_D:
         case Qt::Key_X:
             this->cut();
             this->setMode(MODE_NORMAL);
