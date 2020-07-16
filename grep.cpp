@@ -16,6 +16,7 @@ Grep::Grep(Window* window) :
     QStringList columns;
     columns << "File" << "Line #" << "Line";
     this->tree->setHeaderLabels(columns);
+    this->tree->setIndentation(0);
 
     this->setFocusPolicy(Qt::StrongFocus);
 
@@ -67,6 +68,12 @@ void Grep::onFinished() {
     if (this->process) {
         delete this->process;
         this->process = nullptr;
+    }
+
+    this->tree->setColumnWidth(1, 50);
+    this->tree->resizeColumnToContents(0);
+    if (this->tree->columnWidth(0) > 300) {
+        this->tree->setColumnWidth(0, 300);
     }
 
     // TODO(remy): show that it has finished (ui wise)
@@ -155,7 +162,12 @@ void Grep::readAndAppendResult(const QString& result) {
     // the rest is the result
     QString line = result.section(":", 2);
     parts << line.trimmed();
-    new QTreeWidgetItem(this->tree, parts);
+
+    if (parts[0].startsWith("./")) {
+        parts[0] = parts[0].remove(0, 2);
+    }
+
+    QTreeWidgetItem* item = new QTreeWidgetItem(this->tree, parts);
 }
 
 void Grep::grep(const QString& string, const QString& baseDir) {
