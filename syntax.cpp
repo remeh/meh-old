@@ -49,7 +49,7 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     highlightingRules.append(rule);
 
     singleLineCommentFormat.setForeground(QColor::fromRgb(98,98,98));
-    rule.pattern = QRegularExpression(QStringLiteral("//[^\n]*"));
+    rule.pattern = QRegularExpression(QStringLiteral("(^|\\s)//[^\n]*"));
     rule.format = singleLineCommentFormat;
     highlightingRules.append(rule);
 
@@ -77,12 +77,12 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     QTextCharFormat tasksDone, tasksWontDo;
 
     tasksDone.setForeground(QColor::fromRgb(153,215,0));
-    rule.pattern = QRegularExpression(QStringLiteral("\\[v\\] "));
+    rule.pattern = QRegularExpression(QStringLiteral("\\[v\\] .*"));
     rule.format = tasksDone;
     highlightingRules.append(rule);
 
     tasksWontDo.setForeground(Qt::red);
-    rule.pattern = QRegularExpression(QStringLiteral("\\[x\\] "));
+    rule.pattern = QRegularExpression(QStringLiteral("\\[x\\] .*"));
     rule.format = tasksWontDo;
     highlightingRules.append(rule);
 }
