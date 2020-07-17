@@ -82,8 +82,17 @@ void FilesLookup::lookupBuffers() {
 
     QList<Buffer*> buffers = this->window->getEditor()->getBuffers().values();
     for (int i = 0; i < buffers.size(); i++) {
-        this->filenames.insert(buffers.at(i)->getFilename());
-        this->filteredFiles.insert(buffers.at(i)->getFilename());
+        QString value = buffers.at(i)->getFilename();
+        // remove basedir
+        if (value.startsWith(this->window->getBaseDir())) {
+            value = value.remove(0, this->window->getBaseDir().size());
+            if (value.startsWith("/")) {
+                value = value.remove(0, 1);
+            }
+        }
+
+        this->filenames.insert(value);
+        this->filteredFiles.insert(value);
     }
 }
 
@@ -230,7 +239,8 @@ void FilesLookup::filter() {
 // every time but just removing the filtered entries.
 void FilesLookup::refreshList() {
     this->list->clear();
-    auto it = this->filteredDirs.begin();
+    QSet<QString>::iterator it = this->filteredDirs.begin();
+
     while (it != this->filteredDirs.end()) {
         QIcon icon = QIcon(":/res/directory-in.png");
         if (*it == "..") {
