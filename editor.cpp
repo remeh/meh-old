@@ -525,7 +525,11 @@ void Editor::paintEvent(QPaintEvent* event) {
 
 void Editor::mousePressEvent(QMouseEvent* event) {
     Q_ASSERT(event != NULL);
-
+    if (event->button() == Qt::LeftButton) {
+        if (this->mode == MODE_NORMAL) {
+            this->setMode(MODE_INSERT);
+        }
+    }
     if (event->button() == Qt::ForwardButton) {
         if (this->mode == MODE_NORMAL) {
             this->setMode(MODE_INSERT);
