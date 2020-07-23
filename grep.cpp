@@ -36,6 +36,7 @@ void Grep::show() {
     this->tree->show();
     this->label->setFocus();
     QWidget::show();
+    this->label->setText("No results");
 }
 
 void Grep::hide() {
@@ -51,8 +52,7 @@ void Grep::hide() {
 }
 
 void Grep::onResults() {
-    QByteArray data = this->process->readLine();
-    for (; data.size() > 0; data = this->process->readLine()) {
+    for (QByteArray data = this->process->readLine(); data.size() > 0; data = this->process->readLine()) {
         this->readAndAppendResult(data);
         this->resultsCount++;
     }
