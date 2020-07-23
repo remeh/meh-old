@@ -24,14 +24,30 @@ int main(int argv, char **args)
             if (arguments.at(i).startsWith("+")) {
                 continue;
             }
+
+            QFileInfo fi(arguments.at(i));
+            if (fi.isDir()) {
+                continue;
+            }
+
             window.getEditor()->selectOrCreateBuffer(arguments.at(i));
         }
 
+        // special cases about the last one
         if (arguments.last().startsWith("+")) {
             bool ok = false;
             int lineNumber = arguments.last().toInt(&ok);
             if (ok) {
                 window.getEditor()->goToLine(lineNumber);
+            }
+        } else if (arguments.size() > 1) {
+            // the last one is not a +###
+            // checks whether it is a directory, if it is, we want to
+            // set it as the base work dir.
+            QFileInfo fi(arguments.last());
+            if (fi.isDir()) {
+                window.setBaseDir(fi.absoluteFilePath());
+                window.openListFiles();
             }
         }
     }
