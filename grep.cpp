@@ -18,6 +18,8 @@ Grep::Grep(Window* window) :
     this->tree->setHeaderLabels(columns);
     this->tree->setIndentation(0);
 
+    this->setFont(window->getEditor()->getFont());
+
     this->setFocusPolicy(Qt::StrongFocus);
 
     this->layout = new QGridLayout();

@@ -45,17 +45,7 @@ Editor::Editor(Window* window) :
     // editor font
     // ----------------------
 
-    QFont font;
-    font.setFamily("Inconsolata");
-    font.setStyleHint(QFont::Monospace);
-    font.setFixedPitch(true);
-    #ifdef Q_OS_MAC
-    font.setPointSize(14);
-    #else
-    font.setPointSize(11);
-    #endif
-    this->setFont(font);
-
+    this->setFont(this->getFont());
 
     // basic theming
     // ----------------------
@@ -80,8 +70,8 @@ Editor::Editor(Window* window) :
     // status line
     // ----------------------
 
-    QFont labelFont = font;
-    labelFont.setPointSize(14);
+    QFont labelFont = this->getFont();
+    labelFont.setPointSize(15);
     this->modeLabel = new QLabel("NORMAL  ", this);
     this->modeLabel->setStyleSheet("color: rgba(255, 255, 255, 30); background-color: rgba(0, 0, 0, 0);");
     this->modeLabel->setFont(labelFont);
@@ -101,7 +91,7 @@ Editor::Editor(Window* window) :
     // ----------------------
 
     const int tabSpace = 4;
-    QFontMetrics metrics(font);
+    QFontMetrics metrics(this->getFont());
     this->setTabStopDistance(tabSpace*metrics.horizontalAdvance(" "));
 
     // 80 chars separator
@@ -154,6 +144,19 @@ Editor::~Editor() {
     if (this->currentCompleter) {
         delete this->currentCompleter;
     }
+}
+
+QFont Editor::getFont() {
+    QFont font;
+    font.setFamily("Inconsolata");
+    font.setStyleHint(QFont::Monospace);
+    font.setFixedPitch(true);
+    #ifdef Q_OS_MAC
+    font.setPointSize(14);
+    #else
+    font.setPointSize(11);
+    #endif
+    return font;
 }
 
 void Editor::onWindowResized(QResizeEvent* event) {

@@ -25,6 +25,8 @@ FilesLookup::FilesLookup(Window* window) :
     this->list = new QListWidget(this);
     this->list->setSortingEnabled(true);
 
+    this->setFont(window->getEditor()->getFont());
+
     this->setFocusPolicy(Qt::StrongFocus);
 
     this->layout = new QGridLayout();

@@ -3,6 +3,7 @@
 #include <QChar>
 #include <QColor>
 #include <QFocusEvent>
+#include <QFont>
 #include <QLabel>
 #include <QListWidget>
 #include <QMap>
@@ -136,6 +137,9 @@ public:
 
     // widget related
     // --------------
+
+    // getFont returns the font used by the editor.
+    QFont getFont();
 
     // called by the window when it is resized.
     void onWindowResized(QResizeEvent*);
