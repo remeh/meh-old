@@ -30,7 +30,7 @@ Window::Window(QWidget* parent) :
     // ----------------------
 
     QFileInfo dir(".");
-    this->baseDir = dir.absoluteFilePath();
+    this->setBaseDir(dir.absoluteFilePath());
 
     // grep instance
     // ----------------------
@@ -115,18 +115,11 @@ void Window::setCommand(const QString& text) {
 }
 
 void Window::setBaseDir(const QString& dir) {
-    if (dir.startsWith("/")) {
-        this->baseDir = dir;
-        return;
-    }
+    QFileInfo info(dir);
+    this->baseDir = info.absoluteFilePath();
     if (!this->baseDir.endsWith("/")) {
         this->baseDir += "/";
     }
-
-    this->baseDir += dir;
-
-    QFileInfo info(this->baseDir);
-    this->baseDir = info.absoluteFilePath();
 }
 
 void Window::resizeEvent(QResizeEvent* event) {

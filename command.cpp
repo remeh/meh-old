@@ -172,11 +172,6 @@ void Command::execute(QString text) {
         return;
     }
 
-    if (command == ":basedir") {
-        this->window->setBaseDir(list[1]);
-        return;
-    }
-
     // go to a specific line
     // ----------------------
 

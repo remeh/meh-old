@@ -53,7 +53,14 @@ public:
     // setBaseDir sets the base dir on which the FilesLookup
     // should be opened.
     void setBaseDir(const QString& dir);
-    QString getBaseDir() { return this->baseDir; }
+    // getBaseDir returns the base dir on which the editor has been opened.
+    // Always end with a /
+    QString getBaseDir() {
+        if (!this->baseDir.endsWith("/")) {
+            return this->baseDir + "/";
+        }
+        return this->baseDir;
+    }
 
     Editor* getEditor() { return this->editor; }
 

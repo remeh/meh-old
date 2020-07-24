@@ -54,7 +54,7 @@ void FilesLookup::showFiles() {
 }
 
 void FilesLookup::showBuffers() {
-    this->base = "";
+    this->base = this->window->getBaseDir();
     this->edit->setText("");
     this->lookupBuffers();
     this->show();
