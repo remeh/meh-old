@@ -428,8 +428,8 @@ QStringList Editor::modifiedBuffers() {
 }
 
 void Editor::goToLine(int lineNumber) {
-    // note that the findBlockByLineNumber starts with 0
-    QTextBlock block = this->document()->findBlockByLineNumber(lineNumber - 1);
+    // note that the findBlockByNumber starts with 0
+    QTextBlock block = this->document()->findBlockByNumber(lineNumber - 1);
     QTextCursor cursor = this->textCursor();
     cursor.setPosition(block.position());
     this->setTextCursor(cursor);
