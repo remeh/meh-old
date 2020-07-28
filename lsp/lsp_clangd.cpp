@@ -5,8 +5,6 @@
 #include "../window.h"
 #include "lsp_clangd.h"
 
-#include "qdebug.h"
-
 LSPClangd::LSPClangd(Window* window, const QString& baseDir) : LSP(window) {
     this->serverSpawned = false;
     this->language = "cpp";
@@ -31,7 +29,6 @@ void LSPClangd::readStandardOutput() {
 bool LSPClangd::start() {
     this->lspServer.start("clangd");
     this->serverSpawned = this->lspServer.waitForStarted(5000);
-    qDebug() << "LSPClangd started";
     // TODO(remy): send the initialize command
     return this->serverSpawned;
 }

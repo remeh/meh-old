@@ -139,13 +139,22 @@ void Buffer::onEnter(Editor* editor) {
     editor->setPlainText(this->read());
 
     // restore last cursor position, but do not do that for git messages
-    if (!this->isGitTempFile()) {
-        QTextCursor cursor = editor->textCursor();
-        QSettings settings("mehteor", "meh");
-        cursor.setPosition(settings.value("buffer/" + this->filename + "/cursor", 0).toInt());
-        editor->setTextCursor(cursor);
-        QScrollBar* vscroll = editor->verticalScrollBar();
-        vscroll->setValue(settings.value("buffer/" + this->filename + "/vscroll", 0).toInt());
-        editor->ensureCursorVisible();
+    if (this->isGitTempFile()) {
+        return;
     }
+
+    QSettings settings("mehteor", "meh");
+
+    QTextCursor cursor = editor->textCursor();
+    auto pos = settings.value("buffer/" + this->filename + "/cursor", 0).toInt();
+    if (pos > editor->document()->characterCount()) {
+        cursor.setPosition(editor->document()->characterCount() - 1);
+    } else {
+        cursor.setPosition(pos);
+    }
+    editor->setTextCursor(cursor);
+
+    QScrollBar* vscroll = editor->verticalScrollBar();
+    vscroll->setValue(settings.value("buffer/" + this->filename + "/vscroll", 0).toInt());
+    editor->ensureCursorVisible();
 }
