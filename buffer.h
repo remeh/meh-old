@@ -30,9 +30,12 @@ public:
     // in the editor data.
     void refreshData(Editor* editor);
 
-    // onLeave is called when the Window is leaving this Buffer (either to show
-    // another or because we're closing the application for instance).
+    // onLeave is called when the Window is leaving this Buffer (to show another one).
     void onLeave(Editor* editor);
+
+    // onClose is called when the current Buffer is being closed.
+    // onClose does NOT call onLeave.
+    void onClose(Editor* editor);
 
     // onEnter is called when the window is starting to display this buffer.
     void onEnter(Editor* editor);

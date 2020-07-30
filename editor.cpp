@@ -1,10 +1,12 @@
 #include <QColor>
+#include <QDir>
 #include <QKeyEvent>
 #include <QFileInfo>
 #include <QFont>
 #include <QFontMetrics>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QMessageBox>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QRegularExpression>
@@ -126,12 +128,14 @@ Editor::Editor(Window* window) :
 Editor::~Editor() {
     if (this->currentBuffer != nullptr) {
         this->currentBuffer->onLeave(this); // store settings
+        this->currentBuffer->onClose(this);
         delete this->currentBuffer;
     }
     QList<Buffer*> buf = this->buffers.values();
     for (int i = 0; i < buf.size(); i++) {
         if (buf.at(i) != nullptr) {
             buf.at(i)->onLeave(this);
+            buf.at(i)->onClose(this);
             delete buf.at(i);
         }
     }
@@ -280,8 +284,23 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
 
     Buffer* buffer = this->buffers.take(f);
     if (buffer == nullptr) {
+        // check that this file has not been opened by another instance
+        // of the editor
+        if (this->alreadyOpened(filename)) {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Already opened");
+            msgBox.setText("This file is already opened by another instance of meh, do you still want to open it?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+            msgBox.setDefaultButton(QMessageBox::Cancel);
+            if (msgBox.exec() == QMessageBox::Cancel) {
+                return;
+            }
+        }
+
         // this file has never been opened, open it
         buffer = new Buffer(f);
+        // store somewhere that it is now open by someone
+        this->storeOpenedState(filename, true);
     } else {
         int pos = this->buffersPos.indexOf(f);
         if (pos >= 0) { // should not happen
@@ -302,6 +321,7 @@ void Editor::closeCurrentBuffer() {
     }
 
     this->currentBuffer->onLeave(this); // store settings
+    this->currentBuffer->onClose(this);
     delete this->currentBuffer;
     this->currentBuffer = nullptr;
 
@@ -325,6 +345,30 @@ bool Editor::hasBuffer(const QString& filename) {
     QFileInfo info(filename);
     return this->currentBuffer->getFilename() == info.absoluteFilePath() ||
             this->buffers.contains(info.absoluteFilePath());
+}
+
+bool Editor::alreadyOpened(const QString& filename) {
+    if (filename.size() == 0) {
+        return false;
+    }
+
+    QSettings settings("mehteor", "meh");
+    QFileInfo f(filename);
+    return settings.value("buffer/"+f.absoluteFilePath()+"/opened", false).toBool();
+}
+
+bool Editor::storeOpenedState(const QString& filename, bool state) {
+    if (filename.size() == 0) {
+        return false;
+    }
+
+    if (this->alreadyOpened(filename)) {
+        return false; // return that we didn't update this
+    }
+    QSettings settings("mehteor", "meh");
+    QFileInfo f(filename);
+    settings.setValue("buffer/"+f.absoluteFilePath()+"/opened", state);
+    return true;
 }
 
 void Editor::setMode(int mode, QString command) {

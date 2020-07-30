@@ -130,6 +130,12 @@ void Buffer::onLeave(Editor* editor) {
     settings.setValue("buffer/" + this->filename + "/vscroll", vscroll->value());
 }
 
+void Buffer::onClose(Editor* editor) {
+    Q_ASSERT(editor != NULL);
+    QSettings settings("mehteor", "meh");
+    settings.remove("buffer/" + this->filename + "/opened");
+}
+
 void Buffer::onEnter(Editor* editor) {
     Q_ASSERT(editor != NULL);
 

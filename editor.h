@@ -28,6 +28,7 @@
 
 class Window;
 
+
 class Editor : public QPlainTextEdit
 {
     Q_OBJECT
@@ -203,6 +204,14 @@ private:
     // leaderModeSelectSubMode sets the subMode we should switch in depending
     // of the current buffer.
     void leaderModeSelectSubMode();
+
+    // alreadyOpened returns true if another editor instance seems to have
+    // already opened this file.
+    // It is using a file in the $TMP directory to do that.
+    bool alreadyOpened(const QString& filepath);
+
+    // storeOpenedState stores whether the given file is opened or not.
+    bool storeOpenedState(const QString& filepath, bool state);
 
     // ----------------------
 
