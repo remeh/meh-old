@@ -46,6 +46,7 @@
     * Go to line with `:<line number>`
     * Automatically runs `gofmt` on Go files (on save), `zig fmt` on Zig files.
     * Basic tasks manager (list of todo, done, cancelled tasks)
+    * Confirm messagebox while re-opening a file already opened in another instance.
     * Others: `J`, `C`, `D`, `ct` `cT` `cf` `cF`, `vf`, `vF`, `<`, `>`, ...
 
 ## Roadmap
