@@ -142,6 +142,21 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift) {
                 cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
                 this->setTextCursor(cursor);
                 this->cut();
+            } else if (!shift && event->key() == Qt::Key_J) {
+                QTextCursor cursor = this->textCursor();
+                cursor.movePosition(QTextCursor::StartOfBlock);
+                cursor.movePosition(QTextCursor::Down, QTextCursor::KeepAnchor);
+                cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                this->setTextCursor(cursor);
+                this->cut();
+            } else if (!shift && event->key() == Qt::Key_K) {
+                QTextCursor cursor = this->textCursor();
+                cursor.setPosition(cursor.block().position() + cursor.block().length());
+                cursor.movePosition(QTextCursor::Up, QTextCursor::KeepAnchor, 2);
+                cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+                this->setTextCursor(cursor);
+                this->cut();
             }
             break;
     }
