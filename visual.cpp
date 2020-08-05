@@ -123,6 +123,11 @@ void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool shift) {
             break;
         case Qt::Key_Y:
             {
+                if (this->document()->characterAt(this->textCursor().position()) == "\u2029") {
+                    QTextCursor cursor = this->textCursor();
+                    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                    this->setTextCursor(cursor);
+                }
                 this->copy();
                 QTextCursor cursor = this->textCursor();
                 cursor.clearSelection();
@@ -132,16 +137,21 @@ void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool shift) {
             return;
         case Qt::Key_D:
         case Qt::Key_X:
+            if (this->document()->characterAt(this->textCursor().position()) == "\u2029") {
+                QTextCursor cursor = this->textCursor();
+                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                this->setTextCursor(cursor);
+            }
             this->cut();
             this->setMode(MODE_NORMAL);
             return;
         case Qt::Key_K:
             this->moveCursor(QTextCursor::Up, QTextCursor::KeepAnchor);
-            this->moveCursor(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+            this->selectVisualLineSelection();
             return;
         case Qt::Key_J:
             this->moveCursor(QTextCursor::Down, QTextCursor::KeepAnchor);
-            this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+            this->selectVisualLineSelection();
             return;
         case Qt::Key_G:
             if (shift) {
@@ -170,5 +180,27 @@ void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool shift) {
                 this->textCursor().endEditBlock();
             }
             return;
+    }
+}
+
+void Editor::selectVisualLineSelection() {
+    QTextCursor cursor = this->textCursor();
+    if (this->visualLineBlockStart.blockNumber() == cursor.blockNumber()) {
+        cursor.setPosition(this->visualLineBlockStart.position());
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        this->setTextCursor(cursor);
+        return;
+    } else if (cursor.blockNumber() < this->visualLineBlockStart.blockNumber()) {
+        int target = cursor.block().position();
+        cursor.setPosition(this->visualLineBlockStart.position()+this->visualLineBlockStart.length(), QTextCursor::MoveAnchor);
+        cursor.setPosition(target, QTextCursor::KeepAnchor);
+        this->setTextCursor(cursor);
+        return;
+    } else if (cursor.blockNumber() > this->visualLineBlockStart.blockNumber()) {
+        int target = cursor.block().position() + cursor.block().length() - 1;
+        cursor.setPosition(this->visualLineBlockStart.position(), QTextCursor::MoveAnchor);
+        cursor.setPosition(target, QTextCursor::KeepAnchor);
+        this->setTextCursor(cursor);
+        return;
     }
 }

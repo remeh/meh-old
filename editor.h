@@ -213,6 +213,10 @@ private:
     // storeOpenedState stores whether the given file is opened or not.
     bool storeOpenedState(const QString& filepath, bool state);
 
+    // selectVisualLineSelection selects blocks selected during the visual line
+    // movement.
+    void selectVisualLineSelection();
+
     // ----------------------
 
     TasksPlugin *tasksPlugin;
@@ -253,6 +257,10 @@ private:
     int hundredTwentyCharsX;
 
     QColor highlightedLine;
+
+    // visualLineBlockStart is the block at which has been started the visual
+    // line mode.
+    QTextBlock visualLineBlockStart;
 };
 
 class LineNumberArea : public QWidget

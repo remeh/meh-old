@@ -385,6 +385,7 @@ void Editor::setMode(int mode, QString command) {
         break;
     case MODE_VISUAL_LINE:
         this->modeLabel->setText("V-LINE");
+        this->visualLineBlockStart = this->textCursor().block(); // TODO(remy): is it starting with 0 or 1?
         this->moveCursor(QTextCursor::StartOfBlock);
         this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
         break;
