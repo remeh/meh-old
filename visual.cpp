@@ -161,21 +161,21 @@ void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool shift) {
             }
             return;
         case Qt::Key_Less:
-            {
-                this->textCursor().beginEditBlock();
-                QList<QTextBlock> blocks = this->selectedBlocks();
-                for (int i = 0; i < blocks.size(); i++) {
-                    this->removeIndentation(QTextCursor(blocks.at(i)));
-                }
-                this->textCursor().endEditBlock();
-            }
-            return;
         case Qt::Key_Greater:
             {
                 this->textCursor().beginEditBlock();
                 QList<QTextBlock> blocks = this->selectedBlocks();
-                for (int i = 0; i < blocks.size(); i++) {
-                    this->insertIndentation(QTextCursor(blocks.at(i)));
+                int blocksSize = blocks.size();
+                // if we're going up, we don't want to consider the last line
+                if (this->textCursor().blockNumber() < this->visualLineBlockStart.blockNumber()) {
+                    blocksSize--;
+                }
+                for (int i = 0; i < blocksSize; i++) {
+                    if (event->key() == Qt::Key_Less) {
+                        this->removeIndentation(QTextCursor(blocks.at(i)));
+                    } else {
+                        this->insertIndentation(QTextCursor(blocks.at(i)));
+                    }
                 }
                 this->textCursor().endEditBlock();
             }
