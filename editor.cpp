@@ -210,11 +210,12 @@ void Editor::onTriggerSelectionHighlight() {
     }
     QTextCursor cursor = this->textCursor();
     QString text = cursor.selectedText();
-    if (text.size() > 0 && text.size() <= 2) {
-        return;
-    }
     if (text.size() == 0) {
         text = this->getWordUnderCursor();
+        // do not automatically highlight small words
+        if (text.size() > 0 && text.size() <= 3) {
+            return;
+        }
     }
     if (this->syntax->setSelection(text)) {
         this->syntax->rehighlight();
