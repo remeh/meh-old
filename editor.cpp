@@ -481,7 +481,7 @@ void Editor::goToLine(int lineNumber) {
     QTextCursor cursor = this->textCursor();
     cursor.setPosition(block.position());
     this->setTextCursor(cursor);
-    this->verticalScrollBar()->setValue(this->verticalScrollBar()->value()+25);
+    this->centerCursor();
 }
 
 void Editor::goToColumn(int column) {
@@ -494,6 +494,25 @@ void Editor::goToColumn(int column) {
     cursor.movePosition(QTextCursor::StartOfBlock);
     cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, column);
     this->setTextCursor(cursor);
+    this->centerCursor();
+}
+
+void Editor::centerCursor() {
+    QRect cursorRect = this->cursorRect();
+    // test if it's at the top
+    if (cursorRect.y() < 30) {
+        qDebug() << "too high";
+        QScrollBar* vscroll = this->verticalScrollBar();
+        vscroll->setValue(vscroll->value() - vscroll->pageStep()/2);
+        return;
+    }
+
+    if (cursorRect.y() > this->rect().height() - 20) {
+        qDebug() << "too low";
+        QScrollBar* vscroll = this->verticalScrollBar();
+        vscroll->setValue(vscroll->value() + vscroll->pageStep()/2);
+        return;
+    }
 }
 
 void Editor::goToOccurrence(const QString& string, bool backward) {

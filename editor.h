@@ -90,6 +90,9 @@ public:
     // goToColumn moves the cursor to the given column.
     void goToColumn(int column);
 
+    // centerCursor centers the displayed cursor if possible.
+    void centerCursor();
+
     // goToOccurrence goes to the next occurence of string if any, previous one
     // if backward is set.
     void goToOccurrence(const QString& string, bool backward);
