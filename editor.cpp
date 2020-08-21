@@ -12,6 +12,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
+#include <QScrollBar>
 #include <QSet>
 #include <QSettings>
 #include <QString>
@@ -480,6 +481,7 @@ void Editor::goToLine(int lineNumber) {
     QTextCursor cursor = this->textCursor();
     cursor.setPosition(block.position());
     this->setTextCursor(cursor);
+    this->verticalScrollBar()->setValue(this->verticalScrollBar()->value()+25);
 }
 
 void Editor::goToColumn(int column) {
