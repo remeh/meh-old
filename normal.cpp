@@ -35,6 +35,20 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             this->setMode(MODE_COMMAND, ":w");
             return;
 
+        // arrow keys in normal mode
+        case Qt::Key_Left:
+            this->left();
+            return;
+        case Qt::Key_Down:
+            this->down();
+            return;
+        case Qt::Key_Up:
+            this->up();
+            return;
+        case Qt::Key_Right:
+            this->right();
+            return;
+
         case Qt::Key_Y:
             {
                 QTextCursor cursor = this->textCursor();
