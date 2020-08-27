@@ -31,9 +31,9 @@
     * Auto-indentation (respect previous line indentation, automatically changes it depending on `{`, `}`, and `:`)
     * Simple syntax highlighting (regexp based)
     * Highlight the selection / word under the cursor
-    * Remember cursor position in files previously opened
+    * Remember cursor position in previously opened files
     * Current-line visual emphasizing
-    * 80 chars line indicator
+    * 80 and 120 chars vertical lines indicator
     * Toggle // comments on selection with `Ctrl-m`, toggle # comments with `Ctrl-Shift-m`.
     * Next/previous occurrence of a char on the line (e.g. `fa` go to next `a`, `F(` go to previous `(`)
     * Copy / paste
