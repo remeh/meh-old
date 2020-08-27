@@ -4,5 +4,6 @@
         <file>res/directory-out.png</file>
         <file>res/edit.png</file>
         <file>res/plus.png</file>
+        <file>res/icon.png</file>
     </qresource>
 </RCC>

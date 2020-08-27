@@ -16,6 +16,7 @@ int main(int argv, char **args)
     Window window;
     window.setWindowTitle(QObject::tr("meh - no file"));
     window.resize(800, 700);
+    window.setWindowIcon(QIcon(":res/icon.png"));
     window.show();
 
     QStringList arguments = QCoreApplication::arguments();
