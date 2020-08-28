@@ -276,6 +276,11 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
     } else {
         this->modifiedLabel->setText("");
     }
+
+    if (this->currentBufferExtension() == "tasks") {
+        this->window->setWindowIcon(QIcon(":res/icon-check.png"));
+    }
+
     connect(this->document(), &QTextDocument::modificationChanged, this, &Editor::onChange);
     connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
 }
