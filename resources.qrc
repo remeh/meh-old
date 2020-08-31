@@ -6,5 +6,6 @@
         <file>res/plus.png</file>
         <file>res/icon.png</file>
         <file>res/icon-check.png</file>
+        <file>res/icon-empty.png</file>
     </qresource>
 </RCC>

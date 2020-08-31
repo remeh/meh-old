@@ -4,11 +4,13 @@
 #include <QFileInfo>
 #include <QFont>
 #include <QFontMetrics>
+#include <QImage>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QPixmap>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
@@ -279,6 +281,15 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
 
     if (this->currentBufferExtension() == "tasks") {
         this->window->setWindowIcon(QIcon(":res/icon-check.png"));
+    } else if (this->currentBufferExtension().size() > 0) {
+        QPixmap pixmap(QPixmap::fromImage(QImage(":res/icon-empty.png")));
+        QPainter painter(&pixmap);
+        painter.setPen(QColor(0, 0, 0));
+        painter.setFont(QFont(font().family(), 140));
+        painter.drawText(QRect(60, 75, 390, 245), Qt::AlignCenter, this->currentBufferExtension());
+        this->window->setWindowIcon(QIcon(pixmap));
+    } else {
+        this->window->setWindowIcon(QIcon(":res/icon.png"));
     }
 
     connect(this->document(), &QTextDocument::modificationChanged, this, &Editor::onChange);
