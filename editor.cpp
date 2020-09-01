@@ -544,11 +544,29 @@ void Editor::goToOccurrence(const QString& string, bool backward) {
         settings.setValue("editor/last_value_go_to_occurrence", string);
     }
 
+    // nothing has been found in this direction
+    // let's try again starting from the start of the file
+    // if still nothing is found, restore the cursor position
+    // do this in reverse for backward
     if (backward) {
-        this->find(s, QTextDocument::FindBackward);
+        if (!this->find(s, QTextDocument::FindBackward)) {
+            QTextCursor cursor = this->textCursor();
+            QTextCursor save = this->textCursor();
+            cursor.movePosition(QTextCursor::End);
+            this->setTextCursor(cursor);
+            if (!this->find(s, QTextDocument::FindBackward)) {
+                this->setTextCursor(save);
+            }
+        }
     } else {
         if (!this->find(s)) {
-            this->find(s, QTextDocument::FindBackward);
+            QTextCursor cursor = this->textCursor();
+            QTextCursor save = this->textCursor();
+            cursor.setPosition(0);
+            this->setTextCursor(cursor);
+            if (!this->find(s)) {
+                this->setTextCursor(save);
+            }
         }
     }
 }

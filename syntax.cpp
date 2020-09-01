@@ -28,7 +28,7 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
         highlightingRules.append(rule);
     }
 
-    selectionFormat.setForeground(QColor::fromRgb(153,215,0));
+    selectionFormat.setBackground(QColor::fromRgb(20,133,0));
 
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::gray);
