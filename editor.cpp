@@ -285,7 +285,11 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
         QPixmap pixmap(QPixmap::fromImage(QImage(":res/icon-empty.png")));
         QPainter painter(&pixmap);
         painter.setPen(QColor(0, 0, 0));
+        #ifdef Q_OS_MAC
+        painter.setFont(QFont(font().family(), 160));
+        #else
         painter.setFont(QFont(font().family(), 140));
+        #endif
         painter.drawText(QRect(60, 75, 390, 245), Qt::AlignCenter, this->currentBufferExtension());
         this->window->setWindowIcon(QIcon(pixmap));
     } else {
