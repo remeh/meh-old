@@ -16,7 +16,7 @@ Grep::Grep(Window* window) :
     QStringList columns;
     columns << "File" << "Line #" << "Line";
     this->tree->setHeaderLabels(columns);
-    this->tree->setIndentation(0);
+//    this->tree->setIndentation(0);
 
     this->setFont(window->getEditor()->getFont());
 
@@ -169,11 +169,17 @@ void Grep::readAndAppendResult(const QString& result) {
         parts[0] = parts[0].remove(0, 2);
     }
 
-    QTreeWidgetItem* item = new QTreeWidgetItem(this->tree, parts);
+    if (data.contains(parts[0])) {
+        new QTreeWidgetItem(data[parts[0]], parts);
+    } else {
+        QTreeWidgetItem* item = new QTreeWidgetItem(this->tree, parts);
+        data[parts[0]] = item;
+    }
 }
 
 void Grep::grep(const QString& string, const QString& baseDir) {
     this->grep(string, baseDir, "");
+    data.clear();
 }
 
 // TODO(remy): support case insensitive

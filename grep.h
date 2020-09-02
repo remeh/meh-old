@@ -49,6 +49,8 @@ private:
     QTreeWidget* tree;
     QGridLayout* layout;
 
+    QMap<QString, QTreeWidgetItem*> data;
+
     QProcess* process;
 
     int resultsCount;

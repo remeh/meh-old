@@ -521,14 +521,12 @@ void Editor::centerCursor() {
     QRect cursorRect = this->cursorRect();
     // test if it's at the top
     if (cursorRect.y() < 30) {
-        qDebug() << "too high";
         QScrollBar* vscroll = this->verticalScrollBar();
         vscroll->setValue(vscroll->value() - vscroll->pageStep()/2);
         return;
     }
 
     if (cursorRect.y() > this->rect().height() - 20) {
-        qDebug() << "too low";
         QScrollBar* vscroll = this->verticalScrollBar();
         vscroll->setValue(vscroll->value() + vscroll->pageStep()/2);
         return;
