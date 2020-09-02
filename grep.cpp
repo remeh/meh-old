@@ -4,6 +4,8 @@
 #include "grep.h"
 #include "window.h"
 
+#include "qdebug.h"
+
 Grep::Grep(Window* window) :
     QWidget(window),
     window(window) {
@@ -53,8 +55,12 @@ void Grep::hide() {
 
 void Grep::onResults() {
     for (QByteArray data = this->process->readLine(); data.size() > 0; data = this->process->readLine()) {
-        this->readAndAppendResult(data);
-        this->resultsCount++;
+        buff.append(data);
+        if (buff.endsWith("\n")) {
+            this->readAndAppendResult(buff);
+            this->resultsCount++;
+            buff.clear();
+        }
     }
     this->label->setText(" " + QString::number(this->resultsCount) + " results");
 }

@@ -49,6 +49,8 @@ private:
     QTreeWidget* tree;
     QGridLayout* layout;
 
+    QString buff;
+
     QMap<QString, QTreeWidgetItem*> data;
 
     QProcess* process;
