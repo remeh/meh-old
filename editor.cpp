@@ -1134,15 +1134,22 @@ void Editor::lspInterpret(QByteArray data) {
     switch (action.action) {
         case LSP_ACTION_DECLARATION:
         case LSP_ACTION_DEFINITION:
-            // TODO(remy): deal with multiple results
-            int line = json["result"][0]["range"]["start"]["line"].toInt();
-            int column = json["result"][0]["range"]["start"]["character"].toInt();
-            QString file = json["result"][0]["uri"].toString();
-            file.remove(0,7); // remove the file://
-            this->selectOrCreateBuffer(file);
-            this->goToLine(line + 1);
-            this->goToColumn(column);
-            return;
+            {
+                // TODO(remy): deal with multiple results
+                int line = json["result"][0]["range"]["start"]["line"].toInt();
+                int column = json["result"][0]["range"]["start"]["character"].toInt();
+                QString file = json["result"][0]["uri"].toString();
+                file.remove(0,7); // remove the file://
+                this->selectOrCreateBuffer(file);
+                this->goToLine(line + 1);
+                this->goToColumn(column);
+                return;
+            }
+        case LSP_ACTION_REFERENCES:
+            {
+                qDebug() << json;
+                return;
+            }
     }
 }
 

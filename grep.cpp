@@ -1,5 +1,5 @@
 #include <QByteArray>
-#include <QTreeWidgetItem>
+#include <QGridLayout>
 
 #include "grep.h"
 #include "window.h"
@@ -11,34 +11,19 @@ Grep::Grep(Window* window) :
     window(window) {
     Q_ASSERT(window != nullptr);
 
-    this->label = new QLabel(this);
-    this->tree = new QTreeWidget(this);
-    this->tree->setSortingEnabled(true);
-    this->tree->setColumnCount(3);
-    QStringList columns;
-    columns << "File" << "Line #" << "Line";
-    this->tree->setHeaderLabels(columns);
-//    this->tree->setIndentation(0);
-
-    this->setFont(window->getEditor()->getFont());
-
-    this->setFocusPolicy(Qt::StrongFocus);
+    this->refWidget = new ReferencesWidget(window, this);
+    this->process = nullptr;
 
     this->layout = new QGridLayout();
     this->layout->setContentsMargins(0, 0, 0, 0);
-    this->layout->addWidget(this->label);
-    this->layout->addWidget(this->tree);
+    this->layout->addWidget(this->refWidget);
     this->setLayout(layout);
-
-    this->process = nullptr;
 }
 
 void Grep::show() {
-    this->label->show();
-    this->tree->show();
-    this->label->setFocus();
+    this->refWidget->show();
     QWidget::show();
-    this->label->setText("No results");
+    this->refWidget->setFocus();
 }
 
 void Grep::hide() {
@@ -47,9 +32,8 @@ void Grep::hide() {
         delete this->process;
         this->process = nullptr;
     }
-    this->tree->clear();
-    this->label->hide();
-    this->tree->hide();
+    this->resultsCount = 0;
+    this->refWidget->hide();
     QWidget::hide();
 }
 
@@ -62,7 +46,8 @@ void Grep::onResults() {
             buff.clear();
         }
     }
-    this->label->setText(" " + QString::number(this->resultsCount) + " results");
+
+    this->refWidget->setLabelText(" " + QString::number(this->resultsCount) + " results");
 }
 
 void Grep::onErrorOccurred() {
@@ -78,90 +63,11 @@ void Grep::onFinished() {
         this->process = nullptr;
     }
 
-    this->tree->setColumnWidth(1, 50);
-    this->tree->resizeColumnToContents(0);
-    if (this->tree->columnWidth(0) > 300) {
-        this->tree->setColumnWidth(0, 300);
-    }
-
-    // TODO(remy): show that it has finished (ui wise)
+    this->refWidget->fitContent();
 }
 
 void Grep::keyPressEvent(QKeyEvent* event) {
-    switch (event->key()) {
-        case Qt::Key_Escape:
-            this->window->closeGrep();
-            this->window->getEditor()->setMode(MODE_NORMAL);
-            return;
-    }
-
-    #ifdef Q_OS_MAC
-        bool ctrl = event->modifiers() & Qt::MetaModifier;
-    #else
-        bool ctrl = event->modifiers() & Qt::ControlModifier;
-    #endif
-
-    switch (event->key()) {
-        case Qt::Key_Return:
-            {
-                QTreeWidgetItem* currentItem = this->tree->currentItem();
-                if (currentItem == nullptr) {
-                    return;
-                }
-                QString file = currentItem->text(0);
-                QString lineNumber = currentItem->text(1);
-                this->window->getEditor()->selectOrCreateBuffer(file);
-                this->window->getEditor()->goToLine(lineNumber.toInt());
-                return;
-            }
-        case Qt::Key_N:
-            if (!ctrl) {
-                return;
-            }
-            __attribute__ ((fallthrough));
-        case Qt::Key_J:
-            {
-                QTreeWidgetItem* currentItem = this->tree->currentItem();
-                if (currentItem == nullptr) {
-                    currentItem = this->tree->topLevelItem(0);
-                    this->tree->setCurrentItem(currentItem);
-                    return;
-                }
-                currentItem = this->tree->itemBelow(currentItem);
-                if (currentItem != nullptr) {
-                    this->tree->setCurrentItem(currentItem);
-                }
-            }
-            return;
-        case Qt::Key_Backspace:
-        case Qt::Key_X:
-            {
-                QTreeWidgetItem* currentItem = this->tree->currentItem();
-                if (currentItem != nullptr) {
-                    delete currentItem;
-                }
-            }
-            return;
-        case Qt::Key_P:
-            if (!ctrl) {
-                return;
-            }
-            __attribute__ ((fallthrough));
-        case Qt::Key_K:
-            {
-                QTreeWidgetItem* currentItem = this->tree->currentItem();
-                if (currentItem == nullptr) {
-                    currentItem = this->tree->topLevelItem(0);
-                    this->tree->setCurrentItem(currentItem);
-                    return;
-                }
-                currentItem = this->tree->itemAbove(currentItem);
-                if (currentItem != nullptr) {
-                    this->tree->setCurrentItem(currentItem);
-                }
-            }
-            return;
-    }
+    this->refWidget->onKeyPressEvent(event);
 }
 
 void Grep::readAndAppendResult(const QString& result) {
@@ -175,17 +81,12 @@ void Grep::readAndAppendResult(const QString& result) {
         parts[0] = parts[0].remove(0, 2);
     }
 
-    if (data.contains(parts[0])) {
-        new QTreeWidgetItem(data[parts[0]], parts);
-    } else {
-        QTreeWidgetItem* item = new QTreeWidgetItem(this->tree, parts);
-        data[parts[0]] = item;
-    }
+    this->refWidget->insert(parts[0], parts[1], parts[2]);
 }
 
 void Grep::grep(const QString& string, const QString& baseDir) {
     this->grep(string, baseDir, "");
-    data.clear();
+    this->refWidget->clear();
 }
 
 // TODO(remy): support case insensitive
@@ -198,7 +99,7 @@ void Grep::grep(const QString& string, const QString& baseDir, const QString& ta
 
     // reinit
     this->resultsCount = 0;
-    this->tree->clear();
+    this->refWidget->clear();
 
     // create and init the process
     this->process = new QProcess(this);

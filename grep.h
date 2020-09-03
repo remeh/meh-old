@@ -2,14 +2,12 @@
 
 #include <QGridLayout>
 #include <QKeyEvent>
-#include <QLabel>
-#include <QLineEdit>
-#include <QListWidget>
 #include <QObject>
 #include <QProcess>
 #include <QString>
-#include <QTreeWidget>
 #include <QWidget>
+
+#include "references_widget.h"
 
 class Window;
 
@@ -45,15 +43,10 @@ protected:
 private:
     Window* window;
 
-    QLabel* label;
-    QTreeWidget* tree;
-    QGridLayout* layout;
-
-    QString buff;
-
-    QMap<QString, QTreeWidgetItem*> data;
+    ReferencesWidget *refWidget;
+    QGridLayout *layout;
 
     QProcess* process;
-
+    QString buff;
     int resultsCount;
 };

@@ -29,6 +29,7 @@ set(SOURCES
     lsp/lsp_clangd.cpp
     lsp/lsp_gopls.cpp
     normal.cpp
+    references_widget.cpp
     submode.cpp
     syntax.cpp
     tasks.cpp
