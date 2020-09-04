@@ -17,7 +17,7 @@ class ReferencesWidget : public QWidget {
     Q_OBJECT
 
 public:
-    ReferencesWidget(Window* window, QWidget* parent);
+    ReferencesWidget(Window* window);
     void setItems(const QString& base, const QStringList& list);
 
     // fitContent must be called in order to resize the columns

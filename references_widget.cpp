@@ -4,10 +4,9 @@
 #include "references_widget.h"
 #include "window.h"
 
-ReferencesWidget::ReferencesWidget(Window* window, QWidget* parent) :
-    QWidget(parent),
+ReferencesWidget::ReferencesWidget(Window* window) :
+    QWidget(window),
     window(window) {
-    Q_ASSERT(parent != nullptr);
     Q_ASSERT(window != nullptr);
 
     this->label = new QLabel(this);

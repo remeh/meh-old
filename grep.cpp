@@ -11,19 +11,13 @@ Grep::Grep(Window* window) :
     window(window) {
     Q_ASSERT(window != nullptr);
 
-    this->refWidget = new ReferencesWidget(window, this);
     this->process = nullptr;
-
-    this->layout = new QGridLayout();
-    this->layout->setContentsMargins(0, 0, 0, 0);
-    this->layout->addWidget(this->refWidget);
-    this->setLayout(layout);
 }
 
 void Grep::show() {
-    this->refWidget->show();
+    this->window->getRefWidget()->show();
     QWidget::show();
-    this->refWidget->setFocus();
+    this->window->getRefWidget()->setFocus();
 }
 
 void Grep::hide() {
@@ -33,7 +27,7 @@ void Grep::hide() {
         this->process = nullptr;
     }
     this->resultsCount = 0;
-    this->refWidget->hide();
+    this->window->getRefWidget()->hide();
     QWidget::hide();
 }
 
@@ -47,7 +41,7 @@ void Grep::onResults() {
         }
     }
 
-    this->refWidget->setLabelText(" " + QString::number(this->resultsCount) + " results");
+    this->window->getRefWidget()->setLabelText(" " + QString::number(this->resultsCount) + " results");
 }
 
 void Grep::onErrorOccurred() {
@@ -63,11 +57,11 @@ void Grep::onFinished() {
         this->process = nullptr;
     }
 
-    this->refWidget->fitContent();
+    this->window->getRefWidget()->fitContent();
 }
 
 void Grep::keyPressEvent(QKeyEvent* event) {
-    this->refWidget->onKeyPressEvent(event);
+    this->window->getRefWidget()->onKeyPressEvent(event);
 }
 
 void Grep::readAndAppendResult(const QString& result) {
@@ -81,12 +75,12 @@ void Grep::readAndAppendResult(const QString& result) {
         parts[0] = parts[0].remove(0, 2);
     }
 
-    this->refWidget->insert(parts[0], parts[1], parts[2]);
+    this->window->getRefWidget()->insert(parts[0], parts[1], parts[2]);
 }
 
 void Grep::grep(const QString& string, const QString& baseDir) {
     this->grep(string, baseDir, "");
-    this->refWidget->clear();
+    this->window->getRefWidget()->clear();
 }
 
 // TODO(remy): support case insensitive
@@ -99,7 +93,7 @@ void Grep::grep(const QString& string, const QString& baseDir, const QString& ta
 
     // reinit
     this->resultsCount = 0;
-    this->refWidget->clear();
+    this->window->getRefWidget()->clear();
 
     // create and init the process
     this->process = new QProcess(this);

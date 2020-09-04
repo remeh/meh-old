@@ -23,6 +23,7 @@
 #include "lsp.h"
 #include "lsp_manager.h"
 #include "mode.h"
+#include "references_widget.h"
 #include "syntax.h"
 #include "tasks.h"
 

@@ -32,6 +32,12 @@ Window::Window(QWidget* parent) :
     QFileInfo dir(".");
     this->setBaseDir(dir.absoluteFilePath());
 
+    // references widget displayed at the bottom of the editor
+    // ----------------------
+
+    this->refWidget = new ReferencesWidget(this);
+    this->refWidget->hide();
+
     // grep instance
     // ----------------------
 
@@ -46,7 +52,7 @@ Window::Window(QWidget* parent) :
     this->layout->addWidget(this->editor);
     this->layout->addWidget(this->command);
     this->layout->addWidget(this->filesLookup);
-    this->layout->addWidget(this->grep);
+    this->layout->addWidget(this->refWidget);
     this->layout->addWidget(this->completer);
     this->setLayout(layout);
 }

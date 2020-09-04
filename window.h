@@ -63,6 +63,7 @@ public:
     }
 
     Editor* getEditor() { return this->editor; }
+    ReferencesWidget* getRefWidget() { return this->refWidget; }
 
 protected:
 
@@ -77,6 +78,7 @@ private:
     FilesLookup* filesLookup;
     Grep* grep;
     Completer* completer;
+    ReferencesWidget *refWidget;
 
     // baseDir on which the FilesLookup should be opened.
     QString baseDir;

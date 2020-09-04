@@ -5,6 +5,8 @@
 #include <QFont>
 #include <QFontMetrics>
 #include <QImage>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMessageBox>
@@ -27,6 +29,7 @@
 
 #include "editor.h"
 #include "mode.h"
+#include "references_widget.h"
 #include "syntax.h"
 #include "tasks.h"
 #include "window.h"
@@ -1147,7 +1150,26 @@ void Editor::lspInterpret(QByteArray data) {
             }
         case LSP_ACTION_REFERENCES:
             {
-                qDebug() << json;
+                // TODO(remy): error management
+                this->window->getRefWidget()->clear();
+                this->window->getRefWidget()->hide();
+                QJsonArray list = json["result"].toArray();
+                for (int i = 0; i < list.size(); i++) {
+                    QJsonObject entry = list[i].toObject();
+                    int line = entry["range"].toObject()["start"].toObject()["line"].toInt();
+                    line += 1;
+                    QString file = entry["uri"].toString();
+                    if (file.startsWith("file://")) {
+                        file = file.remove(0, 7);
+                    }
+                    if (file.startsWith(this->window->getBaseDir())) {
+                        file = file.remove(0, this->window->getBaseDir().size());
+                    }
+                    this->window->getRefWidget()->insert(file, QString::number(line), "");
+                }
+                this->window->getRefWidget()->fitContent();
+                this->window->getRefWidget()->show();
+                this->window->getRefWidget()->setFocus();
                 return;
             }
     }
