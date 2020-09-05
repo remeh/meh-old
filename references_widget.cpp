@@ -19,7 +19,6 @@ ReferencesWidget::ReferencesWidget(Window* window) :
     this->tree->setHeaderLabels(columns);
 
     this->setFont(window->getEditor()->getFont());
-
     this->setFocusPolicy(Qt::StrongFocus);
 
     this->layout = new QGridLayout();

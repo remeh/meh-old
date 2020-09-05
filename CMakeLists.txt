@@ -30,6 +30,7 @@ set(SOURCES
     lsp/lsp_gopls.cpp
     normal.cpp
     references_widget.cpp
+    statusbar.cpp
     submode.cpp
     syntax.cpp
     tasks.cpp

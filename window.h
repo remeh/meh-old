@@ -14,6 +14,8 @@ class Command;
 class Completer;
 class Editor;
 class Grep;
+class ReferencesWidget;
+class StatusBar;
 
 class Window : public QWidget
 {
@@ -47,12 +49,15 @@ public:
     // TODO(remy): comment me
     void openGrep(const QString& string, const QString& target);
     void openGrep(const QString& string);
-    // TODO(remy): comment me
     void closeGrep();
+
+    // getStatusBar returns the StatusBar instance.
+    StatusBar* getStatusBar() { return this->statusBar; }
 
     // setBaseDir sets the base dir on which the FilesLookup
     // should be opened.
     void setBaseDir(const QString& dir);
+
     // getBaseDir returns the base dir on which the editor has been opened.
     // Always end with a /
     QString getBaseDir() {
@@ -62,7 +67,10 @@ public:
         return this->baseDir;
     }
 
+    // getEditor returns the Editor instance.
     Editor* getEditor() { return this->editor; }
+
+    // getRefWidget returns the ReferencesWidget instance.
     ReferencesWidget* getRefWidget() { return this->refWidget; }
 
 protected:
@@ -79,6 +87,7 @@ private:
     Grep* grep;
     Completer* completer;
     ReferencesWidget *refWidget;
+    StatusBar* statusBar;
 
     // baseDir on which the FilesLookup should be opened.
     QString baseDir;

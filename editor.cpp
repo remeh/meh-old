@@ -75,26 +75,6 @@ Editor::Editor(Window* window) :
     this->selectionTimer = new QTimer;
     this->lspRefreshTimer = new QTimer;
 
-    // status line
-    // ----------------------
-
-    QFont labelFont = this->getFont();
-    labelFont.setPointSize(15);
-    this->modeLabel = new QLabel("NORMAL  ", this);
-    this->modeLabel->setStyleSheet("color: rgba(255, 255, 255, 30); background-color: rgba(0, 0, 0, 0);");
-    this->modeLabel->setFont(labelFont);
-    this->modeLabel->show();
-
-    this->lineLabel = new QLabel("       1", this);
-    this->lineLabel->setStyleSheet("color: rgba(255, 255, 255, 30); background-color: rgba(0, 0, 0, 0);");
-    this->lineLabel->setFont(labelFont);
-    this->lineLabel->show();
-
-    this->modifiedLabel = new QLabel("", this);
-    this->modifiedLabel->setStyleSheet("color: rgba(255, 255, 255, 30); background-color: rgba(0, 0, 0, 0);");
-    this->modifiedLabel->setFont(labelFont);
-    this->modifiedLabel->show();
-
     // tab space size
     // ----------------------
 
@@ -148,9 +128,6 @@ Editor::~Editor() {
 
     delete this->selectionTimer;
     delete this->lspRefreshTimer;
-    delete this->modeLabel;
-    delete this->lineLabel;
-    delete this->modifiedLabel;
     if (this->currentCompleter) {
         delete this->currentCompleter;
     }
@@ -172,11 +149,6 @@ QFont Editor::getFont() {
 void Editor::onWindowResized(QResizeEvent* event) {
     QPlainTextEdit::resizeEvent(event);
 
-    int x = this->window->rect().width() - 90;
-    this->modeLabel->move(x, 2);
-    this->lineLabel->move(x, 20);
-    this->modifiedLabel->move(x, 38);
-
     QRect cr = this->contentsRect();
     this->lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
@@ -194,7 +166,7 @@ void Editor::onCursorPositionChanged() {
     this->setExtraSelections(extraSelections);
 
     // NOTE(remy): block number should not only be equals to line number...
-    this->lineLabel->setText(QString::number(this->textCursor().blockNumber() + 1));
+    this->getStatusBar()->setLineNumber(this->textCursor().blockNumber() + 1);
 }
 
 void Editor::onSelectionChanged() {
@@ -232,7 +204,7 @@ void Editor::onTriggerSelectionHighlight() {
 void Editor::onChange(bool changed) {
     if (this->currentBuffer != nullptr && changed) {
         this->currentBuffer->modified = true;
-        this->modifiedLabel->setText("*");
+        this->getStatusBar()->setModified(true);
     }
 }
 
@@ -244,7 +216,7 @@ void Editor::save() {
     if (!this->currentBuffer) { return; }
 
     this->currentBuffer->save(this);
-    this->modifiedLabel->setText(" ");
+    this->getStatusBar()->setModified(false);
 }
 
 void Editor::saveAll() {
@@ -259,7 +231,7 @@ void Editor::saveAll() {
         }
     }
 
-    this->modifiedLabel->setText(" ");
+    this->getStatusBar()->setModified(false);
 }
 
 void Editor::setCurrentBuffer(Buffer* buffer) {
@@ -277,9 +249,9 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
     this->currentBuffer->onEnter(this);
     this->document()->setModified(false);
     if (this->currentBuffer->modified) {
-        this->modifiedLabel->setText("*");
+        this->getStatusBar()->setModified(true);
     } else {
-        this->modifiedLabel->setText("");
+        this->getStatusBar()->setModified(false);
     }
 
     if (this->currentBufferExtension() == "tasks") {
@@ -337,6 +309,7 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
     }
 
     this->window->setWindowTitle("meh - " + filename);
+    this->getStatusBar()->setFilename(filename);
     this->setCurrentBuffer(buffer);
     lspManager.manageBuffer(this->window, buffer);
 }
@@ -402,25 +375,25 @@ void Editor::setMode(int mode, QString command) {
     switch (mode) {
     case MODE_NORMAL:
     default:
-        this->modeLabel->setText("NORMAL");
+        this->getStatusBar()->setMode("NORMAL");
         this->setBlockCursor();
         break;
     case MODE_VISUAL:
-        this->modeLabel->setText("VISUAL");
+        this->getStatusBar()->setMode("VISUAL");
         this->setMidCursor();
         break;
     case MODE_VISUAL_LINE:
-        this->modeLabel->setText("V-LINE");
+        this->getStatusBar()->setMode("V-LINE");
         this->visualLineBlockStart = this->textCursor().block(); // TODO(remy): is it starting with 0 or 1?
         this->moveCursor(QTextCursor::StartOfBlock);
         this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
         break;
     case MODE_INSERT:
-        this->modeLabel->setText("INSERT");
+        this->getStatusBar()->setMode("INSERT");
         this->setLineCursor();
         break;
     case MODE_COMMAND:
-        this->modeLabel->setText("COMMAND");
+        this->getStatusBar()->setMode("COMMAND");
         this->setBlockCursor();
         this->window->openCommand();
         if (command.size() > 0) {
@@ -429,12 +402,12 @@ void Editor::setMode(int mode, QString command) {
         break;
     case MODE_REPLACE:
     case MODE_REPLACE_ONE:
-        this->modeLabel->setText("REPLACE");
+        this->getStatusBar()->setMode("REPLACE");
         this->setMidCursor();
         this->setOverwriteMode(true);
         break;
     case MODE_LEADER:
-        this->modeLabel->setText("LEADER");
+        this->getStatusBar()->setMode("LEADER");
         this->setMidCursor();
         this->leaderModeSelectSubMode();
         return; // we don't want to set the mode below,
@@ -448,36 +421,6 @@ void Editor::setSubMode(int subMode) {
     if (subMode != NO_SUBMODE) {
         this->setMidCursor();
     }
-    switch (subMode) {
-    case SUBMODE_c:
-        this->modeLabel->setText("c");
-        break;
-    case SUBMODE_cf:
-        this->modeLabel->setText("cf");
-        break;
-    case SUBMODE_cF:
-        this->modeLabel->setText("cF");
-        break;
-    case SUBMODE_ct:
-        this->modeLabel->setText("ct");
-        break;
-    case SUBMODE_cT:
-        this->modeLabel->setText("cT");
-        break;
-    case SUBMODE_f:
-        this->modeLabel->setText("f");
-        break;
-    case SUBMODE_F:
-        this->modeLabel->setText("F");
-        break;
-    case SUBMODE_d:
-        this->modeLabel->setText("d");
-        break;
-    case SUBMODE_y:
-        this->modeLabel->setText("y");
-        break;
-    }
-
     this->subMode = subMode;
 }
 
@@ -1120,6 +1063,10 @@ int Editor::findNextOneInCurrentLine(QChar c) {
         }
     }
     return 0;
+}
+
+StatusBar* Editor::getStatusBar() {
+    return this->window->getStatusBar();
 }
 
 void Editor::lspInterpret(QByteArray data) {

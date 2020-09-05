@@ -6,6 +6,7 @@
 #include "editor.h"
 #include "fileslookup.h"
 #include "grep.h"
+#include "statusbar.h"
 #include "window.h"
 
 Window::Window(QWidget* parent) :
@@ -20,6 +21,11 @@ Window::Window(QWidget* parent) :
     this->completer = new Completer(this);
     this->completer->setMaximumHeight(100);
     this->completer->hide();
+
+    // status bar
+    // ----------------------
+    this->statusBar = new StatusBar(this);
+    this->statusBar->show();
 
     // editor
     // ----------------------
@@ -52,8 +58,9 @@ Window::Window(QWidget* parent) :
     this->layout->addWidget(this->editor);
     this->layout->addWidget(this->command);
     this->layout->addWidget(this->filesLookup);
-    this->layout->addWidget(this->refWidget);
     this->layout->addWidget(this->completer);
+    this->layout->addWidget(this->refWidget);
+    this->layout->addWidget(this->statusBar);
     this->setLayout(layout);
 }
 

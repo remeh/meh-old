@@ -17,7 +17,7 @@ void Editor::leaderModeSelectSubMode() {
     // ------------------------------------------
 
     if (this->currentBufferExtension() == "tasks") {
-        this->modeLabel->setText("TASKS");
+        this->getStatusBar()->setMode("TASKS");
         this->setSubMode(SUBMODE_tasks);
         return;
     }

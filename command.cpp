@@ -9,7 +9,7 @@
 Command::Command(Window* window) :
     window(window) {
     Q_ASSERT(window != NULL);
-    this->setFont(window->getEditor()->getFont());
+//    this->setFont(window->getEditor()->getFont());
 }
 
 void Command::keyPressEvent(QKeyEvent* event) {

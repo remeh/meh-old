@@ -24,11 +24,11 @@
 #include "lsp_manager.h"
 #include "mode.h"
 #include "references_widget.h"
+#include "statusbar.h"
 #include "syntax.h"
 #include "tasks.h"
 
 class Window;
-
 
 class Editor : public QPlainTextEdit
 {
@@ -144,7 +144,8 @@ public:
     // --------------
 
     // getFont returns the font used by the editor.
-    QFont getFont();
+    // static method.
+    static QFont getFont();
 
     // called by the window when it is resized.
     void onWindowResized(QResizeEvent*);
@@ -221,6 +222,9 @@ private:
     // movement.
     void selectVisualLineSelection();
 
+    // getStatusBar is a convenient method returns the Window's StatusBar instance.
+    StatusBar* getStatusBar();
+
     // ----------------------
 
     TasksPlugin *tasksPlugin;
@@ -229,9 +233,6 @@ private:
 
     QTimer* selectionTimer;
     QTimer* lspRefreshTimer;
-    QLabel* modeLabel;
-    QLabel* lineLabel;
-    QLabel* modifiedLabel;
     QListWidget* currentCompleter;
     QWidget* lineNumberArea;
 
