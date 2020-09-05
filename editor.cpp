@@ -312,7 +312,7 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
         // check that this file has not been opened by another instance
         // of the editor, and is not the current buffer displayed.
         if (this->alreadyOpened(filename) &&
-			this->currentBuffer != nullptr && this->currentBuffer->getFilename() != filename) {
+			this->currentBuffer != nullptr && this->currentBuffer->getFilename() != f) {
             QMessageBox msgBox;
             msgBox.setWindowTitle("Already opened");
             msgBox.setText("This file is already opened by another instance of meh, do you still want to open it?");
