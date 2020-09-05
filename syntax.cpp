@@ -13,11 +13,9 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
         QStringLiteral("\\bfriend\\b"), QStringLiteral("\\binline\\b"), QStringLiteral("\\bint\\b"),
         QStringLiteral("\\blong\\b"), QStringLiteral("\\bnamespace\\b"), QStringLiteral("\\boperator\\b"),
         QStringLiteral("\\bprivate\\b"), QStringLiteral("\\bprotected\\b"), QStringLiteral("\\bpublic\\b"),
-        QStringLiteral("\\bshort\\b"), QStringLiteral("\\bsignals\\b"), QStringLiteral("\\bsigned\\b"),
         QStringLiteral("\\bslots\\b"), QStringLiteral("\\bstatic\\b"), QStringLiteral("\\bstruct\\b"),
-        QStringLiteral("\\btemplate\\b"), QStringLiteral("\\btypedef\\b"), QStringLiteral("\\btypename\\b"),
-        QStringLiteral("\\bunion\\b"), QStringLiteral("\\bunsigned\\b"), QStringLiteral("\\bvirtual\\b"),
         QStringLiteral("\\bvoid\\b"), QStringLiteral("\\bvolatile\\b"), QStringLiteral("\\bbool\\b"),
+        QStringLiteral("\\bfunc\\b"), QStringLiteral("\\bselect\\b"), QStringLiteral("\\brange\\b"),
         QStringLiteral("\\bfor\\b"), QStringLiteral("\\bswitch\\b"), QStringLiteral("\\bcase\\b"),
         QStringLiteral("\\btrue\\b"), QStringLiteral("\\bfalse\\b"), QStringLiteral("\\btype\\b"),
         QStringLiteral("\\bwhile\\b"), QStringLiteral("\\bdelete\\b"), QStringLiteral("\\bnew\\b")
@@ -28,7 +26,7 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
         highlightingRules.append(rule);
     }
 
-    selectionFormat.setBackground(QColor::fromRgb(20,133,0));
+    selectionFormat.setBackground(QColor::fromRgb(5,20,0));
 
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::gray);
