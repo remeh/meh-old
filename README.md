@@ -13,6 +13,7 @@
         * `:e <filepath>`
     * LSP client for C++ (clangd) and Go (gopls):
         * Go to definition with the `def` command
+        * Display references to a variable / method / ... with `ref` command
     * File opener
         * Fast lookup per directory
         * Filtering while typing
@@ -26,6 +27,8 @@
         * `:rgf <pattern>` search in current file with ripgrep for the given pattern
         * In results
             * `Ctrl-n` for next result, `Ctrl-p` for previous result, `Return` to open the file at the matching line
+            * `j` and `k` for also works for next / previous result
+            * `Ctrl-j` and `Ctrl-k` to expand / close results on a file
             * use `x` or `Backspace` to remove entries from the results to remove the noise
     * Auto-complete with words in opened buffers with `Ctrl-Space`
     * Auto-indentation (respect previous line indentation, automatically changes it depending on `{`, `}`, and `:`)
@@ -34,6 +37,7 @@
     * Remember cursor position in previously opened files
     * Current-line visual emphasizing
     * 80 and 120 chars vertical lines indicator
+    * StatusBar with current mode / current buffer / current line
     * Toggle // comments on selection with `Ctrl-m`, toggle # comments with `Ctrl-Shift-m`.
     * Next/previous occurrence of a char on the line (e.g. `fa` go to next `a`, `F(` go to previous `(`)
     * Copy / paste

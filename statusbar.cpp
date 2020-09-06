@@ -17,13 +17,11 @@ StatusBar::StatusBar(Window* window) :
     this->layout->addWidget(this->lineNumber, 0, 2, Qt::AlignRight);
     this->setFont(Editor::getFont());
     this->setLayout(layout);
-//    this->setStyleSheet("margin: 0px; color: #e7e7e7; background-color: #262626;");
 }
 
 void StatusBar::setMode(const QString& mode) {
     if (this->mode == nullptr) { return; }
     this->mode->setText(mode);
-    // TODO(remy): implement me
 }
 
 void StatusBar::setFilename(const QString& filename) {
