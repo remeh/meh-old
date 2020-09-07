@@ -7,18 +7,22 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     HighlightingRule rule;
 
     keywordFormat.setFontWeight(QFont::Bold);
+    keywordFormat.setForeground(Qt::gray);
     const QString keywordPatterns[] = {
         QStringLiteral("\\bchar\\b"), QStringLiteral("\\bclass\\b"), QStringLiteral("\\bconst\\b"),
         QStringLiteral("\\bdouble\\b"), QStringLiteral("\\benum\\b"), QStringLiteral("\\bexplicit\\b"),
         QStringLiteral("\\bfriend\\b"), QStringLiteral("\\binline\\b"), QStringLiteral("\\bint\\b"),
         QStringLiteral("\\blong\\b"), QStringLiteral("\\bnamespace\\b"), QStringLiteral("\\boperator\\b"),
         QStringLiteral("\\bprivate\\b"), QStringLiteral("\\bprotected\\b"), QStringLiteral("\\bpublic\\b"),
-        QStringLiteral("\\bslots\\b"), QStringLiteral("\\bstatic\\b"), QStringLiteral("\\bstruct\\b"),
+        QStringLiteral("\\bslots\\b"), QStringLiteral("\\bstatic\\b"), QStringLiteral("struct\\b"),
+        QStringLiteral("\\bif\\b"), QStringLiteral("\\belse\\b"), QStringLiteral("const\\b"),
+        QStringLiteral("\\bvar\\b"), QStringLiteral("\\breturn\\b"), QStringLiteral("\\bnil\\b"),
         QStringLiteral("\\bvoid\\b"), QStringLiteral("\\bvolatile\\b"), QStringLiteral("\\bbool\\b"),
-        QStringLiteral("\\bfunc\\b"), QStringLiteral("\\bselect\\b"), QStringLiteral("\\brange\\b"),
+        QStringLiteral("func\\b"), QStringLiteral("\\bselect\\b"), QStringLiteral("\\brange\\b"),
         QStringLiteral("\\bfor\\b"), QStringLiteral("\\bswitch\\b"), QStringLiteral("\\bcase\\b"),
         QStringLiteral("\\btrue\\b"), QStringLiteral("\\bfalse\\b"), QStringLiteral("\\btype\\b"),
-        QStringLiteral("\\bwhile\\b"), QStringLiteral("\\bdelete\\b"), QStringLiteral("\\bnew\\b")
+        QStringLiteral("\\bwhile\\b"), QStringLiteral("\\bdelete\\b"), QStringLiteral("\\bnew\\b"),
+        QStringLiteral("package\\b"), QStringLiteral("import\\b")
     };
     for (const QString &pattern : keywordPatterns) {
         rule.pattern = QRegularExpression(pattern);
