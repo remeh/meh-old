@@ -466,13 +466,13 @@ void Editor::goToColumn(int column) {
 void Editor::centerCursor() {
     QRect cursorRect = this->cursorRect();
     // test if it's at the top
-    if (cursorRect.y() < 30) {
+    if (cursorRect.y() < 100) {
         QScrollBar* vscroll = this->verticalScrollBar();
         vscroll->setValue(vscroll->value() - vscroll->pageStep()/2);
         return;
     }
 
-    if (cursorRect.y() > this->rect().height() - 20) {
+    if (cursorRect.y() > this->rect().height() - 100) {
         QScrollBar* vscroll = this->verticalScrollBar();
         vscroll->setValue(vscroll->value() + vscroll->pageStep()/2);
         return;
