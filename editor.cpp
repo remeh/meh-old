@@ -279,6 +279,11 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
     QFileInfo info(filename);
     QString f = info.absoluteFilePath();
 
+    // do not do anything if the current file is the buffer we try to open
+    if (this->currentBuffer != nullptr && this->currentBuffer->getFilename() == f) {
+        return;
+    }
+
     Buffer* buffer = this->buffers.take(f);
     if (buffer == nullptr) {
         // check that this file has not been opened by another instance
