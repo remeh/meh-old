@@ -185,6 +185,19 @@ void Command::execute(QString text) {
         return;
     }
 
+    // run figlet and insert
+    // ----------------------
+
+    if (command.startsWith(":figlet")) {
+        QProcess figlet;
+        QString copy = text.replace(":figlet ", "");
+        figlet.start("figlet", QStringList() << "-f" << "small" << copy);
+        figlet.waitForFinished();
+        QByteArray data = figlet.readAll();
+        this->window->getEditor()->insertPlainText(data);
+        return;
+    }
+
     // search next occurrence of a string
     // ----------------------
 
