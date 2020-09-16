@@ -195,10 +195,14 @@ void Editor::onTriggerSelectionHighlight() {
             return;
         }
     }
+    this->highlightText(text);
+    this->selectionTimer->stop();
+}
+
+void Editor::highlightText(QString text) {
     if (this->syntax->setSelection(text)) {
         this->syntax->rehighlight();
     }
-    this->selectionTimer->stop();
 }
 
 void Editor::onChange(bool changed) {

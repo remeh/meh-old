@@ -125,6 +125,9 @@ public:
     // insertIndentation adds one level of indentation on the line of the given cursor.
     void insertIndentation(QTextCursor cursor);
 
+    // highlightText highlights the given text in the editor.
+    void highlightText(QString text);
+
     // auto-complete
     // -------------
 

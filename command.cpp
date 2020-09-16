@@ -195,7 +195,9 @@ void Command::execute(QString text) {
         for (int i = 1; i < list.size(); i++) {
            search << list.at(i);
         }
-        this->window->getEditor()->goToOccurrence(search.join(" "), false);
+        QString joined = search.join(" ");
+        this->window->getEditor()->highlightText(joined);
+        this->window->getEditor()->goToOccurrence(joined, false);
         return;
     }
 
