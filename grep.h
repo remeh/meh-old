@@ -31,6 +31,7 @@ public:
 
     void show();
     void hide();
+    void focus();
 
 public slots:
     void onErrorOccurred();

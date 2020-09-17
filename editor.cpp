@@ -718,8 +718,13 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     // close extra widgets
     if (event->key() == Qt::Key_Escape) {
         this->window->closeList();
-        this->window->closeGrep();
         this->window->closeCompleter();
+
+        if (!this->hasFocus()) {
+            this->window->closeGrep();
+        } else {
+            this->window->focusGrep();
+        }
     }
 
     // Replace mode

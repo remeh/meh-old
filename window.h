@@ -50,6 +50,7 @@ public:
     void openGrep(const QString& string, const QString& target);
     void openGrep(const QString& string);
     void closeGrep();
+    void focusGrep();
 
     // getStatusBar returns the StatusBar instance.
     StatusBar* getStatusBar() { return this->statusBar; }

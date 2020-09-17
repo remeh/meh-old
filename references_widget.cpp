@@ -85,6 +85,7 @@ void ReferencesWidget::keyPressEvent(QKeyEvent* event) {
                 QString lineNumber = currentItem->text(1);
                 this->window->getEditor()->selectOrCreateBuffer(file);
                 this->window->getEditor()->goToLine(lineNumber.toInt());
+                this->window->getEditor()->setFocus();
                 return;
             }
         case Qt::Key_N:

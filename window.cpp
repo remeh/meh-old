@@ -123,6 +123,10 @@ void Window::closeGrep() {
     this->grep->hide();
 }
 
+void Window::focusGrep() {
+    this->grep->focus();
+}
+
 void Window::setCommand(const QString& text) {
     this->command->setText(text);
 }

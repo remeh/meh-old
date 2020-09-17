@@ -20,6 +20,10 @@ void Grep::show() {
     this->window->getRefWidget()->setFocus();
 }
 
+void Grep::focus() {
+    this->window->getRefWidget()->setFocus();
+}
+
 void Grep::hide() {
     if (this->process != nullptr) {
         this->process->terminate();
