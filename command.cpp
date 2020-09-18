@@ -201,16 +201,21 @@ void Command::execute(QString text) {
     // search next occurrence of a string
     // ----------------------
 
-    if (command.size() > 1 && command.at(0) == "/") {
-        QStringList search;
-        QStringRef first = command.rightRef(command.size() - 1);
-        search << first.toString();
-        for (int i = 1; i < list.size(); i++) {
-           search << list.at(i);
+    if (command.size() >= 1 && command.at(0) == "/") {
+        QString terms = "";
+        if (command.size() > 1) {
+            QStringList search;
+            QStringRef first = command.rightRef(command.size() - 1);
+            search << first.toString();
+            for (int i = 1; i < list.size(); i++) {
+               search << list.at(i);
+            }
+            terms = search.join(" ");
+        } else {
+            terms = this->window->getEditor()->getWordUnderCursor();
         }
-        QString joined = search.join(" ");
-        this->window->getEditor()->highlightText(joined);
-        this->window->getEditor()->goToOccurrence(joined, false);
+        this->window->getEditor()->highlightText(terms);
+        this->window->getEditor()->goToOccurrence(terms, false);
         return;
     }
 
