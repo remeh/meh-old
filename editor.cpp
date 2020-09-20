@@ -13,6 +13,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPixmap>
+#include <QPlainTextEdit>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
@@ -207,9 +208,9 @@ void Editor::highlightText(QString text) {
 
 void Editor::onChange(bool changed) {
     if (this->currentBuffer != nullptr && changed) {
-        this->currentBuffer->modified = true;
-        this->getStatusBar()->setModified(true);
+        this->currentBuffer->modified = changed;
     }
+    this->getStatusBar()->setModified(changed);
 }
 
 void Editor::onContentsChange(int position, int charsRemoved, int charsAdded) {
@@ -220,6 +221,7 @@ void Editor::save() {
     if (!this->currentBuffer) { return; }
 
     this->currentBuffer->save(this);
+    this->document()->setModified(false);
     this->getStatusBar()->setModified(false);
 }
 
@@ -235,12 +237,13 @@ void Editor::saveAll() {
         }
     }
 
+    this->document()->setModified(false);
     this->getStatusBar()->setModified(false);
 }
 
 void Editor::setCurrentBuffer(Buffer* buffer) {
     Q_ASSERT(buffer != NULL);
-    disconnect(this->document(), &QTextDocument::modificationChanged, this, &Editor::onChange);
+    disconnect(this, &QPlainTextEdit::modificationChanged, this, &Editor::onChange);
     disconnect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
     if (this->currentBuffer != nullptr) {
         this->currentBuffer->onLeave(this);
@@ -251,12 +254,7 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
 
     this->currentBuffer = buffer;
     this->currentBuffer->onEnter(this);
-    this->document()->setModified(false);
-    if (this->currentBuffer->modified) {
-        this->getStatusBar()->setModified(true);
-    } else {
-        this->getStatusBar()->setModified(false);
-    }
+    this->document()->setModified(this->currentBuffer->modified);
 
     if (this->currentBufferExtension() == "tasks") {
         this->window->setWindowIcon(QIcon(":res/icon-check.png"));
@@ -275,7 +273,7 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
         this->window->setWindowIcon(QIcon(":res/icon.png"));
     }
 
-    connect(this->document(), &QTextDocument::modificationChanged, this, &Editor::onChange);
+    connect(this, &QPlainTextEdit::modificationChanged, this, &Editor::onChange);
     connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
 }
 
