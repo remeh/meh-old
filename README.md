@@ -10,16 +10,17 @@
     * Open multiple files
         * Ctrl-O (other) to go back to previous buffer
         * Ctrl-P to use the file opener
+        * Ctrl-Shift-P to use the file opener with opened buffers
         * `:e <filepath>`
     * LSP client for C++ (clangd) and Go (gopls):
-        * Go to definition with the `def` command
-        * Display references to a variable / method / ... with `ref` command
+        * Go to definition with the `:def` command
+        * Display references to a variable / method / ... with `:ref` command
     * File opener
         * Fast lookup per directory
         * Filtering while typing
         * `Ctrl-n` next entry, `Ctrl-p` previous entry, `Return` open the file / move to the directory
     * Search in file with `/`, next occurrences with `n` and `N`. `,` to search for the word under the cursor
-    * Toggle `//` comments with Ctrl-M on selected lines (or current line of no selection), `#` with Ctrl-Shift-M
+    * Toggle `//` comments with Ctrl-M on selected lines (or current line if no selection), `#` with Ctrl-Shift-M
     * Search in current/all files with `ripgrep` integration
         * `:rg` search in all files with ripgrep for the word under the cursor
         * `:rg <pattern>` search in all files with ripgrep for the given pattern
@@ -38,7 +39,6 @@
     * Current-line visual emphasizing
     * 80 and 120 chars vertical lines indicator
     * StatusBar with current mode / current buffer / current line
-    * Toggle // comments on selection with `Ctrl-m`, toggle # comments with `Ctrl-Shift-m`.
     * Next/previous occurrence of a char on the line (e.g. `fa` go to next `a`, `F(` go to previous `(`)
     * Copy / paste
         * Visual mode to copy with `y` or cut with `x`
