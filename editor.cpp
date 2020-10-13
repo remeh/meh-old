@@ -383,6 +383,18 @@ void Editor::setMode(int mode, QString command) {
     case MODE_NORMAL:
     default:
         this->getStatusBar()->setMode("NORMAL");
+        // while returning in NORMAL mode, if the current line is only whitespaces
+        // -> remove them.
+        if (this->currentLineIsOnlyWhitespaces()) {
+            // remove all indentation if nothing has been written on the line
+            QTextCursor cursor = this->textCursor();
+            cursor.beginEditBlock();
+            cursor.movePosition(QTextCursor::EndOfBlock);
+            for (int v = this->currentLineIsOnlyWhitespaces(); v > 0; v--) {
+                cursor.deletePreviousChar();
+            }
+            cursor.endEditBlock();
+        }
         this->setBlockCursor();
         break;
     case MODE_VISUAL:
