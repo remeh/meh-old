@@ -8,7 +8,9 @@ StatusBar::StatusBar(Window* window) :
     this->layout = new QGridLayout();
     this->mode = new QLabel("Normal");
     this->mode->setFont(Editor::getFont());
-    this->filename = new QLabel("");
+    this->filename = new QPushButton("");
+    this->filename->setFlat(true);
+	this->filename->setFocusPolicy(Qt::NoFocus);
     this->lineNumber = new QLabel("0");
     this->lineNumber->setFont(Editor::getFont());
     this->layout->setContentsMargins(10, 0, 10, 10);
@@ -17,6 +19,14 @@ StatusBar::StatusBar(Window* window) :
     this->layout->addWidget(this->lineNumber, 0, 2, Qt::AlignRight);
     this->setFont(Editor::getFont());
     this->setLayout(layout);
+
+    connect(this->filename, &QPushButton::clicked, this, &StatusBar::onFilenameClicked);
+}
+
+void StatusBar::onFilenameClicked() {
+    if (this->window != nullptr) {
+        this->window->openListBuffers();
+    }
 }
 
 void StatusBar::setMode(const QString& mode) {
@@ -41,7 +51,6 @@ void StatusBar::setModified(bool modified) {
         }
     }
 }
-
 
 void StatusBar::setLineNumber(int lineNumber) {
     if (this->lineNumber == nullptr) { return; }

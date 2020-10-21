@@ -3,6 +3,7 @@
 #include <QGridLayout>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QPushButton>
 #include <QWidget>
 
 class Window;
@@ -18,11 +19,13 @@ public:
     void setLineNumber(int lineNumber);
     void setModified(bool);
 
+public slots:
+    void onFilenameClicked();
 protected:
 private:
     Window* window;
     QGridLayout* layout;
     QLabel* mode;
-    QLabel* filename;
+    QPushButton* filename;
     QLabel* lineNumber;
 };
