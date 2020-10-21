@@ -37,6 +37,8 @@ FilesLookup::FilesLookup(Window* window) :
     this->setLayout(layout);
 
     connect(this->edit, &QLineEdit::textChanged, this, &FilesLookup::onEditChanged);
+    connect(this->list, &QListWidget::itemDoubleClicked, this, &FilesLookup::onItemDoubleClicked);
+
 }
 
 void FilesLookup::onEditChanged() {
@@ -44,6 +46,11 @@ void FilesLookup::onEditChanged() {
     this->filter();
     this->refreshList();
     this->list->setCurrentRow(0);
+}
+
+void FilesLookup::onItemDoubleClicked() {
+    this->openSelection();
+    this->hide();
 }
 
 void FilesLookup::showFiles() {

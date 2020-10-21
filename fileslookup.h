@@ -48,6 +48,7 @@ public:
 
 public slots:
     void onEditChanged();
+    void onItemDoubleClicked();
 
 protected:
     void keyPressEvent(QKeyEvent* event);
