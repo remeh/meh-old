@@ -269,6 +269,14 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
                 this->undo();
             }
             return;
+
+       case Qt::Key_S:
+           if (shift) {
+               this->lastCheckpoint();
+           } else {
+               this->saveCheckpoint();
+           }
+           return;
     }
 }
 

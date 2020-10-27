@@ -48,6 +48,7 @@
     * Undo `u` / Redo `U`
     * Page up (Ctrl-u) / Page down (Ctrl-d)
     * Go to line with `:<line number>`
+    * `s` stores a checkpoint, `S` goes back to previously saved checkpoint
     * Automatically runs `gofmt` on Go files (on save), `zig fmt` on Zig files.
     * Basic tasks manager (list of todo, done, cancelled tasks)
     * Confirm messagebox while re-opening a file already opened in another instance.

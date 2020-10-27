@@ -5,6 +5,7 @@
 #include <QFocusEvent>
 #include <QFont>
 #include <QLabel>
+#include <QList>
 #include <QListWidget>
 #include <QMap>
 #include <QMouseEvent>
@@ -29,6 +30,13 @@
 #include "tasks.h"
 
 class Window;
+
+class Checkpoint {
+    public:
+        Checkpoint(const QString& filename, int position) : filename(filename), position(position) {}
+        QString filename;
+        int position;
+};
 
 class Editor : public QPlainTextEdit
 {
@@ -105,6 +113,12 @@ public:
 
     int currentLineNumber();
     int currentColumn();
+
+    // saveCheckpoint stores the current filename/cursor position information has a checkpoint.
+    void saveCheckpoint();
+
+    // lastCheckpoint pops the last checkpoint and goes into this file / position.
+    void lastCheckpoint();
 
     // text manipulation
     // -----------------
@@ -227,6 +241,9 @@ private:
 
     // getStatusBar is a convenient method returns the Window's StatusBar instance.
     StatusBar* getStatusBar();
+
+    // checkpoints stored.
+    QList<Checkpoint> checkpoints;
 
     // ----------------------
 

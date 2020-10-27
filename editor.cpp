@@ -1114,6 +1114,7 @@ void Editor::lspInterpret(QByteArray data) {
                 int column = json["result"][0]["range"]["start"]["character"].toInt();
                 QString file = json["result"][0]["uri"].toString();
                 file.remove(0,7); // remove the file://
+                this->saveCheckpoint();
                 this->selectOrCreateBuffer(file);
                 this->goToLine(line + 1);
                 this->goToColumn(column);
@@ -1203,4 +1204,36 @@ int Editor::lineNumberAreaWidth() {
 
     int space = 3 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
     return space;
+}
+
+
+// checkpoints
+// -----------
+
+void Editor::saveCheckpoint() {
+    QString filename = this->getCurrentBuffer()->getFilename();
+    int position = this->textCursor().position();
+    Checkpoint c(filename, position);
+
+    if (this->checkpoints.isEmpty()) {
+        this->checkpoints.append(c);
+        return;
+    }
+
+    if (!this->checkpoints.isEmpty()) {
+        Checkpoint last = this->checkpoints.last();
+        if (last.filename != filename || last.position != position) {
+            this->checkpoints.append(c);
+        }
+    }
+}
+
+void Editor::lastCheckpoint() {
+    if (!this->checkpoints.isEmpty()) {
+        Checkpoint c = this->checkpoints.takeLast();
+        this->selectOrCreateBuffer(c.filename);
+        QTextCursor cursor = this->textCursor();
+        cursor.setPosition(c.position);
+        this->setTextCursor(cursor);
+    }
 }

@@ -142,6 +142,7 @@ bool FilesLookup::openSelection() {
 
     QFileInfo info(this->base + item->text());
     if (info.isFile()) {
+        this->window->getEditor()->saveCheckpoint();
         this->window->getEditor()->selectOrCreateBuffer(info.absoluteFilePath());
         return true;
     } else {
