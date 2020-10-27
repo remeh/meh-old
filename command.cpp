@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QMessageBox>
 #include <QRandomGenerator>
 
@@ -109,6 +110,23 @@ void Command::execute(QString text) {
         if (this->areYouSure()) {
             QCoreApplication::quit();
         }
+        return;
+    }
+
+    // date insertion
+    // --------------
+
+    if (command == ":d") {
+        QDateTime now = QDateTime::currentDateTime();
+        QString v = now.toString("yyyy-MM-dd");
+        this->window->getEditor()->textCursor().insertText(v);
+        return;
+    }
+
+    if (command == ":dt") {
+        QDateTime now = QDateTime::currentDateTime();
+        QString v = now.toString("yyyy-MM-dd hh:mm:ss");
+        this->window->getEditor()->textCursor().insertText(v);
         return;
     }
 
