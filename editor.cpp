@@ -1211,6 +1211,10 @@ int Editor::lineNumberAreaWidth() {
 // -----------
 
 void Editor::saveCheckpoint() {
+    if (this->getCurrentBuffer() == nullptr) {
+        return;
+    }
+
     QString filename = this->getCurrentBuffer()->getFilename();
     int position = this->textCursor().position();
     Checkpoint c(filename, position);
