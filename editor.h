@@ -142,6 +142,15 @@ public:
     // highlightText highlights the given text in the editor.
     void highlightText(QString text);
 
+    // open state of buffers
+    // ---------------------
+
+    // storeOpenedState stores whether the given file is opened or not.
+    bool storeOpenedState(const QString& filepath);
+
+    // removeOpenedState deletes the "open" flag for this file.
+    void removeOpenedState(const QString& filepath);
+
     // auto-complete
     // -------------
 
@@ -229,11 +238,8 @@ private:
 
     // alreadyOpened returns true if another editor instance seems to have
     // already opened this file.
-    // It is using a file in the $TMP directory to do that.
+    // It is using the settings file to do that.
     bool alreadyOpened(const QString& filepath);
-
-    // storeOpenedState stores whether the given file is opened or not.
-    bool storeOpenedState(const QString& filepath, bool state);
 
     // selectVisualLineSelection selects blocks selected during the visual line
     // movement.

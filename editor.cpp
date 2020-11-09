@@ -1,4 +1,5 @@
 #include <QColor>
+#include <QCoreApplication>
 #include <QDir>
 #include <QKeyEvent>
 #include <QFileInfo>
@@ -289,9 +290,8 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
     Buffer* buffer = this->buffers.take(f);
     if (buffer == nullptr) {
         // check that this file has not been opened by another instance
-        // of the editor, and is not the current buffer displayed.
-        if (this->alreadyOpened(filename) &&
-			this->currentBuffer != nullptr && this->currentBuffer->getFilename() != f) {
+        // of the editor.
+        if (this->alreadyOpened(filename)) {
             QMessageBox msgBox;
             msgBox.setWindowTitle("Already opened");
             msgBox.setText("This file is already opened by another instance of meh, do you still want to open it?");
@@ -305,7 +305,7 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
         // this file has never been opened, open it
         buffer = new Buffer(f);
         // store somewhere that it is now open by someone
-        this->storeOpenedState(filename, true);
+        this->storeOpenedState(filename);
     } else {
         int pos = this->buffersPos.indexOf(f);
         if (pos >= 0) { // should not happen
@@ -360,10 +360,11 @@ bool Editor::alreadyOpened(const QString& filename) {
 
     QSettings settings("mehteor", "meh");
     QFileInfo f(filename);
-    return settings.value("buffer/"+f.absoluteFilePath()+"/opened", false).toBool();
+    int pid = settings.value("buffer/"+f.absoluteFilePath()+"/opened", 0).toInt();
+    return pid != 0 && pid != QCoreApplication::applicationPid();
 }
 
-bool Editor::storeOpenedState(const QString& filename, bool state) {
+bool Editor::storeOpenedState(const QString& filename) {
     if (filename.size() == 0) {
         return false;
     }
@@ -371,10 +372,17 @@ bool Editor::storeOpenedState(const QString& filename, bool state) {
     if (this->alreadyOpened(filename)) {
         return false; // return that we didn't update this
     }
+
     QSettings settings("mehteor", "meh");
     QFileInfo f(filename);
-    settings.setValue("buffer/"+f.absoluteFilePath()+"/opened", state);
+    settings.setValue("buffer/"+f.absoluteFilePath()+"/opened", QCoreApplication::applicationPid());
     return true;
+}
+
+void Editor::removeOpenedState(const QString& filename) {
+    QSettings settings("mehteor", "meh");
+    QFileInfo f(filename);
+    settings.remove("buffer/"+f.absoluteFilePath()+"/opened");
 }
 
 void Editor::setMode(int mode, QString command) {

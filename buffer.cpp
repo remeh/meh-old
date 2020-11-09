@@ -132,8 +132,7 @@ void Buffer::onLeave(Editor* editor) {
 
 void Buffer::onClose(Editor* editor) {
     Q_ASSERT(editor != NULL);
-    QSettings settings("mehteor", "meh");
-    settings.remove("buffer/" + this->filename + "/opened");
+    editor->removeOpenedState(this->filename);
 }
 
 void Buffer::onEnter(Editor* editor) {
