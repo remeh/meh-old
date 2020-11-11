@@ -18,11 +18,12 @@ StatusBar::StatusBar(Window* window) :
     this->message->setWordWrap(true);
     this->hideMessage();
     this->lineNumber->setFont(Editor::getFont());
-    this->glayout->setContentsMargins(10, 0, 10, 10);
+    this->glayout->setContentsMargins(10, 0, 10, 5);
     this->glayout->addWidget(this->mode);
     this->glayout->addWidget(this->filename, 0, 1, Qt::AlignCenter);
     this->glayout->addWidget(this->lineNumber, 0, 2, Qt::AlignRight);
     this->setFont(Editor::getFont());
+    this->vlayout->setContentsMargins(10, 0, 10, 0);
     this->vlayout->addWidget(this->message);
     this->vlayout->addLayout(glayout);
     this->setLayout(vlayout);
