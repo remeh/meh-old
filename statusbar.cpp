@@ -5,7 +5,8 @@ StatusBar::StatusBar(Window* window) :
     QWidget(window),
     window(window) {
     Q_ASSERT(window != nullptr);
-    this->layout = new QGridLayout();
+    this->vlayout = new QVBoxLayout();
+    this->glayout = new QGridLayout();
     this->mode = new QLabel("Normal");
     this->mode->setFont(Editor::getFont());
     this->filename = new QPushButton("");
@@ -13,12 +14,18 @@ StatusBar::StatusBar(Window* window) :
 	this->filename->setFocusPolicy(Qt::NoFocus);
     this->lineNumber = new QLabel("0");
     this->lineNumber->setFont(Editor::getFont());
-    this->layout->setContentsMargins(10, 0, 10, 10);
-    this->layout->addWidget(this->mode);
-    this->layout->addWidget(this->filename, 0, 1, Qt::AlignCenter);
-    this->layout->addWidget(this->lineNumber, 0, 2, Qt::AlignRight);
+    this->message = new QLabel("");
+    this->message->setWordWrap(true);
+    this->hideMessage();
+    this->lineNumber->setFont(Editor::getFont());
+    this->glayout->setContentsMargins(10, 0, 10, 10);
+    this->glayout->addWidget(this->mode);
+    this->glayout->addWidget(this->filename, 0, 1, Qt::AlignCenter);
+    this->glayout->addWidget(this->lineNumber, 0, 2, Qt::AlignRight);
     this->setFont(Editor::getFont());
-    this->setLayout(layout);
+    this->vlayout->addWidget(this->message);
+    this->vlayout->addLayout(glayout);
+    this->setLayout(vlayout);
 
     connect(this->filename, &QPushButton::clicked, this, &StatusBar::onFilenameClicked);
 }
@@ -37,6 +44,12 @@ void StatusBar::setMode(const QString& mode) {
 void StatusBar::setFilename(const QString& filename) {
     if (this->filename == nullptr) { return; }
     this->filename->setText(filename);
+}
+
+void StatusBar::setMessage(const QString& message) {
+    if (this->message == nullptr) { return; }
+    this->message->setText(message);
+    this->showMessage();
 }
 
 void StatusBar::setModified(bool modified) {

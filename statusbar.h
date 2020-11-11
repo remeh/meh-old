@@ -4,6 +4,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QPushButton>
+#include <QVBoxLayout>
 #include <QWidget>
 
 class Window;
@@ -16,16 +17,22 @@ public:
 
     void setMode(const QString& mode);
     void setFilename(const QString& filename);
+    void setMessage(const QString& filename);
     void setLineNumber(int lineNumber);
     void setModified(bool);
+
+    void showMessage() { this->message->show(); }
+    void hideMessage() { this->message->hide(); }
 
 public slots:
     void onFilenameClicked();
 protected:
 private:
     Window* window;
-    QGridLayout* layout;
+    QVBoxLayout* vlayout;
+    QGridLayout* glayout;
     QLabel* mode;
     QPushButton* filename;
     QLabel* lineNumber;
+    QLabel* message;
 };
