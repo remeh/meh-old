@@ -733,18 +733,6 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         }
     }
 
-    // close extra widgets
-    if (event->key() == Qt::Key_Escape) {
-        this->window->closeList();
-        this->window->closeCompleter();
-
-        if (!this->hasFocus()) {
-            this->window->closeGrep();
-        } else {
-            this->window->focusGrep();
-        }
-    }
-
     // Replace mode
     // ------------
 
@@ -761,6 +749,20 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         }
         return;
     }
+
+    // close extra widgets
+    if (event->key() == Qt::Key_Escape) {
+        this->window->closeList();
+        this->window->closeCompleter();
+        this->window->getStatusBar()->hideMessage();
+
+        if (!this->hasFocus()) {
+            this->window->closeGrep();
+        } else {
+            this->window->focusGrep();
+        }
+    }
+
 
     // Visual mode
     // -----------
@@ -1121,11 +1123,31 @@ void Editor::lspInterpret(QByteArray data) {
                 int line = json["result"][0]["range"]["start"]["line"].toInt();
                 int column = json["result"][0]["range"]["start"]["character"].toInt();
                 QString file = json["result"][0]["uri"].toString();
+                if (file.isEmpty()) {
+                    this->window->getStatusBar()->setMessage("Nothing found.");
+                    return;
+                }
                 file.remove(0,7); // remove the file://
                 this->saveCheckpoint();
                 this->selectOrCreateBuffer(file);
                 this->goToLine(line + 1);
                 this->goToColumn(column);
+                return;
+            }
+        case LSP_ACTION_SIGNATURE_HELP:
+            {
+                if (!json["result"].isNull() && !json["result"]["signatures"].isNull() && json["result"]["signatures"].toArray().size() > 0) {
+                    QString message;
+                    QJsonArray signatures = json["result"]["signatures"].toArray();
+                    for (int i = 0; i < signatures.size(); i++) {
+                        QJsonValue signature = signatures[i];
+                        message.append(signature["label"].toString()).append("\n");
+                        message.append(signature["documentation"].toString());
+                    }
+                    this->window->getStatusBar()->setMessage(message);
+                    return;
+                }
+                this->window->getStatusBar()->setMessage("Nothing found.");
                 return;
             }
         case LSP_ACTION_REFERENCES:
