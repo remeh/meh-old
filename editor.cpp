@@ -15,6 +15,7 @@
 #include <QPaintEvent>
 #include <QPixmap>
 #include <QPlainTextEdit>
+#include <QRandomGenerator>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
@@ -29,6 +30,7 @@
 
 #include "qdebug.h"
 
+#include "completer.h"
 #include "editor.h"
 #include "mode.h"
 #include "references_widget.h"
@@ -665,6 +667,9 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                 }
                 return;
             case Qt::Key_Space:
+                this->lspAutocomplete();
+                return;
+            case Qt::Key_N:
                 this->autocomplete();
                 return;
             case Qt::Key_H:
@@ -1014,6 +1019,16 @@ QString Editor::getWordUnderCursor() {
     return rv;
 }
 
+void Editor::lspAutocomplete() {
+    LSP* lsp = this->window->getEditor()->lspManager.getLSP(currentBuffer);
+    int reqId = QRandomGenerator::global()->generate();
+    if (reqId < 0) { reqId *= -1; }
+
+    if (lsp == nullptr) { return; }
+    lsp->completion(reqId, currentBuffer->getFilename(), this->currentLineNumber(), this->currentColumn());
+    this->lspManager.setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
+}
+
 void Editor::autocomplete() {
     const QString& base = this->getWordUnderCursor();
 
@@ -1048,7 +1063,12 @@ void Editor::autocomplete() {
     }
 
     this->selectionTimer->stop();
-    this->window->openCompleter(base, list);
+
+    QList<CompleterEntry> entries;
+    for (int i = 0; i < list.size(); i++) {
+        entries.append(CompleterEntry(list[i], ""));
+    }
+    this->window->openCompleter(base, entries);
 }
 
 void Editor::applyAutocomplete(const QString& base, const QString& word) {
@@ -1132,6 +1152,29 @@ void Editor::lspInterpret(QByteArray data) {
                 this->selectOrCreateBuffer(file);
                 this->goToLine(line + 1);
                 this->goToColumn(column);
+                return;
+            }
+        case LSP_ACTION_COMPLETION:
+            {
+                if (json["result"].isNull()) {
+                    this->window->getStatusBar()->setMessage("Nothing found.");
+                    return;
+                }
+
+                QJsonArray items = json["result"]["items"].toArray();
+
+                if (items.size() == 0) {
+                    this->window->getStatusBar()->setMessage("Nothing found.");
+                    return;
+                }
+
+                QList<CompleterEntry> entries;
+                for (int i = 0; i < items.size(); i++) {
+                    QJsonObject object = items[i].toObject();
+                    entries.append(CompleterEntry(object["insertText"].toString(), object["label"].toString()));
+                }
+                const QString& base = this->getWordUnderCursor();
+                this->window->openCompleter(base, entries);
                 return;
             }
         case LSP_ACTION_SIGNATURE_HELP:

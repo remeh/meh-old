@@ -12,6 +12,7 @@
 
 class Command;
 class Completer;
+class CompleterEntry;
 class Editor;
 class Grep;
 class ReferencesWidget;
@@ -30,7 +31,7 @@ public:
     void closeCommand();
 
     // TODO(remy): comment me
-    void openCompleter(const QString& base, const QStringList& list);
+    void openCompleter(const QString& base, QList<CompleterEntry> entries);
     // TODO(remy): comment me
     void closeCompleter();
 

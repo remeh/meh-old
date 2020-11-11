@@ -93,13 +93,17 @@ void Window::closeList() {
     this->filesLookup->hide();
 }
 
-void Window::openCompleter(const QString& base, const QStringList& list) {
+void Window::openCompleter(const QString& base, const QList<CompleterEntry> entries) {
     this->completer->clear();
-    this->completer->setItems(base, list);
+    this->completer->setItems(base, entries);
     QPoint p; this->mapToParent(p);
     this->completer->setGeometry(p.x(), p.y(), 200, 60);
     this->completer->show();
     this->completer->setFocus();
+    if (entries.size() > 0) {
+        this->completer->setCurrentItem(this->completer->topLevelItem(0));
+    }
+    this->completer->scroll(0, 0);
 }
 
 void Window::closeCompleter() {

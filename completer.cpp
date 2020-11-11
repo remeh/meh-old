@@ -1,16 +1,21 @@
-#include <QListWidget>
+#include <QTreeWidget>
 
 #include "completer.h"
 #include "window.h"
 
 Completer::Completer(Window* window) :
-    QListWidget(window),
+    QTreeWidget(window),
     window(window) {
+
+    QStringList columns;
+    columns << "Completion" << "Infos";
+    this->setHeaderLabels(columns);
 }
 
-void Completer::setItems(const QString& base, const QStringList& list) {
-    for (int i = 0; i < list.size(); i++) {
-        new QListWidgetItem(list.at(i), this);
+void Completer::setItems(const QString& base, const QList<CompleterEntry> entries) {
+    for (int i = 0; i < entries.size(); i++) {
+        QStringList list; list << entries[i].completion << entries[i].infos;
+        new QTreeWidgetItem(this, list);
     }
     this->base = base;
 }
@@ -27,22 +32,41 @@ void Completer::keyPressEvent(QKeyEvent* event) {
             this->window->closeCompleter();
             return;
         case Qt::Key_Return:
-            this->window->getEditor()->applyAutocomplete(this->base, this->currentItem()->text());
+            this->window->getEditor()->applyAutocomplete(this->base, this->currentItem()->text(0));
             this->window->closeCompleter();
             return;
         case Qt::Key_Space:
-            this->window->getEditor()->applyAutocomplete(this->base, this->currentItem()->text());
+            this->window->getEditor()->applyAutocomplete(this->base, this->currentItem()->text(0));
             // TODO(remy): should we insert a space here?
             this->window->closeCompleter();
             return;
         case Qt::Key_N:
             if (ctrl) {
-                this->setCurrentRow(this->currentRow() + 1);
+                QTreeWidgetItem* currentItem = this->currentItem();
+                if (currentItem == nullptr) {
+                    currentItem = this->topLevelItem(0);
+                    this->setCurrentItem(currentItem);
+                    return;
+                }
+                currentItem = this->itemBelow(currentItem);
+                if (currentItem != nullptr) {
+                    this->setCurrentItem(currentItem);
+                }
+
             }
             return;
         case Qt::Key_P:
             if (ctrl) {
-                this->setCurrentRow(this->currentRow() - 1);
+                QTreeWidgetItem* currentItem = this->currentItem();
+                if (currentItem == nullptr) {
+                    currentItem = this->topLevelItem(0);
+                    this->setCurrentItem(currentItem);
+                    return;
+                }
+                currentItem = this->itemAbove(currentItem);
+                if (currentItem != nullptr) {
+                    this->setCurrentItem(currentItem);
+                }
             }
             return;
     }

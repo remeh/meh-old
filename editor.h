@@ -158,6 +158,7 @@ public:
     void setCompleter(const QStringList& completer);
     // XXX(remy):
     void autocomplete();
+    void lspAutocomplete();
     void applyAutocomplete(const QString& base, const QString& word);
 
     // lspInterpret is called by the LSP server to let the Editor interpret

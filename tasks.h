@@ -5,6 +5,7 @@
 
 class Window;
 
+// TasksPlugin is the basic definition of a TaskPlugin.
 class TasksPlugin : public QWidget {
     Q_OBJECT
 
