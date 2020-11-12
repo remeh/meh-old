@@ -667,6 +667,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                 }
                 return;
             case Qt::Key_Space:
+                this->onTriggerLspRefresh();
                 this->lspAutocomplete();
                 return;
             case Qt::Key_N:
