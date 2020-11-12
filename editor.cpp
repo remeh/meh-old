@@ -1025,7 +1025,10 @@ void Editor::lspAutocomplete() {
     int reqId = QRandomGenerator::global()->generate();
     if (reqId < 0) { reqId *= -1; }
 
-    if (lsp == nullptr) { return; }
+    if (lsp == nullptr) {
+        this->window->getStatusBar()->setMessage("No LSP server running for this buffer.");
+        return;
+    }
     lsp->completion(reqId, currentBuffer->getFilename(), this->currentLineNumber(), this->currentColumn());
     this->lspManager.setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
 }
