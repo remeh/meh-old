@@ -18,6 +18,7 @@ void Completer::setItems(const QString& base, const QList<CompleterEntry> entrie
         new QTreeWidgetItem(this, list);
     }
     this->base = base;
+    this->fitContent();
 }
 
 void Completer::keyPressEvent(QKeyEvent* event) {
@@ -70,4 +71,8 @@ void Completer::keyPressEvent(QKeyEvent* event) {
             }
             return;
     }
+}
+
+void Completer::fitContent() {
+    this->resizeColumnToContents(0);
 }

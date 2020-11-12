@@ -35,4 +35,5 @@ private:
     Window* window;
     QString base;
 
+    void fitContent();
 };
