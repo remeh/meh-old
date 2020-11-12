@@ -14,7 +14,9 @@
         * `:e <filepath>`
     * LSP client for C++ (clangd) and Go (gopls):
         * Go to definition with the `:def` command
+        * Auto-completion with `Ctrl-Space`
         * Display references to a variable / method / ... with `:ref` command
+        * Get functions/methods signatures and documentation with `:sig`
     * File opener
         * Fast lookup per directory
         * Filtering while typing
@@ -31,7 +33,7 @@
             * `j` and `k` for also works for next / previous result
             * `Ctrl-j` and `Ctrl-k` to expand / close results on a file
             * use `x` or `Backspace` to remove entries from the results to remove the noise
-    * Auto-complete with words in opened buffers with `Ctrl-Space`
+    * Auto-complete with words in opened buffers with `Ctrl-N`
     * Auto-indentation (respect previous line indentation, automatically changes it depending on `{`, `}`, and `:`)
     * Simple syntax highlighting (regexp based)
     * Highlight the selection / word under the cursor
