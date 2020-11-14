@@ -1165,20 +1165,30 @@ void Editor::lspInterpret(QByteArray data) {
                     return;
                 }
 
-                QJsonArray items = json["result"]["items"].toArray();
-
-                if (items.size() == 0) {
+                LSP* lsp = this->lspManager.getLSP(this->currentBuffer) ;
+                if (lsp == nullptr) {
                     this->window->getStatusBar()->setMessage("Nothing found.");
                     return;
                 }
 
-                QList<CompleterEntry> entries;
-                for (int i = 0; i < items.size(); i++) {
-                    QJsonObject object = items[i].toObject();
-                    entries.append(CompleterEntry(object["insertText"].toString(), object["label"].toString()));
+                auto entries = lsp->getEntries(json);
+                if (entries.size() == 0) {
+                    this->window->getStatusBar()->setMessage("Nothing found.");
+                    return;
                 }
                 const QString& base = this->getWordUnderCursor();
                 this->window->openCompleter(base, entries);
+                return;
+            }
+        case LSP_ACTION_HOVER:
+            {
+                if (json["result"].isNull() || json["result"]["contents"].isNull()) {
+                    this->window->getStatusBar()->setMessage("Nothing found.");
+                    return;
+                }
+
+                auto contents = json["result"]["contents"].toObject();
+                this->window->getStatusBar()->setMessage(contents["value"].toString());
                 return;
             }
         case LSP_ACTION_SIGNATURE_HELP:

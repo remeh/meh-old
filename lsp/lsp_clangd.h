@@ -1,7 +1,9 @@
+#include <QList>
 #include <QString>
 
 #include "../buffer.h"
 
+class CompleterEntry;
 class LSP;
 class LSPWriter;
 class Window;
@@ -20,9 +22,11 @@ public:
     void initialize() override;
     void definition(int reqId, const QString& filename, int line, int column) override;
     void declaration(int reqId, const QString& filename, int line, int column) override;
+    void hover(int reqId, const QString& filename, int line, int column) override;
     void signatureHelp(int reqId, const QString& filename, int line, int column) override;
     void references(int reqId, const QString& filename, int line, int column) override;
     void completion(int reqId, const QString& filename, int line, int column) override;
+    QList<CompleterEntry> getEntries(const QJsonDocument& json);
 
 private:
     QString baseDir;

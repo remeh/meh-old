@@ -156,6 +156,12 @@ void Command::execute(QString text) {
         this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_SIGNATURE_HELP, currentBuffer);
     }
 
+    if (command == ":i" || command == ":info") {
+        if (lsp == nullptr) { return; }
+        lsp->hover(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
+        this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_HOVER, currentBuffer);
+    }
+
     if (command == ":ref") {
         if (lsp == nullptr) { return; }
         lsp->references(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());

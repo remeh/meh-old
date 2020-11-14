@@ -1,6 +1,9 @@
 #include <QDir>
 #include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonObject>
 
+#include "../completer.h"
 #include "../lsp.h"
 #include "../window.h"
 #include "lsp_clangd.h"
@@ -60,6 +63,11 @@ void LSPClangd::declaration(int reqId, const QString& filename, int line, int co
     this->lspServer.write(msg.toUtf8());
 }
 
+void LSPClangd::hover(int reqId, const QString& filename, int line, int column) {
+    const QString& msg = this->writer.hover(reqId, filename, line, column);
+    this->lspServer.write(msg.toUtf8());
+}
+
 void LSPClangd::signatureHelp(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.signatureHelp(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
@@ -73,4 +81,26 @@ void LSPClangd::references(int reqId, const QString& filename, int line, int col
 void LSPClangd::completion(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.completion(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
+}
+
+QList<CompleterEntry> LSPClangd::getEntries(const QJsonDocument& json) {
+    QList<CompleterEntry> list;
+
+    if (json["result"].isNull() || json["result"]["items"].isNull()) {
+        return list;
+    }
+
+    QJsonArray items = json["result"]["items"].toArray();
+
+    if (items.size() == 0) {
+        this->window->getStatusBar()->setMessage("Nothing found.");
+        return list;
+    }
+
+    for (int i = 0; i < items.size(); i++) {
+        QJsonObject object = items[i].toObject();
+        list.append(CompleterEntry(object["insertText"].toString(), object["label"].toString()));
+    }
+
+    return list;
 }

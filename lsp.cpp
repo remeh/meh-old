@@ -242,6 +242,28 @@ QString LSPWriter::declaration(int reqId, const QString& filename, int line, int
     return this->payload(str);
 }
 
+QString LSPWriter::hover(int reqId, const QString& filename, int line, int column) {
+    QJsonObject position {
+        {"line", line},
+        {"character", column}
+    };
+    QJsonObject textDocument {
+        {"uri", "file://" + filename },
+    };
+    QJsonObject params {
+        {"textDocument", textDocument},
+        {"position", position}
+    };
+    QJsonObject object {
+        {"jsonrpc", "2.0"},
+        {"id", reqId},
+        {"method", "textDocument/hover"},
+        {"params", params}
+    };
+    QString str = QString(QJsonDocument(object).toJson(QJsonDocument::Compact));
+    return this->payload(str);
+}
+
 QString LSPWriter::signatureHelp(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
         {"line", line},
