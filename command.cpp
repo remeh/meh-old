@@ -139,37 +139,37 @@ void Command::execute(QString text) {
     if (reqId < 0) { reqId *= -1; }
 
     if (command == ":def") {
-        if (lsp == nullptr) { return; }
+        if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->definition(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
         this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_DEFINITION, currentBuffer);
     }
 
     if (command == ":dec") {
-        if (lsp == nullptr) { return; }
+        if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->declaration(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
         this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_DECLARATION, currentBuffer);
     }
 
     if (command == ":sig") {
-        if (lsp == nullptr) { return; }
+        if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->signatureHelp(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
         this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_SIGNATURE_HELP, currentBuffer);
     }
 
     if (command == ":i" || command == ":info") {
-        if (lsp == nullptr) { return; }
+        if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->hover(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
         this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_HOVER, currentBuffer);
     }
 
     if (command == ":ref") {
-        if (lsp == nullptr) { return; }
+        if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->references(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
         this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_REFERENCES, currentBuffer);
     }
 
     if (command == ":com") {
-        if (lsp == nullptr) { return; }
+        if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->completion(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
         this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
     }

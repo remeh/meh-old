@@ -32,17 +32,24 @@ LSP::~LSP() {
 QString LSPWriter::initialize(const QString& baseDir) {
     QString content;
     QFileInfo fi(baseDir);
+    QJsonParseError* error = nullptr;
     QJsonObject workspace = QJsonDocument::fromJson(" \
         { \
             \"configuration\": true, \
             \"workspaceFolders\": true \
         } \
-    ").object();
+    ", error).object();
+    if (error != nullptr) {
+        qDebug() << "LSPWriter::initialize: error while building the workspace init JSON";
+        error = nullptr;
+    }
     QJsonObject textDocument = QJsonDocument::fromJson(" \
         { \
+            \"publishDiagnostics\": { \"dynamicRegistration\": true }, \
+            \"synchronization\": { \"dynamicRegistration\": true }, \
             \"completion\": { \
                 \"dynamicRegistration\": true, \
-                \"contextSupport\": false, \
+                \"contextSupport\": true, \
                 \"completionItem\": { \
                     \"snippetSupport\": false, \
                     \"commitCharactersSupport\": false, \
@@ -55,11 +62,12 @@ QString LSPWriter::initialize(const QString& baseDir) {
                 \"contentFormat\": [ \"plaintext\" ] \
             }, \
             \"signatureHelp\": { \
-                \"dynamicRegistration\": false, \
+                \"dynamicRegistration\": true, \
                 \"signatureInformation\": { \
                     \"documentationFormat\": [ \"plaintext\" ] \
                 } \
             }, \
+            \"codeAction\": { \"dynamicRegistration\": true }, \
             \"documentHighlight\": { \"dynamicRegistration\": false }, \
             \"documentSymbol\": { \"dynamicRegistration\": false }, \
             \"definition\": { \"dynamicRegistration\": true }, \
@@ -71,7 +79,11 @@ QString LSPWriter::initialize(const QString& baseDir) {
             \"typeDefinition\": { \"dynamicRegistration\": true }, \
             \"implementation\": { \"dynamicRegistration\": true } \
         } \
-    ").object();
+    ", error).object();
+    if (error != nullptr) {
+        qDebug() << "LSPWriter::initialize: error while building the textDocument init JSON";
+        error = nullptr;
+    }
     QJsonObject capabilities {
         {"workspace", workspace},
         {"textDocument", textDocument}
