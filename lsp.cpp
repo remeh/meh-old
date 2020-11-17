@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -33,95 +34,42 @@ QString LSPWriter::initialize(const QString& baseDir) {
     QFileInfo fi(baseDir);
     QJsonObject workspace = QJsonDocument::fromJson(" \
         { \
-            \"applyEdit\": true, \
-//            \"workspaceEdit\": { \
-//                \"documentChanges\": true \
-//            }, \
-//            \"didChangeConfiguration\": { \
-//                \"dynamicRegistration\": true \
-//            }, \
-//            \"didChangeWatchedFiles\": { \
-//                \"dynamicRegistration\": true \
-//            }, \
-            \"symbol\": { \
-                \"dynamicRegistration\": true, \
-                \"symbolKind\": { \
-                    \"valueSet\": [ \
-                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, \
-                        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 \
-                    ] \
-                } \
-            }, \
-            \"executeCommand\": { \
-                \"dynamicRegistration\": true \
-            }, \
             \"configuration\": true, \
             \"workspaceFolders\": true \
         } \
     ").object();
     QJsonObject textDocument = QJsonDocument::fromJson(" \
         { \
-            \"publishDiagnostics\": { \
-                \"relatedInformation\": true \
-            }, \
-//            \"synchronization\": { \
-//                \"dynamicRegistration\": true, \
-//                \"willSave\": true, \
-//                \"willSaveWaitUntil\": true, \
-//                \"didSave\": true \
-//            }, \
             \"completion\": { \
                 \"dynamicRegistration\": true, \
-                \"contextSupport\": true, \
+                \"contextSupport\": false, \
                 \"completionItem\": { \
-                    \"snippetSupport\": true, \
-                    \"commitCharactersSupport\": true, \
-                    \"documentationFormat\": [ \
-                        \"markdown\", \
-                        \"plaintext\" \
-                    ], \
-                    \"deprecatedSupport\": true \
-                }, \
-                \"completionItemKind\": { \
-                    \"valueSet\": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, \
-                        14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ] \
+                    \"snippetSupport\": false, \
+                    \"commitCharactersSupport\": false, \
+                    \"documentationFormat\": [ \"plaintext\" ], \
+                    \"deprecatedSupport\": false \
                 } \
             }, \
             \"hover\": { \
                 \"dynamicRegistration\": true, \
-                \"contentFormat\": [ \"markdown\", \"plaintext\" ] \
+                \"contentFormat\": [ \"plaintext\" ] \
             }, \
             \"signatureHelp\": { \
-                \"dynamicRegistration\": true, \
+                \"dynamicRegistration\": false, \
                 \"signatureInformation\": { \
-                    \"documentationFormat\": [ \"markdown\", \"plaintext\" ] \
+                    \"documentationFormat\": [ \"plaintext\" ] \
                 } \
             }, \
+            \"documentHighlight\": { \"dynamicRegistration\": false }, \
+            \"documentSymbol\": { \"dynamicRegistration\": false }, \
             \"definition\": { \"dynamicRegistration\": true }, \
             \"references\": { \"dynamicRegistration\": true }, \
-            \"documentHighlight\": { \"dynamicRegistration\": true }, \
-            \"documentSymbol\": { \
-                \"dynamicRegistration\": true, \
-                \"symbolKind\": { \
-                    \"valueSet\": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, \
-                        14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 ] \
-                } \
-            }, \
-            \"codeAction\": { \"dynamicRegistration\": true }, \
-            \"codeLens\": { \"dynamicRegistration\": true }, \
             \"formatting\": { \"dynamicRegistration\": true }, \
             \"rangeFormatting\": { \"dynamicRegistration\": true }, \
-            \"onTypeFormatting\": { \"dynamicRegistration\": true }, \
             \"rename\": { \"dynamicRegistration\": true }, \
             \"documentLink\": { \"dynamicRegistration\": true }, \
             \"typeDefinition\": { \"dynamicRegistration\": true }, \
-            \"implementation\": { \"dynamicRegistration\": true }, \
-//            \"colorProvider\": { \"dynamicRegistration\": true }, \
-            \"foldingRange\": { \
-                \"dynamicRegistration\": false, \
-                \"rangeLimit\": 5000, \
-                \"lineFoldingOnly\": true \
-            } \
+            \"implementation\": { \"dynamicRegistration\": true } \
         } \
     ").object();
     QJsonObject capabilities {
@@ -177,7 +125,7 @@ QString LSPWriter::openFile(Buffer* buffer, const QString& filename, const QStri
 QString LSPWriter::refreshFile(Buffer* buffer, const QString& filename) {
     QJsonObject textDocument {
         {"uri", "file://" + filename },
-        // NOTE(remy): is file version mandatory?
+        {"version", QString::number(QDateTime::currentMSecsSinceEpoch()) },
     };
     QJsonObject contentChange {
         {"text", QString(buffer->getData())},
@@ -187,7 +135,7 @@ QString LSPWriter::refreshFile(Buffer* buffer, const QString& filename) {
     };
     QJsonObject params {
         {"textDocument", textDocument},
-        {"contentChanges", contentChanges },
+        {"contentChanges", contentChanges},
     };
     QJsonObject object {
         {"jsonrpc", "2.0"},
@@ -348,7 +296,8 @@ QJsonDocument LSPReader::readMessage(const QByteArray& message) {
         QRegularExpressionMatch match = it.next();
         payloadSize = match.captured(1).toInt();
     } else {
-        qWarning() << "LSPReader::readMessage" << "can't read the received message from the LSP Server.";
+        qWarning() << "LSPReader::readMessage" << "can't read the received message from the LSP Server. Message:";
+        qWarning() << message;
         return empty;
     }
 

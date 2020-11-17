@@ -17,6 +17,7 @@
         * Auto-completion with `Ctrl-Space`
         * Display references to a variable / method / ... with `:ref` command
         * Get functions/methods signatures and documentation with `:sig`
+        * `:i` or `:info` to get infos on what's under the cursor
     * File opener
         * Fast lookup per directory
         * Filtering while typing

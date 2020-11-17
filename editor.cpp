@@ -220,6 +220,7 @@ void Editor::onContentsChange(int position, int charsRemoved, int charsAdded) {
     this->lspRefreshTimer->start(500);
 }
 
+
 void Editor::save() {
     if (!this->currentBuffer) { return; }
 
