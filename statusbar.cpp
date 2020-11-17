@@ -1,3 +1,5 @@
+#include <QSizePolicy>
+
 #include "statusbar.h"
 #include "window.h"
 
@@ -9,24 +11,34 @@ StatusBar::StatusBar(Window* window) :
     this->glayout = new QGridLayout();
     this->mode = new QLabel("Normal");
     this->mode->setFont(Editor::getFont());
+    this->mode->setMaximumHeight(15);
+    this->mode->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->filename = new QPushButton("");
     this->filename->setFlat(true);
-	this->filename->setFocusPolicy(Qt::NoFocus);
+    this->filename->setFocusPolicy(Qt::NoFocus);
+    this->filename->setMaximumHeight(17);
+    this->filename->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->lineNumber = new QLabel("0");
     this->lineNumber->setFont(Editor::getFont());
-    this->message = new QLabel("");
-    this->message->setWordWrap(true);
-    this->hideMessage();
     this->lineNumber->setFont(Editor::getFont());
+    this->lineNumber->setMaximumHeight(15);
+    this->lineNumber->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->glayout->setContentsMargins(10, 0, 10, 5);
     this->glayout->addWidget(this->mode);
     this->glayout->addWidget(this->filename, 0, 1, Qt::AlignCenter);
     this->glayout->addWidget(this->lineNumber, 0, 2, Qt::AlignRight);
     this->setFont(Editor::getFont());
-    this->vlayout->setContentsMargins(10, 0, 10, 0);
+    this->message = new QPlainTextEdit();
+    this->message->setReadOnly(true);
+    this->message->setFocusPolicy(Qt::NoFocus);
+    this->message->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    this->message->setMaximumHeight(150);
+    this->vlayout->setContentsMargins(5, 0, 5, 0);
     this->vlayout->addWidget(this->message);
     this->vlayout->addLayout(glayout);
     this->setLayout(vlayout);
+
+    this->hideMessage();
 
     connect(this->filename, &QPushButton::clicked, this, &StatusBar::onFilenameClicked);
 }
@@ -49,7 +61,12 @@ void StatusBar::setFilename(const QString& filename) {
 
 void StatusBar::setMessage(const QString& message) {
     if (this->message == nullptr) { return; }
-    this->message->setText(message);
+    QString t = this->message->toPlainText();
+    if (t.size() > 0) {
+        this->message->setPlainText(t + "\n" + message);
+    } else {
+        this->message->setPlainText(message);
+    }
     this->showMessage();
 }
 

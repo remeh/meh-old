@@ -4,6 +4,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QPushButton>
+#include <QPlainTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -21,8 +22,13 @@ public:
     void setLineNumber(int lineNumber);
     void setModified(bool);
 
-    void showMessage() { this->message->show(); }
-    void hideMessage() { this->message->hide(); }
+    void showMessage() {
+        this->message->show();
+    }
+    void hideMessage() {
+		this->message->setPlainText("");
+		this->message->hide();
+	}
 
 public slots:
     void onFilenameClicked();
@@ -34,5 +40,5 @@ private:
     QLabel* mode;
     QPushButton* filename;
     QLabel* lineNumber;
-    QLabel* message;
+    QPlainTextEdit* message;
 };
