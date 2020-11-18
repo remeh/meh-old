@@ -11,17 +11,29 @@ StatusBar::StatusBar(Window* window) :
     this->glayout = new QGridLayout();
     this->mode = new QLabel("Normal");
     this->mode->setFont(Editor::getFont());
+    #ifdef Q_OS_MAC
+    this->mode->setMaximumHeight(18);
+    #else
     this->mode->setMaximumHeight(15);
+    #endif
     this->mode->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->filename = new QPushButton("");
     this->filename->setFlat(true);
     this->filename->setFocusPolicy(Qt::NoFocus);
+    #ifdef Q_OS_MAC
+    this->filename->setMaximumHeight(26);
+    #else
     this->filename->setMaximumHeight(17);
+    #endif
     this->filename->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->lineNumber = new QLabel("0");
     this->lineNumber->setFont(Editor::getFont());
     this->lineNumber->setFont(Editor::getFont());
+    #ifdef Q_OS_MAC
+    this->lineNumber->setMaximumHeight(18);
+    #else
     this->lineNumber->setMaximumHeight(15);
+    #endif
     this->lineNumber->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->glayout->setContentsMargins(10, 0, 10, 5);
     this->glayout->addWidget(this->mode);

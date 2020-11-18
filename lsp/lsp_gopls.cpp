@@ -18,7 +18,7 @@ LSPGopls::LSPGopls(Window* window, const QString& baseDir) : LSP(window) {
 
 LSPGopls::~LSPGopls() {
     this->lspServer.terminate();
-    this->lspServer.waitForFinished(5000);
+    this->lspServer.waitForFinished(1000);
 }
 
 void LSPGopls::readStandardOutput() {
@@ -34,6 +34,9 @@ void LSPGopls::readStandardOutput() {
 bool LSPGopls::start() {
     this->lspServer.start("gopls");
     this->serverSpawned = this->lspServer.waitForStarted(5000);
+    if (!this->serverSpawned) {
+        this->window->getStatusBar()->setMessage("Unable to start gopls binary");
+    }
     return this->serverSpawned;
 }
 

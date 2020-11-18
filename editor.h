@@ -15,7 +15,6 @@
 #include <QStringList>
 #include <QTextBlock>
 #include <QTextCursor>
-#include <QTextEdit>
 #include <QTimer>
 #include <QVector>
 

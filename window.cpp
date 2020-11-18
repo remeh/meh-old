@@ -15,6 +15,7 @@ Window::Window(QWidget* parent) :
     // widgets
     // ----------------------
     this->command = new Command(this);
+    this->command->setContentsMargins(2, 2, 2, 0);
     this->command->hide();
     this->filesLookup = new FilesLookup(this);
     this->filesLookup->hide();
@@ -55,6 +56,7 @@ Window::Window(QWidget* parent) :
 
     this->layout = new QGridLayout();
     this->layout->setContentsMargins(0, 0, 0, 0);
+    this->layout->setVerticalSpacing(1);
     this->layout->addWidget(this->editor);
     this->layout->addWidget(this->command);
     this->layout->addWidget(this->filesLookup);
