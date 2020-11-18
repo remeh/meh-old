@@ -34,47 +34,55 @@ QString LSPWriter::initialize(const QString& baseDir) {
     QFileInfo fi(baseDir);
     QJsonParseError* error = nullptr;
     QJsonObject workspace;
-    QJsonObject textDocument = QJsonDocument::fromJson(" \
-        { \
-            \"publishDiagnostics\": { \"dynamicRegistration\": true }, \
-            \"synchronization\": { \"dynamicRegistration\": true }, \
-            \"completion\": { \
-                \"dynamicRegistration\": true, \
-                \"contextSupport\": true, \
-                \"completionItem\": { \
-                    \"snippetSupport\": false, \
-                    \"commitCharactersSupport\": false, \
-                    \"documentationFormat\": [ \"plaintext\" ], \
-                    \"deprecatedSupport\": false \
-                } \
-            }, \
-            \"hover\": { \
-                \"dynamicRegistration\": true, \
-                \"contentFormat\": [ \"plaintext\" ] \
-            }, \
-            \"signatureHelp\": { \
-                \"dynamicRegistration\": true, \
-                \"signatureInformation\": { \
-                    \"documentationFormat\": [ \"plaintext\" ] \
-                } \
-            }, \
-            \"codeAction\": { \"dynamicRegistration\": true }, \
-            \"documentHighlight\": { \"dynamicRegistration\": false }, \
-            \"documentSymbol\": { \"dynamicRegistration\": false }, \
-            \"definition\": { \"dynamicRegistration\": true }, \
-            \"references\": { \"dynamicRegistration\": true }, \
-            \"formatting\": { \"dynamicRegistration\": true }, \
-            \"rangeFormatting\": { \"dynamicRegistration\": true }, \
-            \"rename\": { \"dynamicRegistration\": true }, \
-            \"documentLink\": { \"dynamicRegistration\": true }, \
-            \"typeDefinition\": { \"dynamicRegistration\": true }, \
-            \"implementation\": { \"dynamicRegistration\": true } \
-        } \
-    ", error).object();
-    if (error != nullptr) {
-        qDebug() << "LSPWriter::initialize: error while building the textDocument init JSON";
-        error = nullptr;
-    }
+
+
+
+
+    QJsonObject dynRegTrue { {"dynamicRegistration", true} };
+    QJsonObject dynRegFalse { {"dynamicRegistration", false} };
+
+    QJsonObject {
+        {"snippetSupport", false},
+        {"commitCharactersSupport", false},
+        {"documentationFormat", QJsonArray { "plaintext" }},
+        {"deprecatedSupport", false }
+    };
+
+    QJsonObject textDocument {
+        {"completion", QJsonObject {
+            {"dynamicRegistration", true},
+            {"contextSupport", true},
+            {"completionItem", QJsonObject {
+                {"snippetSupport", false},
+                {"commitCharactersSupport", false},
+                {"documentationFormat", QJsonArray { "plaintext" }},
+                {"deprecatedSupport", false }
+            }}
+        }},
+        {"hover", QJsonObject {
+            {"dynamicRegistration", true},
+            {"contentFormat", QJsonArray { "plaintext "}}
+        }},
+        {"signatureHelp", QJsonObject {
+            {"dynamicRegistration", true},
+            {"signatureInformation", QJsonObject {
+                { "documentationFormat", QJsonArray { "plaintext "}}
+            }}
+        }},
+        {"publishDiagnostics", dynRegTrue},
+        {"synchronization",    dynRegTrue},
+        {"codeAction",         dynRegTrue},
+        {"typeDefinition",     dynRegTrue},
+        {"implementation",     dynRegTrue},
+        {"definition",         dynRegTrue},
+        {"references",         dynRegTrue},
+        {"documentHighlight",  dynRegFalse},
+        {"documentSymbol",     dynRegFalse},
+        {"formatting",         dynRegFalse},
+        {"rangeFormatting",    dynRegFalse},
+        {"rename",             dynRegFalse},
+        {"documentLink",       dynRegFalse}
+    };
     QJsonObject capabilities {
         {"workspace", workspace},
         {"textDocument", textDocument}
