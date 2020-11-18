@@ -6,20 +6,22 @@
 #include "../completer.h"
 #include "../lsp.h"
 #include "../window.h"
-#include "lsp_clangd.h"
+#include "gopls.h"
 
-LSPClangd::LSPClangd(Window* window, const QString& baseDir) : LSP(window) {
+#include "qdebug.h"
+
+LSPGopls::LSPGopls(Window* window, const QString& baseDir) : LSP(window) {
     this->serverSpawned = false;
-    this->language = "cpp";
+    this->language = "go";
     this->baseDir = baseDir;
 }
 
-LSPClangd::~LSPClangd() {
+LSPGopls::~LSPGopls() {
     this->lspServer.terminate();
     this->lspServer.waitForFinished(1000);
 }
 
-void LSPClangd::readStandardOutput() {
+void LSPGopls::readStandardOutput() {
     if (this->window == nullptr) {
         return;
     }
@@ -29,61 +31,64 @@ void LSPClangd::readStandardOutput() {
 
 // --------------------------
 
-bool LSPClangd::start() {
-    this->lspServer.start("clangd");
+bool LSPGopls::start() {
+    this->lspServer.start("gopls");
     this->serverSpawned = this->lspServer.waitForStarted(5000);
-    // TODO(remy): send the initialize command
+    if (!this->serverSpawned) {
+        this->window->getStatusBar()->setMessage("Unable to start gopls binary");
+    }
     return this->serverSpawned;
 }
 
-void LSPClangd::initialize() {
+void LSPGopls::initialize() {
     const QString& initialize = this->writer.initialize(this->baseDir);
     const QString& initialized = this->writer.initialized();
     this->lspServer.write(initialize.toUtf8());
     this->lspServer.write(initialized.toUtf8());
 }
 
-void LSPClangd::openFile(Buffer* buffer) {
-    const QString& msg = this->writer.openFile(buffer, buffer->getFilename(), this->language);
+void LSPGopls::openFile(Buffer* buffer) {
+    QFileInfo fi(buffer->getFilename());
+    const QString& msg = this->writer.openFile(buffer, fi.absoluteDir().absolutePath(), "go");
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPClangd::refreshFile(Buffer* buffer) {
+void LSPGopls::refreshFile(Buffer* buffer) {
     const QString& msg = this->writer.refreshFile(buffer, buffer->getFilename());
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPClangd::definition(int reqId, const QString& filename, int line, int column) {
+void LSPGopls::definition(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.definition(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPClangd::declaration(int reqId, const QString& filename, int line, int column) {
+void LSPGopls::declaration(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.declaration(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPClangd::hover(int reqId, const QString& filename, int line, int column) {
+void LSPGopls::hover(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.hover(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPClangd::signatureHelp(int reqId, const QString& filename, int line, int column) {
+void LSPGopls::signatureHelp(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.signatureHelp(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPClangd::references(int reqId, const QString& filename, int line, int column) {
+void LSPGopls::references(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.references(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPClangd::completion(int reqId, const QString& filename, int line, int column) {
+void LSPGopls::completion(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.completion(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-QList<CompleterEntry> LSPClangd::getEntries(const QJsonDocument& json) {
+QList<CompleterEntry> LSPGopls::getEntries(const QJsonDocument& json) {
     QList<CompleterEntry> list;
 
     if (json["result"].isNull() || json["result"]["items"].isNull()) {
@@ -97,9 +102,10 @@ QList<CompleterEntry> LSPClangd::getEntries(const QJsonDocument& json) {
         return list;
     }
 
+    QList<CompleterEntry> entries;
     for (int i = 0; i < items.size(); i++) {
         QJsonObject object = items[i].toObject();
-        list.append(CompleterEntry(object["insertText"].toString(), object["label"].toString()));
+        list.append(CompleterEntry(object["label"].toString(), object["detail"].toString()));
     }
 
     return list;

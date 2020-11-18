@@ -26,8 +26,8 @@ set(SOURCES
     leader.cpp
     lsp.cpp
     lsp_manager.cpp
-    lsp/lsp_clangd.cpp
-    lsp/lsp_gopls.cpp
+    lsp/clangd.cpp
+    lsp/gopls.cpp
     normal.cpp
     references_widget.cpp
     statusbar.cpp

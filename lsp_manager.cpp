@@ -3,8 +3,8 @@
 #include "buffer.h"
 #include "lsp.h"
 #include "window.h"
-#include "lsp/lsp_clangd.h"
-#include "lsp/lsp_gopls.h"
+#include "lsp/clangd.h"
+#include "lsp/gopls.h"
 
 #include "qdebug.h"
 
