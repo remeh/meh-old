@@ -5,6 +5,7 @@
 #include "window.h"
 #include "lsp/clangd.h"
 #include "lsp/gopls.h"
+#include "lsp/zls.h"
 
 #include "qdebug.h"
 
@@ -31,6 +32,16 @@ LSP* LSPManager::start(Window* window, const QString& language) {
          return lsp;
     } else if (language == "cpp" || language == "h") {
         LSP* lsp = new LSPClangd(window, window->getBaseDir());
+        if (!lsp->start()) {
+            // TODO(remy): warning here
+            delete lsp;
+            return nullptr;
+        }
+        lsp->initialize();
+        this->lsps.append(lsp);
+        return lsp;
+    } else if (language == "zig") {
+        LSP* lsp = new LSPZLS(window, window->getBaseDir());
         if (!lsp->start()) {
             // TODO(remy): warning here
             delete lsp;
