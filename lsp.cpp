@@ -33,16 +33,7 @@ QString LSPWriter::initialize(const QString& baseDir) {
     QString content;
     QFileInfo fi(baseDir);
     QJsonParseError* error = nullptr;
-    QJsonObject workspace = QJsonDocument::fromJson(" \
-        { \
-            \"configuration\": true, \
-            \"workspaceFolders\": true \
-        } \
-    ", error).object();
-    if (error != nullptr) {
-        qDebug() << "LSPWriter::initialize: error while building the workspace init JSON";
-        error = nullptr;
-    }
+    QJsonObject workspace;
     QJsonObject textDocument = QJsonDocument::fromJson(" \
         { \
             \"publishDiagnostics\": { \"dynamicRegistration\": true }, \
@@ -89,7 +80,6 @@ QString LSPWriter::initialize(const QString& baseDir) {
         {"textDocument", textDocument}
     };
     QJsonObject params {
-        {"rootPath", fi.absoluteFilePath()},
         {"rootUri", "file://" + fi.absoluteFilePath()},
         {"processId", QCoreApplication::applicationPid()},
         {"capabilities", capabilities},
