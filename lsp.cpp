@@ -301,17 +301,18 @@ QJsonDocument LSPReader::readMessage(const QByteArray& message) {
 
     QRegularExpression rx(QStringLiteral("Content-Length: (\\d+)"));
     QRegularExpressionMatchIterator it = rx.globalMatch(message);
+
+    QByteArray payload;
     int payloadSize = 0;
     if (it.hasNext()) {
         QRegularExpressionMatch match = it.next();
         payloadSize = match.captured(1).toInt();
+        payload = message.right(payloadSize);
     } else {
-        qWarning() << "LSPReader::readMessage" << "can't read the received message from the LSP Server. Message:";
-        qWarning() << message;
-        return empty;
+        // use the whole message as the payload if there is no header
+        payload = message;
     }
 
-    QByteArray payload = message.right(payloadSize);
     QJsonParseError* error = nullptr;
     QJsonDocument result = QJsonDocument::fromJson(payload, error);
     if (error != nullptr) {
