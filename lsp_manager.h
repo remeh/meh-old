@@ -15,6 +15,12 @@ typedef struct LSPAction {
     Buffer* buffer;
 } LSPAction;
 
+typedef struct LSPDiagnostic {
+    QString absFilename;
+    QString message;
+    int line;
+} LSPDiagnostic;
+
 class LSPManager
 {
 public:
@@ -45,6 +51,15 @@ public:
     // removeExecutedAction removes an action from the pending actions.
     int removeExecutedAction(int reqId) { return this->executedActions.remove(reqId); };
 
+    // TODO(remy): comment me
+    void addDiagnostic(const QString& absFilename, LSPDiagnostic diag);
+
+    // TODO(remy): comment me
+    QMap<int, LSPDiagnostic> getDiagnostics(const QString& absFilename);
+
+    // TODO(remy): comment me
+    void clearDiagnostics(const QString& absFilename);
+
 protected:
 private:
 
@@ -58,4 +73,7 @@ private:
     // executedActions is the list of executed actions waiting for a response
 // from the LSP server.
     QMap<int, LSPAction> executedActions;
+
+    // diagnostics is storing the diagnostics for the different files.
+    QMap<QString, QMap<int, LSPDiagnostic>> diagnostics;
 };

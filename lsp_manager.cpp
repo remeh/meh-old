@@ -123,3 +123,18 @@ LSPAction LSPManager::getExecutedAction(int reqId) {
     }
     return this->executedActions.value(reqId);
 }
+
+// Diagnostics
+// -----------
+
+void LSPManager::addDiagnostic(const QString& absFilepath, LSPDiagnostic diag) {
+    this->diagnostics[absFilepath].insert(diag.line, diag);
+}
+
+QMap<int, LSPDiagnostic> LSPManager::getDiagnostics(const QString& absFilepath) {
+    return this->diagnostics[absFilepath];
+}
+
+void LSPManager::clearDiagnostics(const QString& absFilepath) {
+    this->diagnostics[absFilepath].clear();
+}

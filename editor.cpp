@@ -1136,7 +1136,57 @@ void Editor::lspInterpret(QByteArray data) {
 
     LSPAction action = this->lspManager.getExecutedAction(json["id"].toInt());
     if (action.requestId == 0) {
-        // TODO(remy): implement the publishDiagnostic and others?
+        if (json["method"].isNull()) {
+            return;
+        }
+        // showMessage
+        // -----------
+        if (json["method"].toString() == "window/showMessage") {
+            if (!json["params"].isNull()) {
+                const QString& msg = json["params"]["message"].toString();
+                if (msg.size() > 0) {
+                    this->window->getStatusBar()->setMessage(msg);
+                }
+            }
+        // publishDiagnostics
+        // ------------------
+        } else if (json["method"] == "textDocument/publishDiagnostics") {
+            // TODO(remy): implement me at some point
+            if (!json["params"].isNull() && !json["params"]["diagnostics"].isNull()) {
+                if (!json["params"]["diagnostics"].isArray()) {
+                    qWarning() << "lspInterpret: \"diagnostics\" is not an array";
+                    return;
+                }
+                if (json["params"]["uri"].isNull()) {
+                    qWarning() << "lspInterpret: no \"uri\" field in diagnostic";
+                    return;
+                }
+
+                auto diags = json["params"]["diagnostics"].toArray();
+                const QString& uri = QFileInfo(json["params"]["uri"].toString().replace("file://", "")).absoluteFilePath();
+
+                if (diags.size() == 0) {
+                    this->lspManager.clearDiagnostics(uri);
+                    this->repaint();
+                    return;
+                }
+
+                for (int i = 0; i < diags.size(); i++) {
+                    QJsonObject diag = diags[i].toObject();
+                    const QString& msg = diag["message"].toString();
+                    if (!diag["range"].isNull() && !diag["range"].toObject()["start"].isNull()
+                            && !diag["range"].toObject()["start"].toObject()["line"].isNull()) {
+                        int line = diag["range"].toObject()["start"].toObject()["line"].toInt();
+                        LSPDiagnostic diag;
+                        diag.line = line + 1;
+                        diag.message = msg;
+                        diag.absFilename = uri;
+                        this->lspManager.addDiagnostic(uri, diag);
+                    }
+                }
+                this->repaint();
+            }
+        }
         return;
     }
 
@@ -1255,6 +1305,10 @@ void Editor::onUpdateLineNumberArea(const QRect &rect, int dy) {
 }
 
 void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
+    if (this->currentBuffer == nullptr) {
+        return;
+    }
+
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(), QColor::fromRgb(30, 30, 30));
 
@@ -1263,10 +1317,16 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
     int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
 
+    QMap<int, LSPDiagnostic> diags = this->lspManager.getDiagnostics(this->currentBuffer->getFilename());
+
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
-            painter.setPen(QColor::fromRgb(50, 50, 50));
+            if (diags.contains(blockNumber + 1)) {
+                painter.setPen(QColor::fromRgb(250, 50, 50));
+            } else {
+                painter.setPen(QColor::fromRgb(50, 50, 50));
+            }
             painter.drawText(0, top, lineNumberArea->width()-2, fontMetrics().height(),
                              Qt::AlignRight, number);
         }
