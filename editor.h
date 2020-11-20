@@ -151,7 +151,7 @@ public:
     // removeOpenedState deletes the "open" flag for this file.
     void removeOpenedState(const QString& filepath);
 
-    // auto-complete
+    // LSP
     // -------------
 
     // TODO(remy): comment me
@@ -160,6 +160,10 @@ public:
     void autocomplete();
     void lspAutocomplete();
     void applyAutocomplete(const QString& base, const QString& word);
+
+    // showLSPDiagnosticsOfLine shows the diagnostics for this line (of the current buffer)
+    // in the statusbar.
+    void showLSPDiagnosticsOfLine(int line);
 
     // lspInterpret is called by the LSP server to let the Editor interpret
     // the result.

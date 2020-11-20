@@ -52,7 +52,7 @@ Editor::Editor(Window* window) :
     // line number area
     // ----------------------
 
-    this->lineNumberArea = new LineNumberArea(window, this);
+    this->lineNumberArea = new LineNumberArea(this);
     this->onUpdateLineNumberAreaWidth(0);
 
     // editor font
@@ -936,7 +936,7 @@ QString Editor::currentLineIndent() {
 }
 
 int Editor::currentLineNumber() {
-    return this->textCursor().blockNumber();
+    return this->textCursor().blockNumber() + 1;
 }
 
 int Editor::currentColumn() {
@@ -1130,6 +1130,24 @@ StatusBar* Editor::getStatusBar() {
     return this->window->getStatusBar();
 }
 
+void Editor::showLSPDiagnosticsOfLine(int line) {
+    qDebug() << line;
+    auto allDiags = this->lspManager.getDiagnostics(this->window->getEditor()->getCurrentBuffer()->getFilename());
+    auto lineDiags = allDiags[line];
+    if (lineDiags.size() == 0) {
+        return;
+    }
+
+    for (int i = 0; i < lineDiags.size(); i++) {
+        auto diag = lineDiags[i];
+        if (diag.message.size() > 0) {
+            QFileInfo fi = QFileInfo(diag.absFilename);
+            QString message = fi.fileName() + ":" + QString::number(diag.line) + " " + diag.message;
+            this->window->getStatusBar()->setMessage(message);
+        }
+    }
+}
+
 void Editor::lspInterpret(QByteArray data) {
     QJsonDocument json = LSPReader::readMessage(data);
     if (json.isEmpty()) {
@@ -1167,11 +1185,7 @@ void Editor::lspInterpret(QByteArray data) {
                 auto diags = json["params"]["diagnostics"].toArray();
                 const QString& uri = QFileInfo(json["params"]["uri"].toString().replace("file://", "")).absoluteFilePath();
 
-                if (diags.size() == 0) {
-                    this->lspManager.clearDiagnostics(uri);
-                    this->repaint();
-                    return;
-                }
+                this->lspManager.clearDiagnostics(uri);
 
                 for (int i = 0; i < diags.size(); i++) {
                     QJsonObject diag = diags[i].toObject();

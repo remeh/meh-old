@@ -158,7 +158,7 @@ QString LSPWriter::refreshFile(Buffer* buffer, const QString& filename) {
 
 QString LSPWriter::definition(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
-        {"line", line},
+        {"line", line-1},
         {"character", column}
     };
     QJsonObject textDocument {
@@ -180,7 +180,7 @@ QString LSPWriter::definition(int reqId, const QString& filename, int line, int 
 
 QString LSPWriter::declaration(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
-        {"line", line},
+        {"line", line-1},
         {"character", column}
     };
     QJsonObject textDocument {
@@ -202,7 +202,7 @@ QString LSPWriter::declaration(int reqId, const QString& filename, int line, int
 
 QString LSPWriter::hover(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
-        {"line", line},
+        {"line", line-1},
         {"character", column}
     };
     QJsonObject textDocument {
@@ -224,7 +224,7 @@ QString LSPWriter::hover(int reqId, const QString& filename, int line, int colum
 
 QString LSPWriter::signatureHelp(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
-        {"line", line},
+        {"line", line-1},
         {"character", column}
     };
     QJsonObject textDocument {
@@ -246,7 +246,7 @@ QString LSPWriter::signatureHelp(int reqId, const QString& filename, int line, i
 
 QString LSPWriter::references(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
-        {"line", line},
+        {"line", line-1},
         {"character", column}
     };
     QJsonObject textDocument {
@@ -268,7 +268,7 @@ QString LSPWriter::references(int reqId, const QString& filename, int line, int 
 
 QString LSPWriter::completion(int reqId, const QString& filename, int line, int column) {
     QJsonObject position {
-        {"line", line},
+        {"line", line-1},
         {"character", column}
     };
     QJsonObject textDocument {

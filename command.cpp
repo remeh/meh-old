@@ -174,6 +174,12 @@ void Command::execute(QString text) {
         this->window->getEditor()->lspManager.setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
     }
 
+    if  (command == ":err")  {
+        if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
+        this->window->getEditor()->showLSPDiagnosticsOfLine(this->window->getEditor()->currentLineNumber());
+        return;
+    }
+
     // ----------------------
 
     if (command == ":bd") {
