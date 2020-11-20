@@ -55,7 +55,7 @@ public:
     void addDiagnostic(const QString& absFilename, LSPDiagnostic diag);
 
     // TODO(remy): comment me
-    QMap<int, LSPDiagnostic> getDiagnostics(const QString& absFilename);
+    QMap<int, QList<LSPDiagnostic>> getDiagnostics(const QString& absFilename);
 
     // TODO(remy): comment me
     void clearDiagnostics(const QString& absFilename);
@@ -75,5 +75,5 @@ private:
     QMap<int, LSPAction> executedActions;
 
     // diagnostics is storing the diagnostics for the different files.
-    QMap<QString, QMap<int, LSPDiagnostic>> diagnostics;
+    QMap<QString, QMap<int, QList<LSPDiagnostic>>> diagnostics;
 };

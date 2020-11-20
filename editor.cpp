@@ -32,6 +32,7 @@
 
 #include "completer.h"
 #include "editor.h"
+#include "line_number_area.h"
 #include "mode.h"
 #include "references_widget.h"
 #include "syntax.h"
@@ -51,7 +52,7 @@ Editor::Editor(Window* window) :
     // line number area
     // ----------------------
 
-    this->lineNumberArea = new LineNumberArea(this);
+    this->lineNumberArea = new LineNumberArea(window, this);
     this->onUpdateLineNumberAreaWidth(0);
 
     // editor font
@@ -610,6 +611,7 @@ void Editor::paintEvent(QPaintEvent* event) {
 
 void Editor::mousePressEvent(QMouseEvent* event) {
     Q_ASSERT(event != NULL);
+
     if (event->button() == Qt::LeftButton) {
         if (this->mode == MODE_NORMAL) {
             this->setMode(MODE_INSERT);
@@ -1317,7 +1319,7 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
     int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
 
-    QMap<int, LSPDiagnostic> diags = this->lspManager.getDiagnostics(this->currentBuffer->getFilename());
+    QMap<int, QList<LSPDiagnostic>> diags = this->lspManager.getDiagnostics(this->currentBuffer->getFilename());
 
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
@@ -1327,8 +1329,7 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
             } else {
                 painter.setPen(QColor::fromRgb(50, 50, 50));
             }
-            painter.drawText(0, top, lineNumberArea->width()-2, fontMetrics().height(),
-                             Qt::AlignRight, number);
+            painter.drawText(0, top, lineNumberArea->width()-2, fontMetrics().height(), Qt::AlignRight, number);
         }
 
         block = block.next();
@@ -1354,6 +1355,24 @@ int Editor::lineNumberAreaWidth() {
     return space;
 }
 
+int Editor::lineNumberAtY(int y) {
+    QTextBlock block = this->firstVisibleBlock();
+    int blockNumber = block.blockNumber();
+    int top = qRound(this->blockBoundingGeometry(block).translated(this->contentOffset()).top());
+    int bottom = top + qRound(this->blockBoundingRect(block).height());
+
+    while (block.isValid()) {
+        block = block.next();
+        if (y >= top && y <= bottom) {
+            return block.blockNumber();
+        }
+        top = bottom;
+        bottom = top + qRound(blockBoundingRect(block).height());
+        ++blockNumber;
+    }
+
+    return -1;
+}
 
 // checkpoints
 // -----------

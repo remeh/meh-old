@@ -128,10 +128,13 @@ LSPAction LSPManager::getExecutedAction(int reqId) {
 // -----------
 
 void LSPManager::addDiagnostic(const QString& absFilepath, LSPDiagnostic diag) {
-    this->diagnostics[absFilepath].insert(diag.line, diag);
+    QMap<int, QList<LSPDiagnostic>>& lists = this->diagnostics[absFilepath];
+    QList<LSPDiagnostic>& list = lists[diag.line];
+    list.append(diag);
+    this->diagnostics[absFilepath].insert(diag.line, list);
 }
 
-QMap<int, LSPDiagnostic> LSPManager::getDiagnostics(const QString& absFilepath) {
+QMap<int, QList<LSPDiagnostic>> LSPManager::getDiagnostics(const QString& absFilepath) {
     return this->diagnostics[absFilepath];
 }
 

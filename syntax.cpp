@@ -63,7 +63,7 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     rule.format = markdownTitleFormat;
     highlightingRules.append(rule);
 
-    todoFixmeNoteFormat.setForeground(Qt::red);
+    todoFixmeNoteFormat.setForeground(QColor::fromRgb(250, 50, 50));
     rule.pattern = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME|XXX)"));
     rule.format = todoFixmeNoteFormat;
     highlightingRules.append(rule);

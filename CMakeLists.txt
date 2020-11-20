@@ -24,6 +24,7 @@ set(SOURCES
     fileslookup.cpp
     grep.cpp
     leader.cpp
+    line_number_area.cpp
     lsp.cpp
     lsp_manager.cpp
     lsp/clangd.cpp

@@ -29,6 +29,7 @@
 #include "tasks.h"
 
 class Window;
+class LineNumberArea;
 
 class Checkpoint {
     public:
@@ -170,15 +171,19 @@ public:
     // --------------
 
     // getFont returns the font used by the editor.
-    // static method.
     static QFont getFont();
 
     // called by the window when it is resized.
     void onWindowResized(QResizeEvent*);
 
+    QTextBlock getFirstVisibleBlock() const { return this->firstVisibleBlock(); }
+
     void lineNumberAreaPaintEvent(QPaintEvent *event);
 
     int lineNumberAreaWidth();
+
+    // lineNumberAtY returns which line number is at the Y value.
+    int lineNumberAtY(int y);
 
 protected:
     void keyPressEvent(QKeyEvent*) override;
@@ -292,22 +297,4 @@ private:
     // visualLineBlockStart is the block at which has been started the visual
     // line mode.
     QTextBlock visualLineBlockStart;
-};
-
-class LineNumberArea : public QWidget
-{
-public:
-    LineNumberArea(Editor *editor) : QWidget(editor), editor(editor) {}
-
-    QSize sizeHint() const override {
-        return QSize(this->editor->lineNumberAreaWidth(), 0);
-    }
-
-protected:
-    void paintEvent(QPaintEvent *event) override {
-        this->editor->lineNumberAreaPaintEvent(event);
-    }
-
-private:
-    Editor *editor;
 };
