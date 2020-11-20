@@ -1335,11 +1335,15 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
 
     QMap<int, QList<LSPDiagnostic>> diags = this->lspManager.getDiagnostics(this->currentBuffer->getFilename());
 
+    int currentLine = this->currentLineNumber();
+
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
             if (diags.contains(blockNumber + 1)) {
                 painter.setPen(QColor::fromRgb(250, 50, 50));
+            } else if (currentLine == blockNumber+1) {
+                painter.setPen(QColor::fromRgb(200, 200, 200));
             } else {
                 painter.setPen(QColor::fromRgb(50, 50, 50));
             }
