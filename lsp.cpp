@@ -135,7 +135,6 @@ QString LSPWriter::openFile(Buffer* buffer, const QString& filename, const QStri
 QString LSPWriter::refreshFile(Buffer* buffer, const QString& filename) {
     QJsonObject textDocument {
         {"uri", "file://" + filename },
-        {"version", QString::number(QDateTime::currentMSecsSinceEpoch()) },
     };
     QJsonObject contentChange {
         {"text", QString(buffer->getData())},

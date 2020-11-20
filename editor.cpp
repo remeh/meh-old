@@ -1131,7 +1131,6 @@ StatusBar* Editor::getStatusBar() {
 }
 
 void Editor::showLSPDiagnosticsOfLine(int line) {
-    qDebug() << line;
     auto allDiags = this->lspManager.getDiagnostics(this->window->getEditor()->getCurrentBuffer()->getFilename());
     auto lineDiags = allDiags[line];
     if (lineDiags.size() == 0) {
