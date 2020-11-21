@@ -1033,7 +1033,7 @@ void Editor::lspAutocomplete() {
         return;
     }
     lsp->completion(reqId, currentBuffer->getFilename(), this->currentLineNumber(), this->currentColumn());
-    this->lspManager.setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
+    this->lspManager.setExecutedAction(this->window, reqId, LSP_ACTION_COMPLETION, currentBuffer);
 }
 
 void Editor::autocomplete() {
@@ -1153,7 +1153,7 @@ void Editor::lspInterpret(QByteArray data) {
         return;
     }
 
-    LSPAction action = this->lspManager.getExecutedAction(json["id"].toInt());
+    LSPAction action = this->lspManager.getExecutedAction(this->window, json["id"].toInt());
     if (action.requestId == 0) {
         if (json["method"].isNull()) {
             return;

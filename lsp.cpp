@@ -35,18 +35,8 @@ QString LSPWriter::initialize(const QString& baseDir) {
     QJsonParseError* error = nullptr;
     QJsonObject workspace;
 
-
-
-
     QJsonObject dynRegTrue { {"dynamicRegistration", true} };
     QJsonObject dynRegFalse { {"dynamicRegistration", false} };
-
-    QJsonObject {
-        {"snippetSupport", false},
-        {"commitCharactersSupport", false},
-        {"documentationFormat", QJsonArray { "plaintext" }},
-        {"deprecatedSupport", false }
-    };
 
     QJsonObject textDocument {
         {"completion", QJsonObject {

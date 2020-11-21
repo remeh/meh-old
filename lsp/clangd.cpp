@@ -2,6 +2,7 @@
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QStringList>
 
 #include "../completer.h"
 #include "../lsp.h"
@@ -30,9 +31,8 @@ void LSPClangd::readStandardOutput() {
 // --------------------------
 
 bool LSPClangd::start() {
-    this->lspServer.start("clangd");
+    this->lspServer.start("clangd", QStringList());
     this->serverSpawned = this->lspServer.waitForStarted(5000);
-    // TODO(remy): send the initialize command
     return this->serverSpawned;
 }
 
@@ -40,6 +40,7 @@ void LSPClangd::initialize() {
     const QString& initialize = this->writer.initialize(this->baseDir);
     const QString& initialized = this->writer.initialized();
     this->lspServer.write(initialize.toUtf8());
+    this->window->getEditor()->lspManager.setExecutedAction(this->window, 1, LSP_ACTION_INIT, this->window->getEditor()->getCurrentBuffer());
     this->lspServer.write(initialized.toUtf8());
 }
 

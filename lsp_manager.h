@@ -42,14 +42,11 @@ public:
 
     // setExecutedAction stores which action has been executed for the given
     // request ID. The buffer the user was into at this moment is also stored.
-    void setExecutedAction(int reqId, int action, Buffer* buffer);
+    void setExecutedAction(Window* window, int reqId, int action, Buffer* buffer);
 
     // getExecutedAction returns information on the executed action for the
     // given request ID.
-    LSPAction getExecutedAction(int reqId);
-
-    // removeExecutedAction removes an action from the pending actions.
-    int removeExecutedAction(int reqId) { return this->executedActions.remove(reqId); };
+    LSPAction getExecutedAction(Window* window, int reqId);
 
     // TODO(remy): comment me
     void addDiagnostic(const QString& absFilename, LSPDiagnostic diag);
@@ -71,7 +68,7 @@ private:
     // list of instanciated lsps.
     QList<LSP*> lsps;
     // executedActions is the list of executed actions waiting for a response
-// from the LSP server.
+    // from the LSP server.
     QMap<int, LSPAction> executedActions;
 
     // diagnostics is storing the diagnostics for the different files.

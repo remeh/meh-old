@@ -15,6 +15,7 @@
 #define LSP_ACTION_REFERENCES 4
 #define LSP_ACTION_COMPLETION 5
 #define LSP_ACTION_HOVER 6
+#define LSP_ACTION_INIT 7
 
 class CompleterEntry;
 class LSP;

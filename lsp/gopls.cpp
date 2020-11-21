@@ -2,6 +2,7 @@
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QStringList>
 
 #include "../completer.h"
 #include "../lsp.h"
@@ -32,7 +33,7 @@ void LSPGopls::readStandardOutput() {
 // --------------------------
 
 bool LSPGopls::start() {
-    this->lspServer.start("gopls");
+    this->lspServer.start("gopls", QStringList());
     this->serverSpawned = this->lspServer.waitForStarted(5000);
     if (!this->serverSpawned) {
         this->window->getStatusBar()->setMessage("Unable to start gopls binary");
@@ -44,6 +45,7 @@ void LSPGopls::initialize() {
     const QString& initialize = this->writer.initialize(this->baseDir);
     const QString& initialized = this->writer.initialized();
     this->lspServer.write(initialize.toUtf8());
+    this->window->getEditor()->lspManager.setExecutedAction(this->window, 1, LSP_ACTION_INIT, this->window->getEditor()->getCurrentBuffer());
     this->lspServer.write(initialized.toUtf8());
 }
 

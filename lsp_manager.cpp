@@ -105,15 +105,19 @@ LSP* LSPManager::getLSP(Buffer* buffer) {
     return this->lspsPerFile.value(buffer->getFilename(), nullptr);
 }
 
-void LSPManager::setExecutedAction(int reqId, int action, Buffer* buffer) {
+void LSPManager::setExecutedAction(Window* window, int reqId, int action, Buffer* buffer) {
     LSPAction a;
     a.requestId = reqId;
     a.action = action;
     a.buffer = buffer;
     this->executedActions.insert(reqId, a);
+    // TODO(remy): set the flag
+    if (window != nullptr) {
+        window->getStatusBar()->setLspRunning(true);
+    }
 }
 
-LSPAction LSPManager::getExecutedAction(int reqId) {
+LSPAction LSPManager::getExecutedAction(Window* window, int reqId) {
     if (!this->executedActions.contains(reqId)) {
         LSPAction action;
         action.requestId = 0;
@@ -121,7 +125,11 @@ LSPAction LSPManager::getExecutedAction(int reqId) {
         action.action = LSP_ACTION_UNKNOWN;
         return action;
     }
-    return this->executedActions.value(reqId);
+    LSPAction action = this->executedActions.take(reqId);
+    if (this->executedActions.size() == 0) {
+        window->getStatusBar()->setLspRunning(false);
+    }
+    return action;
 }
 
 // Diagnostics

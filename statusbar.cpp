@@ -61,9 +61,14 @@ void StatusBar::onFilenameClicked() {
     }
 }
 
-void StatusBar::setMode(const QString& mode) {
+void StatusBar::setMode(const QString& newMode) {
     if (this->mode == nullptr) { return; }
-    this->mode->setText(mode);
+    if (this->lspWorking) {
+        this->mode->setText(newMode + " - LSP working");
+    } else {
+        QString tmp = newMode;
+        this->mode->setText(tmp.replace(" - LSP working", ""));
+    }
 }
 
 void StatusBar::setFilename(const QString& filename) {
@@ -98,4 +103,9 @@ void StatusBar::setModified(bool modified) {
 void StatusBar::setLineNumber(int lineNumber) {
     if (this->lineNumber == nullptr) { return; }
     this->lineNumber->setText(QString::number(lineNumber));
+}
+
+void StatusBar::setLspRunning(bool running) {
+    this->lspWorking = running;
+    this->setMode(this->mode->text());
 }

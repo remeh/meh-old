@@ -30,6 +30,8 @@ public:
 		this->message->hide();
 	}
 
+	void setLspRunning(bool running);
+
 public slots:
     void onFilenameClicked();
 protected:
@@ -41,4 +43,6 @@ private:
     QPushButton* filename;
     QLabel* lineNumber;
     QPlainTextEdit* message;
+
+    bool lspWorking;
 };
