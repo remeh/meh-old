@@ -25,7 +25,7 @@ void LSPClangd::readStandardOutput() {
         return;
     }
     QByteArray data = this->lspServer.readAll();
-    this->window->getEditor()->lspInterpret(data);
+    this->window->getEditor()->lspInterpretMessages(data);
 }
 
 // --------------------------

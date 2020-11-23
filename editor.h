@@ -165,9 +165,14 @@ public:
     // in the statusbar.
     void showLSPDiagnosticsOfLine(int line);
 
+    // lspInterpretMessages is called when data has been received from the LSP server
+    // and that the editor needs to interpret them. Note that it can interpret several
+    // messages in on call (if the LSP server has sent several messages in one output)
+    void lspInterpretMessages(const QByteArray& data);
+
     // lspInterpret is called by the LSP server to let the Editor interpret
-    // the result.
-    void lspInterpret(QByteArray data);
+    // one JSON message.
+    void lspInterpret(QJsonDocument json);
 
     LSPManager lspManager;
 

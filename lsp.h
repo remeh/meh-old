@@ -45,7 +45,7 @@ private:
 class LSPReader
 {
 public:
-    static QJsonDocument readMessage(const QByteArray& message);
+    static QList<QJsonDocument> readMessage(QByteArray message);
 };
 
 class LSP : public QObject

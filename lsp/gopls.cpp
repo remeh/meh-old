@@ -27,7 +27,7 @@ void LSPGopls::readStandardOutput() {
         return;
     }
     QByteArray data = this->lspServer.readAll();
-    this->window->getEditor()->lspInterpret(data);
+    this->window->getEditor()->lspInterpretMessages(data);
 }
 
 // --------------------------
@@ -44,8 +44,8 @@ bool LSPGopls::start() {
 void LSPGopls::initialize() {
     const QString& initialize = this->writer.initialize(this->baseDir);
     const QString& initialized = this->writer.initialized();
-    this->lspServer.write(initialize.toUtf8());
     this->window->getEditor()->lspManager.setExecutedAction(this->window, 1, LSP_ACTION_INIT, this->window->getEditor()->getCurrentBuffer());
+    this->lspServer.write(initialize.toUtf8());
     this->lspServer.write(initialized.toUtf8());
 }
 

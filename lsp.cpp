@@ -285,29 +285,40 @@ QString LSPWriter::payload(QString& content) {
 
 // --------------------------
 
-QJsonDocument LSPReader::readMessage(const QByteArray& message) {
-    QJsonDocument empty;
+QList<QJsonDocument> LSPReader::readMessage(QByteArray message) {
+    QList<QJsonDocument> rv;
+    while (true) {
+        QRegularExpression rx(QStringLiteral("^Content-Length: (\\d+)"));
+        QRegularExpressionMatchIterator it = rx.globalMatch(message);
 
-    QRegularExpression rx(QStringLiteral("Content-Length: (\\d+)"));
-    QRegularExpressionMatchIterator it = rx.globalMatch(message);
+        if (it.hasNext()) {
+            // look for one message
+            // --------------------
 
-    QByteArray payload;
-    int payloadSize = 0;
-    if (it.hasNext()) {
-        QRegularExpressionMatch match = it.next();
-        payloadSize = match.captured(1).toInt();
-        payload = message.right(payloadSize);
-    } else {
-        // use the whole message as the payload if there is no header
-        payload = message;
+            QRegularExpressionMatch match = it.next();
+            int payloadSize = match.captured(1).toInt();
+            // first, we want to remove the header from the message
+            int headerSize = QString("Content-Length: " + QString::number(payloadSize) + "\r\n\r\n").size();
+            QByteArray payload  = message.remove(0, headerSize).left(payloadSize);
+
+            // read its json
+            // -------------
+
+            QJsonParseError* error = nullptr;
+            QJsonDocument result = QJsonDocument::fromJson(payload, error);
+            if (error != nullptr) {
+                qWarning() << "LSPReader::readMessage" << "can't unmarshal the payload:" << error;
+            }
+            rv.append(result);
+
+            // move forward in the message for other payloads
+            // ----------------------------------------------
+
+            message.remove(0, payloadSize);
+        } else {
+            // we've read all messages
+            break;
+        }
     }
-
-    QJsonParseError* error = nullptr;
-    QJsonDocument result = QJsonDocument::fromJson(payload, error);
-    if (error != nullptr) {
-        qWarning() << "LSPReader::readMessage" << "can't unmarshal the payload:" << error;
-        return empty;
-    }
-
-    return result;
+    return rv;
 }

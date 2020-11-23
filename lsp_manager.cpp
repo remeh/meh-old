@@ -148,4 +148,5 @@ QMap<int, QList<LSPDiagnostic>> LSPManager::getDiagnostics(const QString& absFil
 
 void LSPManager::clearDiagnostics(const QString& absFilepath) {
     this->diagnostics[absFilepath].clear();
+    this->diagnostics.remove(absFilepath);
 }

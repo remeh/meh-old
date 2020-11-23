@@ -144,7 +144,7 @@ QFont Editor::getFont() {
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
     #ifdef Q_OS_MAC
-    font.setPointSize(13);
+    font.setPointSize(14);
     #else
     font.setPointSize(11);
     #endif
@@ -1147,9 +1147,19 @@ void Editor::showLSPDiagnosticsOfLine(int line) {
     }
 }
 
-void Editor::lspInterpret(QByteArray data) {
-    QJsonDocument json = LSPReader::readMessage(data);
-    if (json.isEmpty()) {
+void Editor::lspInterpretMessages(const QByteArray& data) {
+    QList<QJsonDocument> list = LSPReader::readMessage(data);
+    if (list.size() == 0) {
+        return;
+    }
+
+    for (int i = 0; i < list.size(); i++) {
+        this->lspInterpret(list[i]);
+    }
+}
+
+void Editor::lspInterpret(QJsonDocument json) {
+    if (json.isNull() || json.isEmpty()) {
         return;
     }
 

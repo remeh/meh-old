@@ -7,6 +7,8 @@
 #include "lsp.h"
 #include "window.h"
 
+#include "qdebug.h"
+
 Command::Command(Window* window) :
     window(window) {
     Q_ASSERT(window != NULL);
