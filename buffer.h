@@ -15,6 +15,9 @@ public:
     // Buffer creates a buffer targeting a given file.
     Buffer(QString filename);
 
+    // Buffer creates a buffer showing the given data
+    Buffer(QByteArray data);
+
     // read returns the content of the buffer. It reads the content from the file
     // on disk if has not been already done.
     QByteArray read();
@@ -22,9 +25,9 @@ public:
     // save saves the file on disk.
     void save(Editor* editor);
 
-    const QString& getFilename() { return this->filename; }
+    const QString& getFilename() const { return this->filename; }
 
-    const QByteArray& getData() { return this->data; }
+    const QByteArray& getData() const { return this->data; }
 
     // refreshData refreshes the data of the current buffer with what's available
     // in the editor data.

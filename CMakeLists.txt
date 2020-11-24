@@ -22,6 +22,7 @@ set(SOURCES
     completer.cpp
     editor.cpp
     fileslookup.cpp
+    git.cpp
     grep.cpp
     leader.cpp
     line_number_area.cpp

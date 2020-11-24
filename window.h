@@ -14,6 +14,7 @@ class Command;
 class Completer;
 class CompleterEntry;
 class Editor;
+class Git;
 class Grep;
 class ReferencesWidget;
 class StatusBar;
@@ -54,7 +55,7 @@ public:
     void focusGrep();
 
     // getStatusBar returns the StatusBar instance.
-    StatusBar* getStatusBar() { return this->statusBar; }
+    StatusBar* getStatusBar() const { return this->statusBar; }
 
     // setBaseDir sets the base dir on which the FilesLookup
     // should be opened.
@@ -75,6 +76,9 @@ public:
     // getRefWidget returns the ReferencesWidget instance.
     ReferencesWidget* getRefWidget() { return this->refWidget; }
 
+    // Git returns the Git instance.
+    Git* getGit() { return this->git; }
+
 protected:
 
 private slots:
@@ -90,6 +94,7 @@ private:
     Completer* completer;
     ReferencesWidget *refWidget;
     StatusBar* statusBar;
+    Git* git;
 
     // baseDir on which the FilesLookup should be opened.
     QString baseDir;

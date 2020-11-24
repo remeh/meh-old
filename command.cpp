@@ -6,6 +6,7 @@
 
 #include "command.h"
 #include "lsp.h"
+#include "git.h"
 #include "window.h"
 
 #include "qdebug.h"
@@ -141,6 +142,18 @@ void Command::execute(QString text) {
         if (this->areYouSure()) {
             QCoreApplication::quit();
         }
+        return;
+    }
+
+    // git
+    // --------------
+
+    if (command == ":gblame") {
+        Buffer* buffer = this->window->getEditor()->getCurrentBuffer();
+        if (buffer == nullptr) {
+            return;
+        }
+        this->window->getGit()->blame(buffer);
         return;
     }
 

@@ -277,7 +277,6 @@ private:
     QWidget* lineNumberArea;
 
     Window* window;
-
     Syntax* syntax;
 
     // currentBuffer is the currently visible buffer. Note that it is not part

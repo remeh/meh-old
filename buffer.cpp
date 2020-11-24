@@ -10,6 +10,7 @@
 
 Buffer::Buffer() :
     modified(false),
+    filename(""),
     readFromDisk(false) {
 }
 
@@ -20,6 +21,13 @@ Buffer::Buffer(QString filename) :
     QFileInfo info(filename);
     this->filename = info.absoluteFilePath();
 }
+
+Buffer::Buffer(QByteArray data) :
+    modified(false),
+    filename(""),
+    readFromDisk(false) {
+    this->data = data;
+};
 
 QByteArray Buffer::read() {
     if (readFromDisk) {
