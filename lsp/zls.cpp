@@ -18,7 +18,7 @@ LSPZLS::LSPZLS(Window* window, const QString& baseDir) : LSP(window) {
 }
 
 LSPZLS::~LSPZLS() {
-    this->lspServer.terminate();
+    this->lspServer.kill();
     this->lspServer.waitForFinished(1000);
 }
 

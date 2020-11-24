@@ -18,7 +18,7 @@ LSPGopls::LSPGopls(Window* window, const QString& baseDir) : LSP(window) {
 }
 
 LSPGopls::~LSPGopls() {
-    this->lspServer.terminate();
+    this->lspServer.kill();
     this->lspServer.waitForFinished(1000);
 }
 
