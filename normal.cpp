@@ -244,6 +244,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             return;
 
         case Qt::Key_G:
+            this->saveCheckpoint();
             if (shift) {
                 this->moveCursor(QTextCursor::End);
             } else {
