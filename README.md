@@ -12,7 +12,7 @@
         * Ctrl-P to use the file opener
         * Ctrl-Shift-P to use the file opener with opened buffers
         * `:e <filepath>`
-    * LSP client for C++ (clangd) and Go (gopls):
+    * LSP client for C++ (clangd), Go (gopls) and Zig (zls):
         * Go to definition with the `:def` command
         * Auto-completion with `Ctrl-Space`
         * Display references to a variable / method / ... with `:ref` command
@@ -22,8 +22,6 @@
         * Fast lookup per directory
         * Filtering while typing
         * `Ctrl-n` next entry, `Ctrl-p` previous entry, `Return` open the file / move to the directory
-    * Search in file with `/`, next occurrences with `n` and `N`. `,` to search for the word under the cursor
-    * Toggle `//` comments with Ctrl-M on selected lines (or current line if no selection), `#` with Ctrl-Shift-M
     * Search in current/all files with `ripgrep` integration
         * `:rg` search in all files with ripgrep for the word under the cursor
         * `:rg <pattern>` search in all files with ripgrep for the given pattern
@@ -34,6 +32,9 @@
             * `j` and `k` for also works for next / previous result
             * `Ctrl-j` and `Ctrl-k` to expand / close results on a file
             * use `x` or `Backspace` to remove entries from the results to remove the noise
+    * `:gblame` opens the git blame of the current buffer
+    * Search in file with `/`, next occurrences with `n` and `N`. `,` to search for the word under the cursor
+    * Toggle `//` comments with Ctrl-M on selected lines (or current line if no selection), `#` with Ctrl-Shift-M
     * Auto-complete with words in opened buffers with `Ctrl-N`
     * Auto-indentation (respect previous line indentation, automatically changes it depending on `{`, `}`, and `:`)
     * Simple syntax highlighting (regexp based)
@@ -59,7 +60,7 @@
 
 ## Roadmap
 
-    * Finish the LSP client with signatures infos, methods comments, type of objects and completion
+    * After having started `:gblame`, enter should load the file in the commit under the cursor
     * Syntax highlighting per file extension
     * May implement the file opener with FZF if this one annoys me, but so far I'm happy with it
 
