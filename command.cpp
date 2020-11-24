@@ -2,6 +2,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QRandomGenerator>
+#include <QSettings>
 
 #include "command.h"
 #include "lsp.h"
@@ -23,6 +24,18 @@ void Command::keyPressEvent(QKeyEvent* event) {
             this->clear();
             this->window->closeCommand();
             return;
+        case Qt::Key_Up:
+            {
+                QSettings settings("mehteor", "meh");
+                const QStringList list = settings.value("command/history").toStringList();
+                if (list.size() <= this->historyIdx) {
+                    return;
+                }
+                const QString v = list.at(list.size() - 1 - this->historyIdx);
+                this->setText(v);
+                this->historyIdx++;
+                return;
+            }
         case Qt::Key_Return:
             this->execute(this->text());
             this->window->closeCommand();
@@ -30,6 +43,12 @@ void Command::keyPressEvent(QKeyEvent* event) {
     }
 
     QLineEdit::keyPressEvent(event);
+}
+
+void Command::show() {
+    this->historyIdx = 0;
+
+    QLineEdit::show();
 }
 
 bool Command::warningModifiedBuffers() {
@@ -66,6 +85,16 @@ bool Command::areYouSure() {
 
 void Command::execute(QString text) {
     this->clear();
+
+    QSettings settings("mehteor", "meh");
+    QStringList commands = settings.value("command/history").toStringList();
+    if (commands.last() != text) {
+        commands.append(text);
+    }
+    while (commands.size() > 1000) {
+        commands.removeFirst();
+    }
+    settings.setValue("command/history", commands);
 
     QStringList list = text.split(" ");
     const QString& command = list[0];
@@ -202,6 +231,15 @@ void Command::execute(QString text) {
         }
         this->window->getEditor()->closeCurrentBuffer();
         return;
+    }
+
+    // print the whole history commands
+    // --------------------------------
+
+    if (command == ":history") {
+        QSettings settings("mehteor", "meh");
+        auto list = settings.value("command/history").toStringList();
+        this->window->getStatusBar()->setMessage(list.join("\n"));
     }
 
     // go to a specific line
