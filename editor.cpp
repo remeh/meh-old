@@ -159,7 +159,7 @@ void Editor::onWindowResized(QResizeEvent* event) {
 }
 
 void Editor::onCursorPositionChanged() {
-    this->selectionTimer->start(1000);
+    this->selectionTimer->start(300);
 
     QList<QTextEdit::ExtraSelection> extraSelections;
     QTextEdit::ExtraSelection selection;
@@ -188,6 +188,7 @@ void Editor::onTriggerLspRefresh() {
 }
 
 void Editor::onTriggerSelectionHighlight() {
+    // do not highlight in big files
     if (this->document()->blockCount() > 3000) {
         return;
     }
