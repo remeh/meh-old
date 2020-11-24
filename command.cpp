@@ -150,14 +150,14 @@ void Command::execute(QString text) {
     if (command == ":d") {
         QDateTime now = QDateTime::currentDateTime();
         QString v = now.toString("yyyy-MM-dd");
-        this->window->getEditor()->textCursor().insertText(v);
+        this->window->getEditor()->textCursor().insertText(" " + v);
         return;
     }
 
     if (command == ":dt") {
         QDateTime now = QDateTime::currentDateTime();
         QString v = now.toString("yyyy-MM-dd hh:mm:ss");
-        this->window->getEditor()->textCursor().insertText(v);
+        this->window->getEditor()->textCursor().insertText(" " + v);
         return;
     }
 
@@ -211,6 +211,7 @@ void Command::execute(QString text) {
         return;
     }
 
+    // close the current bnuffer
     // ----------------------
 
     if (command == ":bd") {
