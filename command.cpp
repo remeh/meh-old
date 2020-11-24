@@ -28,7 +28,7 @@ void Command::keyPressEvent(QKeyEvent* event) {
             {
                 QSettings settings("mehteor", "meh");
                 const QStringList list = settings.value("command/history").toStringList();
-                if (list.size() <= this->historyIdx) {
+                if (list.size() == 0 || list.size() <= this->historyIdx) {
                     return;
                 }
                 const QString v = list.at(list.size() - 1 - this->historyIdx);
@@ -88,7 +88,7 @@ void Command::execute(QString text) {
 
     QSettings settings("mehteor", "meh");
     QStringList commands = settings.value("command/history").toStringList();
-    if (commands.last() != text) {
+    if (commands.size() == 0 || commands.last() != text) {
         commands.append(text);
     }
     while (commands.size() > 1000) {
