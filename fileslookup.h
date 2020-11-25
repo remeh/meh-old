@@ -11,6 +11,10 @@
 #include <QString>
 #include <QWidget>
 
+#define FILESLOOKUP_DATA_LABEL 0 // label to display
+#define FILESLOOKUP_DATA_ID    1 // id in the list of buffers
+#define FILESLOOKUP_DATA_TYPE  2 // possible values: directory, file, buffer
+
 class Window;
 
 class FilesLookup : public QWidget {
@@ -25,8 +29,7 @@ public:
     // TODO(remy): comment me
     void lookupBuffers();
 
-    // resetFiltered resets the list with filetered results (they again
-    // contain all entries).
+    // resetFiltered resets the list with filtered results: they again contain all entries.
     void resetFiltered();
 
     // refreshList refreshes the content of the list.

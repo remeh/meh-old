@@ -5,8 +5,8 @@
 #include <QString>
 
 #define GIT_UNKNOWN 0
-#define GIT_BLAME 1
-#define GIT_SHOW
+#define GIT_BLAME   1
+#define GIT_SHOW    2
 
 class Buffer;
 class Window;

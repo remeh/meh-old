@@ -140,17 +140,28 @@ bool FilesLookup::openSelection() {
         return false;
     }
 
-    QFileInfo info(this->base + item->text());
-    if (info.isFile()) {
+    QString name = item->data(FILESLOOKUP_DATA_ID).toString();
+    QString type = item->data(FILESLOOKUP_DATA_TYPE).toString();
+
+    if (type == "file") {
+        QFileInfo info(this->base + item->text());
         this->window->getEditor()->saveCheckpoint();
+        // TODO(remy): should I use the ID here?
         this->window->getEditor()->selectOrCreateBuffer(info.absoluteFilePath());
         return true;
-    } else {
+    } else if (type == "buffer") {
+        QFileInfo info(this->base + item->text());
+        this->window->getEditor()->saveCheckpoint();
+        this->window->getEditor()->selectOrCreateBuffer(name);
+        return true;
+    } else if (type == "directory") {
         this->lookupDir(item->text());
         this->edit->setText("");
         this->refreshList();
         return false;
     }
+
+    return false;
 }
 
 void FilesLookup::keyPressEvent(QKeyEvent* event) {
@@ -219,7 +230,6 @@ void FilesLookup::resetFiltered() {
         this->filteredFiles.insert(*it);
         ++it;
     }
-
 }
 
 void FilesLookup::filter() {
@@ -250,7 +260,6 @@ void FilesLookup::filter() {
 void FilesLookup::refreshList() {
     this->list->clear();
     QSet<QString>::iterator it = this->filteredDirs.begin();
-
     while (it != this->filteredDirs.end()) {
         QIcon icon = QIcon(":/res/directory-in.png");
         if (*it == "..") {

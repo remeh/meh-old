@@ -7,11 +7,13 @@
 #include <QString>
 
 // buffer is showing data, we don't know from where the data come from
-#define BUFFER_TYPE_UNKNOWN 0
+#define BUFFER_TYPE_UNKNOWN   0
 // buffer is showing content of file
-#define BUFFER_TYPE_FILE 1
+#define BUFFER_TYPE_FILE      1
 // current buffer is showing a git blame
 #define BUFFER_TYPE_GIT_BLAME 2
+// current buffer is showing a git show
+#define BUFFER_TYPE_GIT_SHOW  3
 
 class Editor;
 
@@ -73,6 +75,10 @@ public:
 
     // getName returns the name of this buffer, which is used when there is no filename attached.
     const QString& getName() { return this->name; }
+
+    // getId returns an identifier for this buffer. This identifier will be generated using the
+    // type of buffer.
+    QString getId();
 
 protected:
 

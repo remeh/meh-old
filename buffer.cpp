@@ -48,6 +48,40 @@ QByteArray Buffer::read() {
     return this->data;
 }
 
+QString Buffer::getId() {
+
+    // BUFFER_TYPE_FILE
+    // ----------------
+
+    if (this->bufferType == BUFFER_TYPE_FILE) {
+        if (!this->filename.isEmpty()) {
+            return this->filename;
+        } else {
+            qWarning() << "warn: empty filename for a BUFFER_TYPE_FILE";
+            return this->name;
+        }
+    }
+
+    // BUFFER_TYPE_GIT_*
+    // -----------------
+
+    QString rv;
+    switch (this->bufferType) {
+    case BUFFER_TYPE_GIT_BLAME:
+        rv = "GIT BLAME - ";
+        break;
+    case BUFFER_TYPE_GIT_SHOW:
+        rv = "GIT SHOW - ";
+        break;
+    }
+
+    // other kind of buffers
+    // ---------------------
+
+    rv += this->name;
+    return rv;
+}
+
 void Buffer::save(Editor* editor) {
     Q_ASSERT(editor != NULL);
     QFile file(filename);
