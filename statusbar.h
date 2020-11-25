@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+class Buffer;
 class Window;
 
 class StatusBar : public QWidget {
@@ -17,7 +18,7 @@ public:
     StatusBar(Window* window);
 
     void setMode(const QString& mode);
-    void setFilename(const QString& filename);
+    void setBuffer(Buffer* buffer);
     void setMessage(const QString& filename);
     void setLineNumber(int lineNumber);
     void setModified(bool);

@@ -30,6 +30,9 @@ void Git::onFinished() {
     int lineNumber = this->window->getEditor()->currentLineNumber();
 
     Buffer* buffer = new Buffer(this->data);
+    buffer->setType(BUFFER_TYPE_GIT_BLAME);
+    // FIXME(remy): this is wrong if the user has switched buffer before the git process finished.
+    buffer->setName(this->window->getEditor()->getCurrentBuffer()->getFilename());
     this->window->getEditor()->setCurrentBuffer(buffer);
     this->window->getEditor()->goToLine(lineNumber);
 }

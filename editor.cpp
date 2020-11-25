@@ -279,6 +279,10 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
         this->window->setWindowIcon(QIcon(":res/icon.png"));
     }
 
+    if (this->getStatusBar() != nullptr) {
+        this->getStatusBar()->setBuffer(buffer);
+    }
+
     connect(this, &QPlainTextEdit::modificationChanged, this, &Editor::onChange);
     connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
 }
@@ -321,7 +325,6 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
     }
 
     this->window->setWindowTitle("meh - " + filename);
-    this->getStatusBar()->setFilename(filename);
     this->setCurrentBuffer(buffer);
     lspManager.manageBuffer(this->window, buffer);
 }

@@ -1,5 +1,6 @@
 #include <QSizePolicy>
 
+#include "buffer.h"
 #include "statusbar.h"
 #include "window.h"
 
@@ -71,9 +72,18 @@ void StatusBar::setMode(const QString& newMode) {
     }
 }
 
-void StatusBar::setFilename(const QString& filename) {
-    if (this->filename == nullptr) { return; }
-    this->filename->setText(filename);
+void StatusBar::setBuffer(Buffer* buffer) {
+    if (this->filename == nullptr || buffer == nullptr) {
+        return;
+    }
+
+    switch (buffer->getType()) {
+        case BUFFER_TYPE_GIT_BLAME:
+            this->filename->setText("GIT BLAME - " + buffer->getName());
+            break;
+        default:
+            this->filename->setText(buffer->getFilename());
+    }
 }
 
 void StatusBar::setMessage(const QString& message) {

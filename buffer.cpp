@@ -6,15 +6,19 @@
 #include "buffer.h"
 #include "editor.h"
 
+#include "qdebug.h"
+
 Buffer::Buffer() :
     modified(false),
     filename(""),
-    readFromDisk(false) {
+    readFromDisk(false),
+    bufferType(BUFFER_TYPE_UNKNOWN) {
 }
 
 Buffer::Buffer(QString filename) :
     modified(false),
-    readFromDisk(false) {
+    readFromDisk(false),
+    bufferType(BUFFER_TYPE_FILE) {
     // resolve the absolute path of this
     QFileInfo info(filename);
     this->filename = info.absoluteFilePath();
@@ -23,7 +27,8 @@ Buffer::Buffer(QString filename) :
 Buffer::Buffer(QByteArray data) :
     modified(false),
     filename(""),
-    readFromDisk(false) {
+    readFromDisk(false),
+    bufferType(BUFFER_TYPE_UNKNOWN) {
     this->data = data;
 };
 

@@ -6,12 +6,20 @@
 #include <QTextEdit>
 #include <QString>
 
+// buffer is showing data, we don't know from where the data come from
+#define BUFFER_TYPE_UNKNOWN 0
+// buffer is showing content of file
+#define BUFFER_TYPE_FILE 1
+// current buffer is showing a git blame
+#define BUFFER_TYPE_GIT_BLAME 2
+
 class Editor;
 
 class Buffer
 {
 public:
     Buffer();
+
     // Buffer creates a buffer targeting a given file.
     Buffer(QString filename);
 
@@ -54,11 +62,26 @@ public:
     // isGitTempFile returns true if the currently opened file is a git tmp file.
     bool isGitTempFile();
 
+    // getType returns the type of this buffer.
+    int getType() { return this->bufferType; }
+
+    // setType sets the type of this buffer.
+    void setType(int type) { this->bufferType = type; }
+
+    // setName sets the name of this buffer, which is used when there is no filename attached.
+    void setName(const QString& name) { this->name = name; }
+
+    // getName returns the name of this buffer, which is used when there is no filename attached.
+    const QString& getName() { return this->name; }
+
 protected:
 
 private:
     QString filename;
+    QString name; // if the buffer doesn't has a filename attached, it may have a name
 
     bool readFromDisk;
     QByteArray data;
+
+    int bufferType;
 };
