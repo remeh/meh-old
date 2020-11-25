@@ -2,7 +2,7 @@
 #include "git.h"
 #include "window.h"
 
-Git::Git(Window* window) : window(window) {
+Git::Git(Window* window) : window(window), command(GIT_UNKNOWN) {
     this->process = nullptr;
 }
 
@@ -35,6 +35,10 @@ void Git::onFinished() {
     buffer->setName(this->window->getEditor()->getCurrentBuffer()->getFilename());
     this->window->getEditor()->setCurrentBuffer(buffer);
     this->window->getEditor()->goToLine(lineNumber);
+
+    // we've finished, clean-up
+    this->data.clear();
+    this->command = GIT_UNKNOWN;
 }
 
 
@@ -45,7 +49,7 @@ void Git::blame(const Buffer* buffer) {
     }
 
     const QString& filename = buffer->getFilename();
-    this->data.clear(); // clear the data before starting the blame
+    this->data.clear(); // clear the data read from the process before starting the blame
 
     // create and init the process
     this->process = new QProcess(this);
@@ -57,8 +61,23 @@ void Git::blame(const Buffer* buffer) {
     QStringList args; args << "blame" << fi.fileName();
     this->process->start("git", args);
 
+    this->command = GIT_BLAME;
+
     // connect the events
     connect(this->process, &QProcess::readyReadStandardOutput, this, &Git::onResults);
     connect(this->process, &QProcess::errorOccurred, this, &Git::onErrorOccurred);
     connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Git::onFinished);
+}
+
+void Git::show(const Buffer* buffer, const QString& checksum) {
+    if (buffer == nullptr) {
+        return
+    }
+
+    const QString& filename = buffer->getFilename();
+    this->data.clear(); // clear the data read from the process before starting the show
+
+    // create and init the process
+    this->process = new QProcess(this);
+    QFileInfo fi(filename);
 }
