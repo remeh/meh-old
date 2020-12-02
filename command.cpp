@@ -299,6 +299,7 @@ void Command::execute(QString text) {
             terms = this->window->getEditor()->getWordUnderCursor();
         }
         this->window->getEditor()->highlightText(terms);
+        this->window->getEditor()->saveCheckpoint();
         this->window->getEditor()->goToOccurrence(terms, false);
         return;
     }
