@@ -136,7 +136,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
                     this->insertNewLine(true);
                     return;
                 }
-                this->moveCursor(QTextCursor::EndOfLine);
+                this->moveCursor(QTextCursor::EndOfBlock);
                 this->insertNewLine(false);
                 return;
             }

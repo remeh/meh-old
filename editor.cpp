@@ -602,13 +602,13 @@ void Editor::insertNewLine(bool above) {
     if (above) {
         int position = this->textCursor().position();
         this->moveCursor(QTextCursor::Up);
-        this->moveCursor(QTextCursor::StartOfLine);
+        this->moveCursor(QTextCursor::StartOfBlock);
 
         // special case of top of the file
         if (this->textCursor().position() == 0) {
             this->insertPlainText("\n");
             this->moveCursor(QTextCursor::Up);
-            this->moveCursor(QTextCursor::StartOfLine);
+            this->moveCursor(QTextCursor::StartOfBlock);
             cursor.endEditBlock();
             this->setMode(MODE_INSERT);
             return;
@@ -629,7 +629,7 @@ void Editor::insertNewLine(bool above) {
     if (above) {
         cursor.setPosition(position);
         this->setTextCursor(cursor);
-        this->moveCursor(QTextCursor::StartOfLine);
+        this->moveCursor(QTextCursor::StartOfBlock);
         this->insertPlainText("\n");
         this->moveCursor(QTextCursor::Up);
         this->insertPlainText(indent);
