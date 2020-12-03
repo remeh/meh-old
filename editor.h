@@ -231,6 +231,9 @@ private:
     // many whitespaces (' ' or '\t') are composing this line.
     int currentLineIsOnlyWhitespaces();
 
+    // cleanOnlyWhiteSpacesLine removes all the whitespace of the current line.
+    void cleanOnlyWhiteSpacesLine();
+
     // currentLineLastChar returns the last char of the line.
     QChar currentLineLastChar();
 
