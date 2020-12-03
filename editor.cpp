@@ -626,8 +626,16 @@ void Editor::insertNewLine(bool above) {
         this->cleanOnlyWhiteSpacesLine();
     }
 
-    this->moveCursor(QTextCursor::EndOfLine);
-    this->insertPlainText("\n" + indent);
+    if (above) {
+        cursor.setPosition(position);
+        this->setTextCursor(cursor);
+        this->moveCursor(QTextCursor::StartOfLine);
+        this->insertPlainText("\n");
+        this->moveCursor(QTextCursor::Up);
+        this->insertPlainText(indent);
+    } else {
+        this->insertPlainText("\n" + indent);
+    }
     this->setMode(MODE_INSERT);
 
     cursor.endEditBlock();

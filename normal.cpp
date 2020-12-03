@@ -132,12 +132,11 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
         case Qt::Key_O:
             {
-                // NOTE(remy): we could detect the { at the end of a line
-                // to have another behavior.
                 if (shift) {
                     this->insertNewLine(true);
                     return;
                 }
+                this->moveCursor(QTextCursor::EndOfLine);
                 this->insertNewLine(false);
                 return;
             }
