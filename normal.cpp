@@ -133,11 +133,10 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
         case Qt::Key_O:
             {
                 if (shift) {
-                    this->insertNewLine(true);
+                    this->insertNewLine(true, true);
                     return;
                 }
-                this->moveCursor(QTextCursor::EndOfBlock);
-                this->insertNewLine(false);
+                this->insertNewLine(false, true);
                 return;
             }
         case Qt::Key_Dollar:

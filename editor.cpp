@@ -589,9 +589,13 @@ void Editor::deleteCurrentLine() {
     cursor.removeSelectedText();
 }
 
-void Editor::insertNewLine(bool above) {
+void Editor::insertNewLine(bool above, bool noCutText) {
     QTextCursor cursor = this->textCursor();
     int position = cursor.position();
+
+    if (noCutText) {
+        this->moveCursor(QTextCursor::EndOfBlock);
+    }
 
     cursor.beginEditBlock();
 

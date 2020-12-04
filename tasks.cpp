@@ -21,9 +21,9 @@ void TasksPlugin::keyPressEvent(QKeyEvent* event, bool ctrl, bool shift) {
     switch (event->key()) {
         case Qt::Key_N:
             if (shift) {
-                editor->insertNewLine(true);
+                editor->insertNewLine(true, true);
             } else {
-                editor->insertNewLine(false);
+                editor->insertNewLine(false, true);
             }
             editor->textCursor().insertText("[ ] ");
             editor->setMode(MODE_INSERT);
@@ -31,9 +31,9 @@ void TasksPlugin::keyPressEvent(QKeyEvent* event, bool ctrl, bool shift) {
             return;
         case Qt::Key_C:
             if (shift) {
-                editor->insertNewLine(true);
+                editor->insertNewLine(true, true);
             } else {
-                editor->insertNewLine(false);
+                editor->insertNewLine(false, true);
             }
             editor->textCursor().insertText("# ");
             editor->setMode(MODE_INSERT);

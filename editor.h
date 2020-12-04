@@ -128,7 +128,10 @@ public:
 
     // insertNewLine insert a new line either under, or above the current one
     // and takes care of adding the proper indentation.
-    void insertNewLine(bool above);
+    // If noCutText is set to true, while creating/going to the next line,
+    // the text on the // right of the cursor won't be moved to the new line.
+    // When above is true, noCutText has no effect.
+    void insertNewLine(bool above, bool noCutText = false);
 
     // getWordUnderCursor returns the word under the cursor if any.
     QString getWordUnderCursor();
