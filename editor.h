@@ -291,6 +291,8 @@ private:
 
     // buffers is the currently loaded buffers. Note that it doesn't contain
     // the currentBuffer. It is the owner of the buffers.
+    // The key is the ID of the buffer, could be a filename but it could also be
+    // just a simple name for buffers not written on disk.
     QMap<QString, Buffer*> buffers;
 
     // bufferPos can be used to know the order of usage of the buffers.

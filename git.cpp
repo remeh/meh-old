@@ -2,7 +2,7 @@
 #include "git.h"
 #include "window.h"
 
-Git::Git(Window* window) : window(window), command(GIT_UNKNOWN) {
+Git::Git(Window* window) : window(window), command(GIT_UNKNOWN), bufferName("") {
     this->process = nullptr;
 }
 
@@ -33,8 +33,7 @@ void Git::onFinished() {
             {
                 Buffer* buffer = new Buffer(this->data);
                 buffer->setType(BUFFER_TYPE_GIT_BLAME);
-                // FIXME(remy): this is wrong if the user has switched buffer before the git process finished.
-                buffer->setName(this->window->getEditor()->getCurrentBuffer()->getFilename());
+                buffer->setName(this->bufferName);
                 this->window->getEditor()->setCurrentBuffer(buffer);
                 this->window->getEditor()->goToLine(lineNumber);
             }
@@ -43,10 +42,18 @@ void Git::onFinished() {
             {
                 Buffer* buffer = new Buffer(this->data);
                 buffer->setType(BUFFER_TYPE_GIT_SHOW);
-                // FIXME(remy): this is wrong if the user has switched buffer before the git process finished.
-                buffer->setName(this->window->getEditor()->getCurrentBuffer()->getFilename());
+                buffer->setName(this->bufferName);
                 this->window->getEditor()->setCurrentBuffer(buffer);
-                this->window->getEditor()->goToLine(lineNumber);
+                this->window->getEditor()->goToLine(0);
+            }
+            break;
+        case GIT_DIFF:
+            {
+                Buffer* buffer = new Buffer(this->data);
+                buffer->setType(BUFFER_TYPE_GIT_DIFF);
+                buffer->setName(this->bufferName);
+                this->window->getEditor()->setCurrentBuffer(buffer);
+                this->window->getEditor()->goToLine(0);
             }
             break;
     }
@@ -77,6 +84,7 @@ void Git::blame(const Buffer* buffer) {
     this->process->start("git", args);
 
     this->command = GIT_BLAME;
+    this->bufferName = fi.fileName();
 
     // connect the events
     connect(this->process, &QProcess::readyReadStandardOutput, this, &Git::onResults);
@@ -84,28 +92,47 @@ void Git::blame(const Buffer* buffer) {
     connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Git::onFinished);
 }
 
-void Git::show(const Buffer* buffer, const QString& checksum) {
-    if (buffer == nullptr) {
-        this->window->getStatusBar()->setMessage("Git show called on a null buffer.");
-        return;
-    }
-
-    const QString& filename = buffer->getFilename();
+void Git::show(const QString& workDir, const QString& checksum) {
     this->data.clear(); // clear the data read from the process before starting the show
 
     // TODO(remy): runGit(QStringList args, int command) command
 
     // create and init the process
     this->process = new QProcess(this);
-    QFileInfo fi(filename);
-
+    QFileInfo fi(workDir);
     this->process->setWorkingDirectory(fi.absolutePath());
 
-    // run git show <filename>:<checksum>
-    QStringList args; args << "show" << fi.fileName()+":"+checksum;
+    // run git show <checksum>
+    QStringList args; args << "show" << checksum;
     this->process->start("git", args);
 
     this->command = GIT_SHOW;
+    this->bufferName = checksum;
+
+    // connect the events
+    connect(this->process, &QProcess::readyReadStandardOutput, this, &Git::onResults);
+    connect(this->process, &QProcess::errorOccurred, this, &Git::onErrorOccurred);
+    connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Git::onFinished);
+}
+
+void Git::diff(const QString& workDir, bool staged) {
+    this->data.clear(); // clear the data read from the process before starting the show
+
+    // TODO(remy): runGit(QStringList args, int command) command
+
+    // create and init the process
+    this->process = new QProcess(this);
+    QFileInfo fi(workDir);
+    this->process->setWorkingDirectory(fi.absolutePath());
+
+    QStringList args; args << "diff";
+    if (staged) {
+        args << "--staged";
+    }
+    this->process->start("git", args);
+
+    this->command = GIT_DIFF;
+    this->bufferName = "";
 
     // connect the events
     connect(this->process, &QProcess::readyReadStandardOutput, this, &Git::onResults);

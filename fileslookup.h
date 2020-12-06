@@ -11,9 +11,9 @@
 #include <QString>
 #include <QWidget>
 
-#define FILESLOOKUP_DATA_LABEL 0 // label to display
-#define FILESLOOKUP_DATA_ID    1 // id in the list of buffers
-#define FILESLOOKUP_DATA_TYPE  2 // possible values: directory, file, buffer
+#define FILESLOOKUP_DATA_LABEL 0 << 2 // label to display
+#define FILESLOOKUP_DATA_ID    1 << 2 // id in the list of buffers
+#define FILESLOOKUP_DATA_TYPE  2 << 2 // possible values: directory, file, buffer
 
 class Window;
 
@@ -70,4 +70,6 @@ private:
     QSet<QString> filteredDirs;
     QSet<QString> filenames;
     QSet<QString> filteredFiles;
+    QSet<QString> buffers;
+    QSet<QString> filteredBuffers;
 };

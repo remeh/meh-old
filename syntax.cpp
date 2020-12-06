@@ -90,6 +90,13 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     rule.format = diffOut;
     highlightingRules.append(rule);
 
+    rule.pattern = QRegularExpression(QStringLiteral("^\\+.*"));
+    rule.format = diffIn;
+    highlightingRules.append(rule);
+    rule.pattern = QRegularExpression(QStringLiteral("^\\-.*"));
+    rule.format = diffOut;
+    highlightingRules.append(rule);
+
     // tasks
     // -----
 

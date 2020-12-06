@@ -222,7 +222,6 @@ void Editor::onContentsChange(int position, int charsRemoved, int charsAdded) {
     this->lspRefreshTimer->start(500);
 }
 
-
 void Editor::save() {
     if (!this->currentBuffer) { return; }
 
@@ -239,6 +238,7 @@ void Editor::saveAll() {
     QList<Buffer*> buff = this->buffers.values();
     for (int i = 0; i < buff.size(); i++) {
         if (buff.at(i)->modified) {
+            // TODO(remy): save this buffer only if it is a file
             buff.at(i)->save(this);
         }
     }
@@ -254,8 +254,8 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
     if (this->currentBuffer != nullptr) {
         this->currentBuffer->onLeave(this);
         // we're leaving this one, append it to the end of the buffers list.
-        this->buffersPos.append(this->currentBuffer->getFilename());
-        this->buffers[this->currentBuffer->getFilename()] = this->currentBuffer;
+        this->buffersPos.append(this->currentBuffer->getId());
+        this->buffers[this->currentBuffer->getId()] = this->currentBuffer;
     }
 
     this->currentBuffer = buffer;
@@ -287,20 +287,17 @@ void Editor::setCurrentBuffer(Buffer* buffer) {
     connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
 }
 
-void Editor::selectOrCreateBuffer(const QString& filename) {
-    QFileInfo info(filename);
-    QString f = info.absoluteFilePath();
-
+void Editor::selectOrCreateBuffer(const QString& id) {
     // do not do anything if the current file is the buffer we try to open
-    if (this->currentBuffer != nullptr && this->currentBuffer->getFilename() == f) {
+    if (this->currentBuffer != nullptr && this->currentBuffer->getId() == id) {
         return;
     }
 
-    Buffer* buffer = this->buffers.take(f);
+    Buffer* buffer = this->buffers.take(id);
     if (buffer == nullptr) {
         // check that this file has not been opened by another instance
         // of the editor.
-        if (this->alreadyOpened(filename)) {
+        if (this->alreadyOpened(id)) {
             QMessageBox msgBox;
             msgBox.setWindowTitle("Already opened");
             msgBox.setText("This file is already opened by another instance of meh, do you still want to open it?");
@@ -312,11 +309,13 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
         }
 
         // this file has never been opened, open it
-        buffer = new Buffer(f);
+        // TODO(remy): 	it will automatically consider it as a filename within this constructor
+        // 				maybe we would prefer to have an empty constructor and a setFilename method?
+        buffer = new Buffer(id);
         // store somewhere that it is now open by someone
-        this->storeOpenedState(filename);
+        this->storeOpenedState(id);
     } else {
-        int pos = this->buffersPos.indexOf(f);
+        int pos = this->buffersPos.indexOf(id);
         if (pos >= 0) { // should not happen
             this->buffersPos.remove(pos);
         } else {
@@ -324,7 +323,7 @@ void Editor::selectOrCreateBuffer(const QString& filename) {
         }
     }
 
-    this->window->setWindowTitle("meh - " + filename);
+    this->window->setWindowTitle("meh - " + id);
     this->setCurrentBuffer(buffer);
     lspManager.manageBuffer(this->window, buffer);
 }
@@ -340,6 +339,7 @@ void Editor::closeCurrentBuffer() {
     this->currentBuffer = nullptr;
 
     if (this->buffers.size() == 0) {
+        // TODO(remy): do we want to open a scratch buffer here?
         this->setPlainText(""); // clear
         this->window->setWindowTitle("meh - no file");
         return;
@@ -347,17 +347,17 @@ void Editor::closeCurrentBuffer() {
 
     // NOTE(remy): don't remove it here, just take a ref,
     // the selectOrCreateBuffer takes care of the list order etc.
-    const QString& filename = this->buffersPos.last();
-    this->selectOrCreateBuffer(filename);
+    const QString& id = this->buffersPos.last();
+    this->selectOrCreateBuffer(id);
 }
 
-bool Editor::hasBuffer(const QString& filename) {
+bool Editor::hasBuffer(const QString& id) {
     if (this->currentBuffer == nullptr) {
         return false;
     }
 
-    QFileInfo info(filename);
-    return this->currentBuffer->getFilename() == info.absoluteFilePath() ||
+    QFileInfo info(id);
+    return this->currentBuffer->getId() == id ||
             this->buffers.contains(info.absoluteFilePath());
 }
 
@@ -467,13 +467,13 @@ QStringList Editor::modifiedBuffers() {
     QStringList rv;
 
     if (this->currentBuffer != nullptr && this->currentBuffer->modified) {
-        rv << this->currentBuffer->getFilename();
+        rv << this->currentBuffer->getId();
     }
 
     QList<Buffer*> buff = this->buffers.values();
     for (int i = 0; i < buff.size(); i++) {
         if (buff.at(i)->modified) {
-            rv << buff.at(i)->getFilename();
+            rv << buff.at(i)->getId();
         }
     }
 
@@ -676,8 +676,8 @@ void Editor::mousePressEvent(QMouseEvent* event) {
         if (this->buffers.size() > 0) {
             // NOTE(remy): don't remove it here, just take a ref,
             // the selectOrCreateBuffer takes care of the list order etc.
-            const QString& filename = this->buffersPos.last();
-            this->selectOrCreateBuffer(filename);
+            const QString& id = this->buffersPos.last();
+            this->selectOrCreateBuffer(id);
         }
         return;
     }

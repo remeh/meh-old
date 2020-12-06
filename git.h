@@ -7,6 +7,7 @@
 #define GIT_UNKNOWN 0
 #define GIT_BLAME   1
 #define GIT_SHOW    2
+#define GIT_DIFF    3
 
 class Buffer;
 class Window;
@@ -21,8 +22,10 @@ public:
     // in a new buffer.
     void blame(const Buffer* buffer);
 
-    // show is showing the buffer file statee in the given checksum.
-    void show(const Buffer* buffer, const QString& checksum);
+    // show is showing the given git commit with this checksum
+    void show(const QString& baseDir, const QString& checksum);
+
+    void diff(const QString& baseDir, bool staged);
 
 public slots:
     void onErrorOccurred();
@@ -33,6 +36,10 @@ private:
     QByteArray data;
     QProcess* process;
     Window* window;
+
+    // bufferName is a temporary var used to set the buffer name after the command
+    // has been executed.
+    QString bufferName;
 
     // command contains the last command started
     int command;

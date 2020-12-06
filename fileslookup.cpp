@@ -25,8 +25,6 @@ FilesLookup::FilesLookup(Window* window) :
     this->list = new QListWidget(this);
     this->list->setSortingEnabled(true);
 
-//    this->setFont(window->getEditor()->getFont());
-
     this->setFocusPolicy(Qt::StrongFocus);
 
     this->layout = new QGridLayout();
@@ -88,11 +86,15 @@ void FilesLookup::lookupBuffers() {
     this->filteredFiles.clear();
     this->directories.clear();
     this->filteredDirs.clear();
+    this->buffers.clear();
+    this->filteredBuffers.clear();
 
     QList<Buffer*> buffers = this->window->getEditor()->getBuffers().values();
     for (int i = 0; i < buffers.size(); i++) {
-        QString value = buffers.at(i)->getFilename();
-        // remove basedir
+        Buffer* buffer = buffers.at(i);
+        QString value = buffer->getId();
+
+        // remove basedir of filenames
         if (value.startsWith(this->window->getBaseDir())) {
             value = value.remove(0, this->window->getBaseDir().size());
             if (value.startsWith("/")) {
@@ -100,8 +102,13 @@ void FilesLookup::lookupBuffers() {
             }
         }
 
-        this->filenames.insert(value);
-        this->filteredFiles.insert(value);
+        if (buffer->getType() == BUFFER_TYPE_FILE) {
+            this->filenames.insert(value);
+            this->filteredFiles.insert(value);
+        } else {
+            this->buffers.insert(value);
+            this->filteredBuffers.insert(value);
+        }
     }
 }
 
@@ -110,6 +117,8 @@ void FilesLookup::lookupDir(QString filepath) {
     this->filteredFiles.clear();
     this->directories.clear();
     this->filteredDirs.clear();
+    this->buffers.clear();
+    this->filteredBuffers.clear();
 
     if (filepath.endsWith("/")) {
         this->base += filepath;
@@ -140,22 +149,24 @@ bool FilesLookup::openSelection() {
         return false;
     }
 
-    QString name = item->data(FILESLOOKUP_DATA_ID).toString();
+    QString id = item->data(FILESLOOKUP_DATA_ID).toString();
     QString type = item->data(FILESLOOKUP_DATA_TYPE).toString();
 
+    qDebug() << "id" << id << "type" << type;
+
     if (type == "file") {
-        QFileInfo info(this->base + item->text());
+        QFileInfo info(id);
         this->window->getEditor()->saveCheckpoint();
-        // TODO(remy): should I use the ID here?
+        qDebug() << "opening a file";
         this->window->getEditor()->selectOrCreateBuffer(info.absoluteFilePath());
         return true;
     } else if (type == "buffer") {
-        QFileInfo info(this->base + item->text());
         this->window->getEditor()->saveCheckpoint();
-        this->window->getEditor()->selectOrCreateBuffer(name);
+        qDebug() << "opening a buffer";
+        this->window->getEditor()->selectOrCreateBuffer(id);
         return true;
     } else if (type == "directory") {
-        this->lookupDir(item->text());
+        this->lookupDir(id);
         this->edit->setText("");
         this->refreshList();
         return false;
@@ -218,6 +229,7 @@ void FilesLookup::keyPressEvent(QKeyEvent* event) {
 void FilesLookup::resetFiltered() {
     this->filteredDirs.clear();
     this->filteredFiles.clear();
+    this->filteredBuffers.clear();
 
     auto it = this->directories.begin();
     while (it != this->directories.end()) {
@@ -230,13 +242,18 @@ void FilesLookup::resetFiltered() {
         this->filteredFiles.insert(*it);
         ++it;
     }
+
+    it = this->buffers.begin();
+    while (it != this->buffers.end()) {
+        this->filteredBuffers.insert(*it);
+        ++it;
+    }
 }
 
 void FilesLookup::filter() {
     QString string = this->edit->text();
     auto it = this->filteredDirs.constBegin();
     while (it != this->filteredDirs.constEnd()) {
-        // TODO(remy): fuzzy search
         if (!(it->contains(QRegularExpression(string)))) {
             it = this->filteredDirs.erase(it);
         } else {
@@ -246,9 +263,17 @@ void FilesLookup::filter() {
 
     it = this->filteredFiles.begin();
     while (it != this->filteredFiles.end()) {
-        // TODO(remy): fuzzy search
         if (!it->contains(QRegularExpression(string))) {
             it = this->filteredFiles.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    it = this->filteredBuffers.begin();
+    while (it != this->filteredBuffers.end()) {
+        if (!it->contains(QRegularExpression(string))) {
+            it = this->filteredBuffers.erase(it);
         } else {
             ++it;
         }
@@ -265,7 +290,10 @@ void FilesLookup::refreshList() {
         if (*it == "..") {
             icon = QIcon(":/res/directory-out.png");
         }
-        new QListWidgetItem(icon, *it, this->list);
+        QListWidgetItem* item = new QListWidgetItem(icon, *it, this->list);
+        item->setData(FILESLOOKUP_DATA_TYPE, "directory");
+        item->setData(FILESLOOKUP_DATA_ID, *it);
+        item->setText(*it);
         ++it;
     }
     it = this->filteredFiles.begin();
@@ -274,7 +302,18 @@ void FilesLookup::refreshList() {
         if (this->window->getEditor()->hasBuffer(*it)) {
             icon = QIcon(":/res/edit.png");
         }
-        new QListWidgetItem(icon, *it, this->list);
+        QListWidgetItem* item = new QListWidgetItem(icon, *it, this->list);
+        item->setData(FILESLOOKUP_DATA_TYPE, "file");
+        item->setData(FILESLOOKUP_DATA_ID, *it);
+        item->setText(*it);
+        ++it;
+    }
+    it = this->filteredBuffers.begin();
+    while (it != this->filteredBuffers.end()) {
+        QListWidgetItem* item = new QListWidgetItem(QIcon(":/res/edit.png"), *it, this->list);
+        item->setData(FILESLOOKUP_DATA_TYPE, "buffer");
+        item->setData(FILESLOOKUP_DATA_ID, *it);
+        item->setText(*it);
         ++it;
     }
 }

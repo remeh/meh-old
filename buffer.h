@@ -14,6 +14,8 @@
 #define BUFFER_TYPE_GIT_BLAME 2
 // current buffer is showing a git show
 #define BUFFER_TYPE_GIT_SHOW  3
+// current buffer is showing a git diff
+#define BUFFER_TYPE_GIT_DIFF  4
 
 class Editor;
 

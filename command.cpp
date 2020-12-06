@@ -157,6 +157,32 @@ void Command::execute(QString text) {
         return;
     }
 
+    if (command == ":gshow") {
+        // gshow is used to show the commit of a given checksum
+        // if no parameter is given, use the word under the cursor for the checksum
+        QString checksum;
+        if (list.size() > 1) {
+            checksum = list[1];
+        } else if (this->window->getEditor()->getCurrentBuffer() != nullptr) {
+            checksum = this->window->getEditor()->getWordUnderCursor();
+        } else {
+            this->window->getStatusBar()->setMessage("no checksum provided");
+            return;
+        }
+        this->window->getGit()->show(this->window->getBaseDir(), checksum);
+    }
+
+    if (command == ":gdiff") {
+        bool staged = false;
+        if (list.size() > 1) {
+            if (list[1] == "--staged") {
+                staged = true;
+            }
+        }
+        this->window->getGit()->diff(this->window->getBaseDir(), staged);
+        return;
+    }
+
     // date insertion
     // --------------
 

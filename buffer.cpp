@@ -73,6 +73,9 @@ QString Buffer::getId() {
     case BUFFER_TYPE_GIT_SHOW:
         rv = "GIT SHOW - ";
         break;
+    case BUFFER_TYPE_GIT_DIFF:
+        rv = "GIT DIFF";
+        break;
     }
 
     // other kind of buffers
@@ -82,6 +85,8 @@ QString Buffer::getId() {
     return rv;
 }
 
+// TODO(remy): while saving the buffer into a file, it should turns the buffer
+// into a BUFFER_TYPE_FILE.
 void Buffer::save(Editor* editor) {
     Q_ASSERT(editor != NULL);
     QFile file(filename);
