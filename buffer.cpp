@@ -78,6 +78,11 @@ QString Buffer::getId() {
         break;
     }
 
+    // BUFFER_TYPE_COMMAND
+    // -------------------
+
+    return "COMMAND - " + this->name;
+
     // other kind of buffers
     // ---------------------
 

@@ -5,6 +5,7 @@
 #include <QSettings>
 
 #include "command.h"
+#include "exec.h"
 #include "lsp.h"
 #include "git.h"
 #include "window.h"
@@ -197,6 +198,19 @@ void Command::execute(QString text) {
         QDateTime now = QDateTime::currentDateTime();
         QString v = now.toString("yyyy-MM-dd hh:mm:ss");
         this->window->getEditor()->textCursor().insertText(" " + v);
+        return;
+    }
+
+    // exec a command
+    // --------------
+
+    if (command.startsWith(":!") || command == ":exec") {
+        if (command.startsWith(":!")) {
+            list[0] = QString(command).remove(0, 2);
+        } else {
+            list.removeFirst();
+        }
+        this->window->getExec()->start(this->window->getBaseDir(), list);
         return;
     }
 

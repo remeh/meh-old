@@ -4,6 +4,7 @@
 #include "command.h"
 #include "completer.h"
 #include "editor.h"
+#include "exec.h"
 #include "fileslookup.h"
 #include "git.h"
 #include "grep.h"
@@ -66,9 +67,17 @@ Window::Window(QWidget* parent) :
     this->layout->addWidget(this->statusBar);
     this->setLayout(layout);
 
-    // git instance
+    // git instance and exec instance
     // ----------------------
+
     this->git = new Git(this);
+    this->exec = new Exec(this);
+}
+
+Window::~Window() {
+    delete this->grep;
+    delete this->git;
+    delete this->exec;
 }
 
 void Window::closeEvent(QCloseEvent* event) {

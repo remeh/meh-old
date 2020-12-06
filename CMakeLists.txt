@@ -21,6 +21,7 @@ set(SOURCES
     command.cpp
     completer.cpp
     editor.cpp
+    exec.cpp
     fileslookup.cpp
     git.cpp
     grep.cpp

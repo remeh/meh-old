@@ -7,15 +7,17 @@
 #include <QString>
 
 // buffer is showing data, we don't know from where the data come from
-#define BUFFER_TYPE_UNKNOWN   0
+#define BUFFER_TYPE_UNKNOWN	0
 // buffer is showing content of file
-#define BUFFER_TYPE_FILE      1
-// current buffer is showing a git blame
-#define BUFFER_TYPE_GIT_BLAME 2
-// current buffer is showing a git show
-#define BUFFER_TYPE_GIT_SHOW  3
-// current buffer is showing a git diff
-#define BUFFER_TYPE_GIT_DIFF  4
+#define BUFFER_TYPE_FILE		1
+// buffer is showing a git blame
+#define BUFFER_TYPE_GIT_BLAME	2
+// buffer is showing a git show
+#define BUFFER_TYPE_GIT_SHOW	3
+// buffer is showing a git diff
+#define BUFFER_TYPE_GIT_DIFF	4
+// buffer is showing a command exec result
+#define BUFFER_TYPE_COMMAND	5
 
 class Editor;
 

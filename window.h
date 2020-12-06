@@ -14,6 +14,7 @@ class Command;
 class Completer;
 class CompleterEntry;
 class Editor;
+class Exec;
 class Git;
 class Grep;
 class ReferencesWidget;
@@ -24,6 +25,7 @@ class Window : public QWidget
     Q_OBJECT
 public:
     Window(QWidget* parent = nullptr);
+    ~Window();
 
     // openCommand opens the command line and focus on it.
     void openCommand();
@@ -76,8 +78,11 @@ public:
     // getRefWidget returns the ReferencesWidget instance.
     ReferencesWidget* getRefWidget() { return this->refWidget; }
 
-    // Git returns the Git instance.
+    // getGit returns the Git instance.
     Git* getGit() { return this->git; }
+
+    // getExec returns the Exec instance.
+    Exec* getExec() { return this->exec; }
 
 protected:
 
@@ -95,6 +100,7 @@ private:
     ReferencesWidget *refWidget;
     StatusBar* statusBar;
     Git* git;
+    Exec* exec;
 
     // baseDir on which the FilesLookup should be opened.
     QString baseDir;
