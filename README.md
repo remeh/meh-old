@@ -32,12 +32,16 @@
             * `j` and `k` for also works for next / previous result
             * `Ctrl-j` and `Ctrl-k` to expand / close results on a file
             * use `x` or `Backspace` to remove entries from the results to remove the noise
-    * `:gblame` opens the git blame of the current buffer
+    * Git support:
+        * `:gblame` opens the git blame of the current buffer
+        * `:gshow [<checksum>]` show the commit of the given checksum or the one under the cursor if none provided
+        * `:gdiff [--staged]` shows the current diff / staged diff
     * Search in file with `/`, next occurrences with `n` and `N`. `,` to search for the word under the cursor
     * Toggle `//` comments with Ctrl-M on selected lines (or current line if no selection), `#` with Ctrl-Shift-M
     * Auto-complete with words in opened buffers with `Ctrl-N`
     * Auto-indentation (respect previous line indentation, automatically changes it depending on `{`, `}`, and `:`)
     * Simple syntax highlighting (regexp based)
+    * Execute a command and display the output in a buffer (with `:exec <command> <args>` or `:!<command> <args>`)
     * Highlight the selection / word under the cursor
     * Remember cursor position in previously opened files
     * Current-line visual emphasizing
