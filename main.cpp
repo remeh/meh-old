@@ -1,15 +1,23 @@
 #include <QApplication>
+#include <QFile>
 #include <QObject>
 #include <QStringList>
+#include <QThread>
 
+#include <stdio.h>
+
+#include "buffer.h"
 #include "editor.h"
 #include "window.h"
+
+#include "qdebug.h"
 
 int main(int argv, char **args)
 {
     QApplication app(argv, args);
     app.setCursorFlashTime(0);
     QCoreApplication::setOrganizationName("mehteor");
+
     QCoreApplication::setOrganizationDomain("remy.io");
     QCoreApplication::setApplicationName("meh");
 
@@ -20,7 +28,24 @@ int main(int argv, char **args)
     window.show();
 
     QStringList arguments = QCoreApplication::arguments();
-    if (arguments.size() > 0) {
+
+    // special case of reading from stdin
+    if (arguments.size() > 1 && arguments.at(1) == "-") {
+
+        QByteArray content;
+
+        QFile in;
+        if (!in.open(stdin, QIODevice::ReadOnly)) {
+            qWarning() << "can't read stdin";
+            qWarning() << in.errorString();
+        }
+        content += in.readAll();
+        in.close();
+
+        Buffer* buffer = new Buffer(content);
+        buffer->setName("stdin");
+        window.getEditor()->setCurrentBuffer(buffer);
+    } else if (arguments.size() > 0) {
         for (int i = arguments.size() - 1; i > 0; i--) {
             if (arguments.at(i).startsWith("+")) {
                 continue;

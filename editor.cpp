@@ -393,6 +393,17 @@ void Editor::removeOpenedState(const QString& filename) {
     settings.remove("buffer/"+f.absoluteFilePath()+"/opened");
 }
 
+void Editor::cleanOnlyWhiteSpacesLine() {
+    // remove all indentation if nothing has been written on the line
+    QTextCursor cursor = this->textCursor();
+    cursor.beginEditBlock();
+    cursor.movePosition(QTextCursor::EndOfBlock);
+    for (int v = this->currentLineIsOnlyWhitespaces(); v > 0; v--) {
+        cursor.deletePreviousChar();
+    }
+    cursor.endEditBlock();
+}
+
 void Editor::setMode(int mode, QString command) {
     this->setOverwriteMode(false);
     switch (mode) {
@@ -402,14 +413,7 @@ void Editor::setMode(int mode, QString command) {
         // while returning in NORMAL mode, if the current line is only whitespaces
         // -> remove them.
         if (this->currentLineIsOnlyWhitespaces()) {
-            // remove all indentation if nothing has been written on the line
-            QTextCursor cursor = this->textCursor();
-            cursor.beginEditBlock();
-            cursor.movePosition(QTextCursor::EndOfBlock);
-            for (int v = this->currentLineIsOnlyWhitespaces(); v > 0; v--) {
-                cursor.deletePreviousChar();
-            }
-            cursor.endEditBlock();
+            this->cleanOnlyWhiteSpacesLine();
         }
         this->setBlockCursor();
         break;
@@ -585,21 +589,60 @@ void Editor::deleteCurrentLine() {
     cursor.removeSelectedText();
 }
 
-void Editor::insertNewLine(bool above) {
-    // take the indent now, of the current line.
-    if (above) {
-        this->moveCursor(QTextCursor::Up);
-    }
-    this->moveCursor(QTextCursor::EndOfLine);
-    QString indent = this->currentLineIndent();
+void Editor::insertNewLine(bool above, bool noCutText) {
+    QTextCursor cursor = this->textCursor();
+    int position = cursor.position();
 
+    if (noCutText) {
+        this->moveCursor(QTextCursor::EndOfBlock);
+    }
+
+    cursor.beginEditBlock();
+
+    // take the indent now, of the current line.
+    QString indent = "";
+
+    // if we are going up, we want the indent of n-1
+    if (above) {
+        int position = this->textCursor().position();
+        this->moveCursor(QTextCursor::Up);
+        this->moveCursor(QTextCursor::StartOfBlock);
+
+        // special case of top of the file
+        if (this->textCursor().position() == 0) {
+            this->insertPlainText("\n");
+            this->moveCursor(QTextCursor::Up);
+            this->moveCursor(QTextCursor::StartOfBlock);
+            cursor.endEditBlock();
+            this->setMode(MODE_INSERT);
+            return;
+        }
+    }
+
+    // do we want to add extra indentation because of the previous line end of char?
+    indent = this->currentLineIndent();
     QChar lastChar = this->currentLineLastChar();
     if (lastChar == ":" || lastChar == "{") {
         indent += "    ";
     }
-    this->insertPlainText("\n" + indent);
+
+    if (this->currentLineIsOnlyWhitespaces()) {
+        this->cleanOnlyWhiteSpacesLine();
+    }
+
+    if (above) {
+        cursor.setPosition(position);
+        this->setTextCursor(cursor);
+        this->moveCursor(QTextCursor::StartOfBlock);
+        this->insertPlainText("\n");
+        this->moveCursor(QTextCursor::Up);
+        this->insertPlainText(indent);
+    } else {
+        this->insertPlainText("\n" + indent);
+    }
     this->setMode(MODE_INSERT);
-    return;
+
+    cursor.endEditBlock();
 }
 
 void Editor::paintEvent(QPaintEvent* event) {
@@ -820,37 +863,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     }
 
     if (event->key() == Qt::Key_Return) {
-        QString indent = this->currentLineIndent();
-        QTextCursor cursor = this->textCursor();
-
-        cursor.beginEditBlock();
-
-        // remove all indentation if nothing has been written on the line
-        for (int v = this->currentLineIsOnlyWhitespaces(); v > 0; v--) {
-            cursor.deletePreviousChar();
-        }
-
-        if (shift) {
-            this->moveCursor(QTextCursor::Up);
-            this->moveCursor(QTextCursor::EndOfLine);
-        } else {
-            // FIXME(remy): doesn't work propery for Shift+Return.
-            QChar lastChar = this->currentLineLastChar();
-            if (lastChar == ":" || lastChar == "{") {
-                indent += "    ";
-            }
-
-            // If next chars are white spaces we'll want to remove them before
-            // going to the next line.
-            QChar c = this->document()->characterAt(cursor.position());
-            while (c == " " || c == "\t") {
-                cursor.deleteChar();
-                c = this->document()->characterAt(cursor.position());
-            }
-        }
-
-        this->insertPlainText("\n" + indent);
-        cursor.endEditBlock();
+        this->insertNewLine(shift == true);
         return;
     }
 

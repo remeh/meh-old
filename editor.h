@@ -128,7 +128,10 @@ public:
 
     // insertNewLine insert a new line either under, or above the current one
     // and takes care of adding the proper indentation.
-    void insertNewLine(bool above);
+    // If noCutText is set to true, while creating/going to the next line,
+    // the text on the // right of the cursor won't be moved to the new line.
+    // When above is true, noCutText has no effect.
+    void insertNewLine(bool above, bool noCutText = false);
 
     // getWordUnderCursor returns the word under the cursor if any.
     QString getWordUnderCursor();
@@ -230,6 +233,9 @@ private:
     // currentLineIsOnlyWhitespaces return -1 if this is wrong and returns how
     // many whitespaces (' ' or '\t') are composing this line.
     int currentLineIsOnlyWhitespaces();
+
+    // cleanOnlyWhiteSpacesLine removes all the whitespace of the current line.
+    void cleanOnlyWhiteSpacesLine();
 
     // currentLineLastChar returns the last char of the line.
     QChar currentLineLastChar();

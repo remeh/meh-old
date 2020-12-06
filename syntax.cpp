@@ -73,6 +73,23 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     rule.format = trailingWhiteSpaces;
     highlightingRules.append(rule);
 
+    // diff markups
+    // ------------
+
+    QTextCharFormat diffIn, diffSeparator, diffOut;
+    diffIn.setForeground(QColor::fromRgb(153,215,0));
+    diffSeparator.setForeground(QColor::fromRgb(255,255,255));
+    diffOut.setForeground(QColor::fromRgb(250,50,50));
+    rule.pattern = QRegularExpression(QStringLiteral("^<<<<<<< .*"));
+    rule.format = diffIn;
+    highlightingRules.append(rule);
+    rule.pattern = QRegularExpression(QStringLiteral("^=======$"));
+    rule.format = diffSeparator;
+    highlightingRules.append(rule);
+    rule.pattern = QRegularExpression(QStringLiteral("^>>>>>>> .*"));
+    rule.format = diffOut;
+    highlightingRules.append(rule);
+
     // tasks
     // -----
 

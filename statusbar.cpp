@@ -6,7 +6,8 @@
 
 StatusBar::StatusBar(Window* window) :
     QWidget(window),
-    window(window) {
+    window(window),
+    lspWorking(false) {
     Q_ASSERT(window != nullptr);
     this->vlayout = new QVBoxLayout();
     this->glayout = new QGridLayout();

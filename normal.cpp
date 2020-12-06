@@ -132,13 +132,11 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
         case Qt::Key_O:
             {
-                // NOTE(remy): we could detect the { at the end of a line
-                // to have another behavior.
                 if (shift) {
-                    this->insertNewLine(true);
+                    this->insertNewLine(true, true);
                     return;
                 }
-                this->insertNewLine(false);
+                this->insertNewLine(false, true);
                 return;
             }
         case Qt::Key_Dollar:
