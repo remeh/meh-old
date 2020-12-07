@@ -155,7 +155,7 @@ bool FilesLookup::openSelection() {
     qDebug() << "id" << id << "type" << type;
 
     if (type == "file") {
-        QFileInfo info(id);
+        QFileInfo info(this->base + "/" + id);
         this->window->getEditor()->saveCheckpoint();
         qDebug() << "opening a file";
         this->window->getEditor()->selectOrCreateBuffer(info.absoluteFilePath());
