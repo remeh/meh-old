@@ -152,17 +152,13 @@ bool FilesLookup::openSelection() {
     QString id = item->data(FILESLOOKUP_DATA_ID).toString();
     QString type = item->data(FILESLOOKUP_DATA_TYPE).toString();
 
-    qDebug() << "id" << id << "type" << type;
-
     if (type == "file") {
         QFileInfo info(this->base + "/" + id);
         this->window->getEditor()->saveCheckpoint();
-        qDebug() << "opening a file";
         this->window->getEditor()->selectOrCreateBuffer(info.absoluteFilePath());
         return true;
     } else if (type == "buffer") {
         this->window->getEditor()->saveCheckpoint();
-        qDebug() << "opening a buffer";
         this->window->getEditor()->selectOrCreateBuffer(id);
         return true;
     } else if (type == "directory") {

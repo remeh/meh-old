@@ -74,14 +74,16 @@ QString Buffer::getId() {
         rv = "GIT SHOW - ";
         break;
     case BUFFER_TYPE_GIT_DIFF:
-        rv = "GIT DIFF";
+        rv = "GIT DIFF - ";
         break;
     }
 
     // BUFFER_TYPE_COMMAND
     // -------------------
 
-    return "COMMAND - " + this->name;
+    if (this->bufferType == BUFFER_TYPE_COMMAND) {
+        rv = "COMMAND - ";
+    }
 
     // other kind of buffers
     // ---------------------
