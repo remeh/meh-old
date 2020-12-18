@@ -18,6 +18,7 @@ class Exec;
 class Git;
 class Grep;
 class ReferencesWidget;
+class ReplaceWidget;
 class StatusBar;
 
 class Window : public QWidget
@@ -33,24 +34,22 @@ public:
     // if it has been instanciated.
     void closeCommand();
 
-    // TODO(remy): comment me
     void openCompleter(const QString& base, QList<CompleterEntry> entries);
-    // TODO(remy): comment me
     void closeCompleter();
 
     // setCommand sets the text in the command to the given value.
     void setCommand(const QString& text);
 
-    // TODO(remy): rename and comment me
     void openListFiles();
-    // TODO(remy): rename and comment me
     void openListBuffers();
+
+    void openReplace();
+    void closeReplace();
 
     // closeList removes all entries in the list and hides it.
     // TODO(remy): rename me
     void closeList();
 
-    // TODO(remy): comment me
     void openGrep(const QString& string, const QString& target);
     void openGrep(const QString& string);
     void closeGrep();
@@ -101,6 +100,7 @@ private:
     StatusBar* statusBar;
     Git* git;
     Exec* exec;
+    ReplaceWidget* replace;
 
     // baseDir on which the FilesLookup should be opened.
     QString baseDir;

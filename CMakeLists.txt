@@ -34,6 +34,7 @@ set(SOURCES
     lsp/zls.cpp
     normal.cpp
     references_widget.cpp
+    replace.cpp
     statusbar.cpp
     submode.cpp
     syntax.cpp

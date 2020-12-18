@@ -720,6 +720,9 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                 this->onTriggerLspRefresh();
                 this->lspAutocomplete();
                 return;
+            case Qt::Key_R:
+                this->window->openReplace();
+                return;
             case Qt::Key_N:
                 this->autocomplete();
                 return;
@@ -810,6 +813,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Escape) {
         this->window->closeList();
         this->window->closeCompleter();
+        this->window->closeReplace();
         this->window->getStatusBar()->hideMessage();
 
         if (!this->hasFocus()) {

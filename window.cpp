@@ -8,6 +8,7 @@
 #include "fileslookup.h"
 #include "git.h"
 #include "grep.h"
+#include "replace.h"
 #include "statusbar.h"
 #include "window.h"
 
@@ -34,6 +35,12 @@ Window::Window(QWidget* parent) :
     // ----------------------
 
     this->editor = new Editor(this);
+
+    // replace
+    // ----------------------
+
+    this->replace = new ReplaceWidget(this);
+    this->replace->hide();
 
     // set base dir
     // ----------------------
@@ -64,6 +71,7 @@ Window::Window(QWidget* parent) :
     this->layout->addWidget(this->filesLookup);
     this->layout->addWidget(this->completer);
     this->layout->addWidget(this->refWidget);
+    this->layout->addWidget(this->replace);
     this->layout->addWidget(this->statusBar);
     this->setLayout(layout);
 
@@ -107,6 +115,14 @@ void Window::openListBuffers() {
 
 void Window::closeList() {
     this->filesLookup->hide();
+}
+
+void Window::openReplace() {
+    this->replace->show();
+}
+
+void Window::closeReplace() {
+    this->replace->hide();
 }
 
 void Window::openCompleter(const QString& base, const QList<CompleterEntry> entries) {
