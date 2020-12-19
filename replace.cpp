@@ -1,6 +1,8 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QRegExp>
+#include <QTextCursor>
 #include <QWidget>
 
 #include "replace.h"
@@ -36,7 +38,26 @@ void ReplaceWidget::clear() {
 }
 
 void ReplaceWidget::replace() {
-    // TODO(remy): implement me
+    QTextCursor cursor = this->window->getEditor()->textCursor();
+
+    QString str;
+    if (cursor.hasSelection()) {
+        str = cursor.selectedText();
+    } else {
+        str = this->window->getEditor()->document()->toPlainText();
+    }
+
+    QRegExp rx(this->searchForEdit->text());
+    str.replace(rx, this->replaceWithEdit->text());
+
+    cursor.beginEditBlock();
+    if (!cursor.hasSelection()) {
+        cursor.setPosition(0);
+        cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+    }
+    cursor.removeSelectedText();
+    cursor.insertText(str);
+    cursor.endEditBlock();
 }
 
 void ReplaceWidget::keyPressEvent(QKeyEvent* event) {
