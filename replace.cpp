@@ -17,11 +17,13 @@ ReplaceWidget::ReplaceWidget(Window* window) : QWidget(window), window(window) {
     this->searchForEdit = new QLineEdit();
     this->replaceWith = new QLabel("Replace with");
     this->replaceWithEdit = new QLineEdit();
+    this->status = new QLabel("");
 
     this->layout->addWidget(this->searchFor);
     this->layout->addWidget(this->searchForEdit);
     this->layout->addWidget(this->replaceWith);
     this->layout->addWidget(this->replaceWithEdit);
+    this->layout->addWidget(this->status);
 
     this->setLayout(layout);
 }
@@ -35,6 +37,7 @@ void ReplaceWidget::show() {
 void ReplaceWidget::clear() {
     this->replaceWithEdit->setText("");
     this->searchForEdit->setText("");
+    this->status->setText("");
 }
 
 void ReplaceWidget::replace() {
@@ -48,6 +51,8 @@ void ReplaceWidget::replace() {
     }
 
     QRegExp rx(this->searchForEdit->text());
+
+    int count = str.count(rx);
     str.replace(rx, this->replaceWithEdit->text());
 
     cursor.beginEditBlock();
@@ -58,6 +63,12 @@ void ReplaceWidget::replace() {
     cursor.removeSelectedText();
     cursor.insertText(str);
     cursor.endEditBlock();
+
+    if (count > 0) {
+        this->status->setText(QString::number(count) + " entries replaced.");
+    } else {
+        this->status->setText("Nothing has been replaced.");
+    }
 }
 
 void ReplaceWidget::keyPressEvent(QKeyEvent* event) {
@@ -68,6 +79,7 @@ void ReplaceWidget::keyPressEvent(QKeyEvent* event) {
 
     if (event->key() == Qt::Key_Return) {
         if (this->searchForEdit->text() == "") {
+            this->status->setText("Enter a valid regexp to search for.");
             this->searchForEdit->setFocus();
             return;
         }

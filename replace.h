@@ -33,4 +33,5 @@ private:
     QLineEdit* searchForEdit;
     QLabel* replaceWith;
     QLineEdit* replaceWithEdit;
+    QLabel* status;
 };
