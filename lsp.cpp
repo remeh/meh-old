@@ -8,6 +8,7 @@
 #include <QJsonParseError>
 #include <QStringList>
 #include <QTextStream>
+#include <QTime>
 
 #include "buffer.h"
 #include "lsp.h"
@@ -125,6 +126,7 @@ QString LSPWriter::openFile(Buffer* buffer, const QString& filename, const QStri
 QString LSPWriter::refreshFile(Buffer* buffer, const QString& filename) {
     QJsonObject textDocument {
         {"uri", "file://" + filename },
+        {"version", QTime::currentTime().second() },
     };
     QJsonObject contentChange {
         {"text", QString(buffer->getData())},

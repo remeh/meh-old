@@ -50,8 +50,7 @@ void LSPGopls::initialize() {
 }
 
 void LSPGopls::openFile(Buffer* buffer) {
-    QFileInfo fi(buffer->getFilename());
-    const QString& msg = this->writer.openFile(buffer, fi.absoluteDir().absolutePath(), "go");
+    const QString& msg = this->writer.openFile(buffer, buffer->getFilename(), "go");
     this->lspServer.write(msg.toUtf8());
 }
 
