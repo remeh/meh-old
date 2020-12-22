@@ -74,6 +74,11 @@ Editor::Editor(Window* window) :
 
     this->syntax = new Syntax(this->document());
 
+    // prepare the lsp manager
+    // ----------------------
+
+    this->lspManager = new LSPManager(this->window);
+
     // selection timer
     // ----------------------
 
@@ -133,6 +138,7 @@ Editor::~Editor() {
 
     delete this->selectionTimer;
     delete this->lspRefreshTimer;
+    delete this->lspManager;
     if (this->currentCompleter) {
         delete this->currentCompleter;
     }
@@ -183,7 +189,7 @@ void Editor::onTriggerLspRefresh() {
         return;
     }
     this->currentBuffer->refreshData(this);
-    this->lspManager.manageBuffer(this->window, this->currentBuffer);
+    this->lspManager->manageBuffer(this->currentBuffer);
     this->lspRefreshTimer->stop();
 }
 
@@ -325,7 +331,7 @@ void Editor::selectOrCreateBuffer(const QString& id) {
 
     this->window->setWindowTitle("meh - " + id);
     this->setCurrentBuffer(buffer);
-    lspManager.manageBuffer(this->window, buffer);
+    lspManager->manageBuffer(buffer);
 }
 
 void Editor::closeCurrentBuffer() {
@@ -1045,7 +1051,7 @@ QString Editor::getWordUnderCursor() {
 }
 
 void Editor::lspAutocomplete() {
-    LSP* lsp = this->window->getEditor()->lspManager.getLSP(currentBuffer);
+    LSP* lsp = this->lspManager->getLSP(currentBuffer);
     int reqId = QRandomGenerator::global()->generate();
     if (reqId < 0) { reqId *= -1; }
 
@@ -1054,7 +1060,7 @@ void Editor::lspAutocomplete() {
         return;
     }
     lsp->completion(reqId, currentBuffer->getFilename(), this->currentLineNumber(), this->currentColumn());
-    this->lspManager.setExecutedAction(this->window, reqId, LSP_ACTION_COMPLETION, currentBuffer);
+    this->lspManager->setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
 }
 
 void Editor::autocomplete() {
@@ -1152,7 +1158,7 @@ StatusBar* Editor::getStatusBar() {
 }
 
 void Editor::showLSPDiagnosticsOfLine(int line) {
-    auto allDiags = this->lspManager.getDiagnostics(this->window->getEditor()->getCurrentBuffer()->getFilename());
+    auto allDiags = this->lspManager->getDiagnostics(this->window->getEditor()->getCurrentBuffer()->getFilename());
     auto lineDiags = allDiags[line];
     if (lineDiags.size() == 0) {
         return;
@@ -1184,7 +1190,7 @@ void Editor::lspInterpret(QJsonDocument json) {
         return;
     }
 
-    LSPAction action = this->lspManager.getExecutedAction(this->window, json["id"].toInt());
+    LSPAction action = this->lspManager->getExecutedAction(json["id"].toInt());
     if (action.requestId == 0) {
         if (json["method"].isNull()) {
             return;
@@ -1215,7 +1221,7 @@ void Editor::lspInterpret(QJsonDocument json) {
                 auto diags = json["params"]["diagnostics"].toArray();
                 const QString& uri = QFileInfo(json["params"]["uri"].toString().replace("file://", "")).absoluteFilePath();
 
-                this->lspManager.clearDiagnostics(uri);
+                this->lspManager->clearDiagnostics(uri);
 
                 for (int i = 0; i < diags.size(); i++) {
                     QJsonObject diag = diags[i].toObject();
@@ -1227,7 +1233,7 @@ void Editor::lspInterpret(QJsonDocument json) {
                         diag.line = line + 1;
                         diag.message = msg;
                         diag.absFilename = uri;
-                        this->lspManager.addDiagnostic(uri, diag);
+                        this->lspManager->addDiagnostic(uri, diag);
                     }
                 }
                 this->repaint();
@@ -1262,7 +1268,7 @@ void Editor::lspInterpret(QJsonDocument json) {
                     return;
                 }
 
-                LSP* lsp = this->lspManager.getLSP(this->currentBuffer) ;
+                LSP* lsp = this->lspManager->getLSP(this->currentBuffer) ;
                 if (lsp == nullptr) {
                     this->window->getStatusBar()->setMessage("Nothing found.");
                     return;
@@ -1363,7 +1369,7 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
     int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
 
-    QMap<int, QList<LSPDiagnostic>> diags = this->lspManager.getDiagnostics(this->currentBuffer->getFilename());
+    QMap<int, QList<LSPDiagnostic>> diags = this->lspManager->getDiagnostics(this->currentBuffer->getFilename());
 
     int currentLine = this->currentLineNumber();
 

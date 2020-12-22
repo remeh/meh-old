@@ -44,7 +44,7 @@ bool LSPGopls::start() {
 void LSPGopls::initialize() {
     const QString& initialize = this->writer.initialize(this->baseDir);
     const QString& initialized = this->writer.initialized();
-    this->window->getEditor()->lspManager.setExecutedAction(this->window, 1, LSP_ACTION_INIT, this->window->getEditor()->getCurrentBuffer());
+    this->window->getEditor()->lspManager->setExecutedAction(1, LSP_ACTION_INIT, this->window->getEditor()->getCurrentBuffer());
     this->lspServer.write(initialize.toUtf8());
     this->lspServer.write(initialized.toUtf8());
 }

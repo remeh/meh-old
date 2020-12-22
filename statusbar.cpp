@@ -117,6 +117,7 @@ void StatusBar::setLineNumber(int lineNumber) {
 }
 
 void StatusBar::setLspRunning(bool running) {
+    if (this->lspWorking == running) { return; }
     this->lspWorking = running;
     this->setMode(this->mode->text());
 }

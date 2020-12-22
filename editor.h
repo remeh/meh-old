@@ -177,7 +177,7 @@ public:
     // one JSON message.
     void lspInterpret(QJsonDocument json);
 
-    LSPManager lspManager;
+    LSPManager* lspManager;
 
     // widget related
     // --------------
