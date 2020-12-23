@@ -1232,7 +1232,6 @@ void Editor::lspInterpret(QJsonDocument json) {
         // publishDiagnostics
         // ------------------
         } else if (json["method"] == "textDocument/publishDiagnostics") {
-            // TODO(remy): implement me at some point
             if (!json["params"].isNull() && !json["params"]["diagnostics"].isNull()) {
                 if (!json["params"]["diagnostics"].isArray()) {
                     qWarning() << "lspInterpret: \"diagnostics\" is not an array";
@@ -1419,8 +1418,6 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
 }
 
 int Editor::lineNumberAreaWidth() {
-    // TODO(remy): I don't want this to be dynamic
-
     int digits = 1;
     int max = qMax(1, blockCount());
     while (max >= 10) {

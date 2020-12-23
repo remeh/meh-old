@@ -17,7 +17,6 @@ class Grep : public QWidget {
 public:
     Grep(Window* window);
 
-    // TODO(remy): comment me
     // baseDir is the directory from which the command is run.
     // target is the target in which ripgrep should look for matches.
     void grep(const QString& string, const QString& baseDir, const QString& target);

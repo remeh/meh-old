@@ -272,6 +272,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
        case Qt::Key_S:
            if (shift) {
                this->lastCheckpoint();
+               this->centerCursor();
            } else {
                this->saveCheckpoint();
            }
