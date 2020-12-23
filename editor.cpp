@@ -935,7 +935,7 @@ void Editor::toggleComments(QList<QTextBlock> blocks, const QString& commentChar
         int commentPos = text.indexOf(commentChars);
 
         // we still want to be sure that it is as the start of the line
-        if (commentPos != -1 && text.trimmed().startsWith(commentChars)) {
+        if (commentPos != -1 && text.startsWith(commentChars)) {
             // uncomment
             cursor.setPosition(block.position() + commentPos);
             for (int j = 0; j < commentChars.size(); j++) {
