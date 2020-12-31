@@ -93,13 +93,15 @@ public:
     // movements
     // ---------
 
-    // goToLine moves the cursor to a given position in the buffer.
+    // goToLine moves the cursor to a given position in the buffer
+    // end centers the scroll on the cursor.
     void goToLine(int lineNumber);
 
     // goToColumn moves the cursor to the given column.
     void goToColumn(int column);
 
-    // centerCursor centers the displayed cursor if possible.
+    // centerCursor centers the displayed cursor if possible
+    // end centers the scroll on the cursor.
     void centerCursor();
 
     // goToOccurrence goes to the next occurence of string if any, previous one
@@ -157,11 +159,15 @@ public:
     // LSP
     // -------------
 
-    // TODO(remy): comment me
-    void setCompleter(const QStringList& completer);
     // XXX(remy):
+    // autocomplete is a basic auto-complete with words available in the opened
+    // buffers. It is trying to complete the current word if one has been started.
     void autocomplete();
+
+    // lspAutocomplete is using an available LSP client if any for the current buffer
+    // for smart auto-complete.
     void lspAutocomplete();
+
     void applyAutocomplete(const QString& base, const QString& word);
 
     // showLSPDiagnosticsOfLine shows the diagnostics for this line (of the current buffer)

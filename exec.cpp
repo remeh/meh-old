@@ -1,6 +1,5 @@
-#include "exec.h"
-
 #include "buffer.h"
+#include "exec.h"
 #include "git.h"
 #include "window.h"
 
