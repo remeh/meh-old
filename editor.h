@@ -62,6 +62,10 @@ public:
     // closeCurrentBuffer closes the current buffer.
     void closeCurrentBuffer();
 
+    // deleteBuffer closes the given buffer and deletes the memory allocated to it.
+    // Don't use buffer anymore after a call to closeBuffer.
+    void deleteBuffer(Buffer* buffer);
+
     // hasBuffer returns true if a buffer has already been loaded.
     bool hasBuffer(const QString& filename);
 

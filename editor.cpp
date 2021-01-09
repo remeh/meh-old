@@ -130,9 +130,7 @@ Editor::~Editor() {
     QList<Buffer*> buf = this->buffers.values();
     for (int i = 0; i < buf.size(); i++) {
         if (buf.at(i) != nullptr) {
-            buf.at(i)->onLeave(this);
-            buf.at(i)->onClose(this);
-            delete buf.at(i);
+            this->deleteBuffer(buf.at(i));
         }
     }
 
@@ -325,7 +323,7 @@ void Editor::selectOrCreateBuffer(const QString& id) {
         if (pos >= 0) { // should not happen
             this->buffersPos.remove(pos);
         } else {
-            qDebug() << "pos == -1 in selectBuffer, should never happen.";
+            qDebug() << "pos == -1 in selectOrCreateBuffer, should never happen.";
         }
     }
 
@@ -339,9 +337,7 @@ void Editor::closeCurrentBuffer() {
         return;
     }
 
-    this->currentBuffer->onLeave(this); // store settings
-    this->currentBuffer->onClose(this);
-    delete this->currentBuffer;
+    this->deleteBuffer(this->currentBuffer);
     this->currentBuffer = nullptr;
 
     if (this->buffers.size() == 0) {
@@ -353,8 +349,23 @@ void Editor::closeCurrentBuffer() {
 
     // NOTE(remy): don't remove it here, just take a ref,
     // the selectOrCreateBuffer takes care of the list order etc.
+    if (this->buffersPos.size() == 0) {
+        return;
+    }
+
     const QString& id = this->buffersPos.last();
     this->selectOrCreateBuffer(id);
+}
+
+void Editor::deleteBuffer(Buffer* buffer) {
+    if (buffer == nullptr) {
+        return;
+    }
+
+    buffer->onLeave(this);
+    buffer->onClose(this);
+    buffersPos.removeOne(buffer->getId());
+    delete buffer;
 }
 
 bool Editor::hasBuffer(const QString& id) {
