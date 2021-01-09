@@ -279,6 +279,20 @@ void Command::execute(QString text) {
         return;
     }
 
+    // close every unmodified buffers
+    if (command == ":bu") {
+        QMap<QString, Buffer*>& buffers = this->window->getEditor()->getBuffers();
+        QList<QString> keys = buffers.keys();
+        for (int i = 0; i < keys.size(); i++) {
+            Buffer* buffer = buffers[keys.at(i)];
+            if (!buffer->modified) {
+                this->window->getEditor()->deleteBuffer(buffer);
+                buffers.remove(keys.at(i));
+           }
+        }
+        return;
+    }
+
     if (command == ":bd!") {
         if (this->window->getEditor()->getCurrentBuffer() == nullptr) {
             return;
