@@ -216,6 +216,10 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             }
             return;
 
+        case Qt::Key_Z:
+            this->centerCursor();
+            return;
+
         case Qt::Key_C:
             if (shift) {
                 QTextCursor cursor = this->textCursor();
