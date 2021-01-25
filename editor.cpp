@@ -758,7 +758,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                     QPlainTextEdit::keyPressEvent(&pageEvent);
                 }
                 return;
-            case Qt::Key_Space:
+            case Qt::Key_Return:
                 this->onTriggerLspRefresh();
                 this->lspAutocomplete();
                 return;

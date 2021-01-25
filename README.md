@@ -14,7 +14,7 @@
         * `:e <filepath>`
     * LSP client for C++ (clangd), Go (gopls) and Zig (zls):
         * Go to definition with the `:def` command
-        * Auto-completion with `Ctrl-Space`
+        * Auto-completion with `Ctrl-Enter`
         * Display references to a variable / method / ... with `:ref` command
         * Get functions/methods signatures and documentation with `:sig`
         * `:i` or `:info` to get infos on what's under the cursor
