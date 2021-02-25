@@ -179,7 +179,7 @@ void Editor::onCursorPositionChanged() {
 }
 
 void Editor::onSelectionChanged() {
-    this->selectionTimer->start(500);
+    this->selectionTimer->start(150);
 }
 
 void Editor::onTriggerLspRefresh() {
