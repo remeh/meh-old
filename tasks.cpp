@@ -25,7 +25,14 @@ void TasksPlugin::keyPressEvent(QKeyEvent* event, bool ctrl, bool shift) {
             } else {
                 editor->insertNewLine(false, true);
             }
-            editor->textCursor().insertText("[ ] ");
+
+            // we never want a new task to not have an indent
+            if (editor->textCursor().positionInBlock() == 0) {
+                editor->textCursor().insertText("    [ ] ");
+            } else {
+                editor->textCursor().insertText("[ ] ");
+            }
+
             editor->setMode(MODE_INSERT);
             editor->setSubMode(NO_SUBMODE);
             return;
