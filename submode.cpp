@@ -157,6 +157,13 @@ void Editor::keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift) {
                 cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
                 this->setTextCursor(cursor);
                 this->cut();
+            } else if (event->key() == Qt::Key_W) {
+                QString word = this->getWordUnderCursor();
+                QTextCursor cursor = this->textCursor();
+                cursor.movePosition(QTextCursor::StartOfWord);
+                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, word.size());
+                this->setTextCursor(cursor);
+                this->cut();
             }
             break;
     }

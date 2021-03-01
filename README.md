@@ -53,6 +53,8 @@
         * Paste with `Ctrl-V` in insert mode or `p` and `P` in normal mode
         * `yy` copy the current line in normal mode
         * `dd` cut the current line in normal mode
+        * `dw` cut the word under the cursor
+        * `D` cut the rest of the line, `C` cut the rest of the line and enter insert mode
     * Undo `u` / Redo `U`
     * Page up (Ctrl-u) / Page down (Ctrl-d)
     * Go to line with `:<line number>`
