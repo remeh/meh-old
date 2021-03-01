@@ -87,6 +87,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             } else {
                 this->goToOccurrence("", false);
             }
+            this->centerCursor();
             return;
 
         case Qt::Key_Question:

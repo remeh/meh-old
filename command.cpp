@@ -355,6 +355,7 @@ void Command::execute(QString text) {
         this->window->getEditor()->highlightText(terms);
         this->window->getEditor()->saveCheckpoint();
         this->window->getEditor()->goToOccurrence(terms, false);
+        this->window->getEditor()->centerCursor();
         return;
     }
 
