@@ -1,4 +1,5 @@
 #include <QFileInfo>
+#include <QMessageBox>
 #include <QTextCursor>
 #include <QScrollBar>
 #include <QSettings>
@@ -39,6 +40,18 @@ QByteArray Buffer::read() {
 
     if (QFile::exists(this->filename)) {
         QFile file(this->filename);
+        // warn when the file is larger than 10MB
+        if (file.size() > 1024*1024*10) {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Large file.");
+            msgBox.setText("The file '" + this->filename + "' is " + QString::number(file.size()/1024/1024) +  "MB, do you confirm that you want to open it?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+            msgBox.setDefaultButton(QMessageBox::Cancel);
+            if (msgBox.exec() == QMessageBox::Cancel) {
+                file.close();
+                return this->data;
+            }
+        }
         file.open(QIODevice::ReadOnly);
         this->data = file.readAll();
         file.close();
