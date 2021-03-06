@@ -256,14 +256,24 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             return;
 
         case Qt::Key_E:
-            if (shift) { /* TODO(remy): move right until previous space */ }
-            // TODO(remy): confirm this is the wanted behavior
-            this->moveCursor(QTextCursor::NextWord);
+            if (shift) {
+                int offset = this->findNextOneInCurrentLine(' ');
+                if (offset > 0) {
+                    QTextCursor cursor = this->textCursor();
+                    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, offset);
+                    this->setTextCursor(cursor);
+                }
+            }
             return;
         case Qt::Key_B:
-            if (shift) { /* TODO(remy): move left until previous space */ }
-            // TODO(remy): confirm this is the wanted behavior
-            this->moveCursor(QTextCursor::PreviousWord);
+            if (shift) {
+                int offset = this->findPreviousOneInCurrentLine(' ');
+                if (offset > 0) {
+                    QTextCursor cursor = this->textCursor();
+                    cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, offset);
+                    this->setTextCursor(cursor);
+                }
+            }
             return;
 
         case Qt::Key_U:
