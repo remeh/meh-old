@@ -9,8 +9,6 @@
 #include "../window.h"
 #include "zls.h"
 
-#include "qdebug.h"
-
 LSPZLS::LSPZLS(Window* window, const QString& baseDir) : LSP(window) {
     this->serverSpawned = false;
     this->language = "zig";
@@ -102,7 +100,6 @@ QList<CompleterEntry> LSPZLS::getEntries(const QJsonDocument& json) {
 
     for (int i = 0; i < items.size(); i++) {
         QJsonObject object = items[i].toObject();
-		qDebug() << object;
         list.append(CompleterEntry(object["label"].toString(), object["detail"].toString()));
     }
 

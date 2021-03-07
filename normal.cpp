@@ -256,7 +256,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             return;
 
         case Qt::Key_E:
-            if (shift) {
+            {
                 int offset = this->findNextOneInCurrentLine(' ');
                 if (offset > 0) {
                     QTextCursor cursor = this->textCursor();
@@ -266,7 +266,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             }
             return;
         case Qt::Key_B:
-            if (shift) {
+            {
                 int offset = this->findPreviousOneInCurrentLine(' ');
                 if (offset > 0) {
                     QTextCursor cursor = this->textCursor();
