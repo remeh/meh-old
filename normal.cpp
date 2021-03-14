@@ -34,6 +34,9 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
         case Qt::Key_W:
             this->setMode(MODE_COMMAND, ":w");
             return;
+        case Qt::Key_Exclam:
+            this->setMode(MODE_COMMAND, "!");
+            break;
 
         // arrow keys in normal mode
         case Qt::Key_Left:

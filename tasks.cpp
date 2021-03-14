@@ -2,9 +2,6 @@
 #include "tasks.h"
 #include "window.h"
 
-#include "qdebug.h"
-
-
 TasksPlugin::TasksPlugin(Window* window) :
     window(window) {
     Q_ASSERT(window != nullptr);

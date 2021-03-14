@@ -28,7 +28,7 @@ void Exec::onFinished() {
     }
 
     if (this->data.size() == 0) {
-        this->window->getStatusBar()->setMessage(this->command + QString("Command executed but no output.\n"));
+        this->window->getStatusBar()->setMessage(this->command + QString("\n\nCommand executed but no output."));
         this->window->getStatusBar()->showMessage();
         return;
     }

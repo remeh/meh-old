@@ -204,8 +204,10 @@ void Command::execute(QString text) {
     // exec a command
     // --------------
 
-    if (command.startsWith(":!") || command == ":exec") {
-        if (command.startsWith(":!")) {
+    if (command.startsWith(":!") || command.startsWith("!") || command == ":exec") {
+        if (command.startsWith("!")) {
+            list[0] = QString(command).remove(0, 1);
+        } else if (command.startsWith(":!")) {
             list[0] = QString(command).remove(0, 2);
         } else {
             list.removeFirst();
