@@ -33,12 +33,8 @@ void Completer::keyPressEvent(QKeyEvent* event) {
             this->window->closeCompleter();
             return;
         case Qt::Key_Return:
-            this->window->getEditor()->applyAutocomplete(this->base, this->currentItem()->text(0));
-            this->window->closeCompleter();
-            return;
         case Qt::Key_Space:
             this->window->getEditor()->applyAutocomplete(this->base, this->currentItem()->text(0));
-            // TODO(remy): should we insert a space here?
             this->window->closeCompleter();
             return;
         case Qt::Key_N:

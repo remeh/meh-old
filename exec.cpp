@@ -27,6 +27,12 @@ void Exec::onFinished() {
         this->process = nullptr;
     }
 
+    if (this->data.size() == 0) {
+        this->window->getStatusBar()->setMessage(this->command + QString("Command executed but no output.\n"));
+        this->window->getStatusBar()->showMessage();
+        return;
+    }
+
     Buffer* buffer = new Buffer(this->data);
     buffer->setType(BUFFER_TYPE_COMMAND);
     buffer->setName(this->command);
@@ -44,6 +50,7 @@ void Exec::start(const QString& baseDir, QStringList args) {
 
     this->process = new QProcess(this);
     this->process->setWorkingDirectory(baseDir);
+    this->process->setProcessChannelMode(QProcess::MergedChannels); // read both stdout and stderr
 
     if (args.size() < 1) {
         this->window->getStatusBar()->setMessage(QString("can't execute command:") + QString(args.join(" ")));
@@ -56,6 +63,7 @@ void Exec::start(const QString& baseDir, QStringList args) {
 
     // connect the events
     connect(this->process, &QProcess::readyReadStandardOutput, this, &Exec::onResults);
+    connect(this->process, &QProcess::readyReadStandardError, this, &Exec::onResults);
     connect(this->process, &QProcess::errorOccurred, this, &Exec::onErrorOccurred);
     connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Exec::onFinished);
 }
