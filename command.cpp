@@ -10,8 +10,6 @@
 #include "git.h"
 #include "window.h"
 
-#include "qdebug.h"
-
 Command::Command(Window* window) :
     window(window) {
     Q_ASSERT(window != NULL);
@@ -66,25 +64,6 @@ bool Command::warningModifiedBuffers() {
 	return false;
 }
 
-bool Command::areYouSure() {
-    Q_ASSERT(this->window != nullptr);
-    Q_ASSERT(this->window->getEditor() != nullptr);
-
-    if (this->window->getEditor()->getCurrentBuffer() == nullptr) {
-        return true;
-    }
-
-    if (this->window->getEditor()->getCurrentBuffer()->isGitTempFile()) {
-        return true;
-    }
-
-    QMessageBox msgBox;
-    msgBox.setText("Are you sure to close the app?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    return msgBox.exec() == QMessageBox::Yes;
-}
-
 void Command::execute(QString text) {
     this->clear();
 
@@ -108,16 +87,12 @@ void Command::execute(QString text) {
 		if (this->warningModifiedBuffers()) {
 			return;
 		}
-        if (this->areYouSure()) {
-            QCoreApplication::quit();
-        }
+        QCoreApplication::quit();
         return;
     }
 
     if (command == ":q!" || command == ":qa!") {
-        if (this->areYouSure()) {
-            QCoreApplication::quit();
-        }
+        QCoreApplication::quit();
         return;
     }
 
@@ -129,9 +104,7 @@ void Command::execute(QString text) {
 		if (this->warningModifiedBuffers()) {
 			return;
 		}
-        if (this->areYouSure()) {
-            QCoreApplication::quit();
-        }
+        QCoreApplication::quit();
         return;
     }
 
@@ -140,9 +113,7 @@ void Command::execute(QString text) {
             // TODO(remy):  save to another file
         }
         this->window->getEditor()->saveAll();
-        if (this->areYouSure()) {
-            QCoreApplication::quit();
-        }
+        QCoreApplication::quit();
         return;
     }
 

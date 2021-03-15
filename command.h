@@ -25,8 +25,6 @@ private slots:
 private:
     void openFile(const QString& filename);
 
-    bool areYouSure();
-
     // historyIdx starts with 0, use it to count backward.
     int historyIdx;
 

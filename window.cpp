@@ -1,5 +1,6 @@
 #include <QFileInfo>
 #include <QString>
+#include <QMessageBox>
 
 #include "command.h"
 #include "completer.h"
@@ -89,8 +90,26 @@ Window::~Window() {
 }
 
 void Window::closeEvent(QCloseEvent* event) {
-    this->command->execute(":q");
-    event->ignore();
+    if (!this->areYouSure()) {
+        event->ignore();
+    }
+}
+
+bool Window::areYouSure() {
+    if (this->getEditor() != nullptr) {
+        if (this->getEditor()->getCurrentBuffer() == nullptr) {
+            return true;
+        }
+        if (this->getEditor()->getCurrentBuffer()->isGitTempFile()) {
+            return true;
+        }
+    }
+
+    QMessageBox msgBox;
+    msgBox.setText("Are you sure to close the app?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    return msgBox.exec() == QMessageBox::Yes;
 }
 
 void Window::openCommand() {

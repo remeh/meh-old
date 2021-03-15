@@ -83,6 +83,9 @@ public:
     // getExec returns the Exec instance.
     Exec* getExec() { return this->exec; }
 
+    // areYouSure shows a "Are you sure?" message box
+    bool areYouSure();
+
 protected:
 
 private slots:
