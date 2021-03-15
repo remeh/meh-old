@@ -1,7 +1,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextCursor>
 #include <QWidget>
 
@@ -50,7 +50,7 @@ void ReplaceWidget::replace() {
         str = this->window->getEditor()->document()->toPlainText();
     }
 
-    QRegExp rx(this->searchForEdit->text());
+    QRegularExpression rx(this->searchForEdit->text());
 
     int count = str.count(rx);
     str.replace(rx, this->replaceWithEdit->text());

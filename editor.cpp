@@ -583,7 +583,7 @@ void Editor::right() {
     {
         QTextCursor cursor = this->textCursor();
         QChar c = this->document()->characterAt(cursor.position()+1);
-        if (c != "\u2029") {
+        if (c != QChar(u'\u2029')) {
             this->moveCursor(QTextCursor::Right);
         }
     }
@@ -593,7 +593,7 @@ void Editor::left() {
     {
         QTextCursor cursor = this->textCursor();
         QChar c = this->document()->characterAt(cursor.position()-1);
-        if (c != "\u2029") {
+        if (c != u'\u2029') {
             this->moveCursor(QTextCursor::Left);
         }
     }
@@ -639,7 +639,7 @@ void Editor::insertNewLine(bool above, bool noCutText) {
     // do we want to add extra indentation because of the previous line end of char?
     indent = this->currentLineIndent();
     QChar lastChar = this->currentLineLastChar();
-    if (lastChar == ":" || lastChar == "{") {
+    if (lastChar == ':' || lastChar == '{') {
         indent += "    ";
     }
 
@@ -901,7 +901,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Escape) {
         QTextCursor cursor = this->textCursor();
         QChar c = this->document()->characterAt(cursor.position());
-        if (c == "\u2029") {
+        if (c == u'\u2029') {
             this->moveCursor(QTextCursor::Left);
         }
         this->setMode(MODE_NORMAL);
@@ -972,9 +972,9 @@ void Editor::removeIndentation(QTextCursor cursor) {
     int i = 0;
     for (i = 0; i < 4; i++) {
         QChar c = this->document()->characterAt(cursor.position());
-        if (c == " ") {
+        if (c == ' ') {
             cursor.deleteChar();
-        } else if (c == "\t") {
+        } else if (c == '\t') {
             cursor.deleteChar();
             i++;
             break;

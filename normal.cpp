@@ -151,7 +151,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             {
                 QTextCursor cursor = this->textCursor();
                 QChar c = this->document()->characterAt(cursor.position());
-                if (c != "\u2029") {
+                if (c != u'\u2029') {
                     this->textCursor().deleteChar();
                 }
             }
@@ -167,7 +167,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
                 cursor.beginEditBlock();
                 cursor.deleteChar();
                 QChar c = document->characterAt(cursor.position());
-                while (c == "\t" || c == " ") {
+                while (c == '\t' || c == ' ') {
                     cursor.deleteChar();
                     c = document->characterAt(cursor.position());
                 }

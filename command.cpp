@@ -315,8 +315,8 @@ void Command::execute(QString text) {
     // go to a specific line
     // ----------------------
 
-    if (command.size() > 1 && command.at(0) == ":" && command.at(1).isDigit()) {
-        QStringRef lineStr = command.rightRef(command.size() - 1);
+    if (command.size() > 1 && command.at(0) == ':' && command.at(1).isDigit()) {
+        QStringView lineStr = QStringView{command}.right(command.size() - 1);
         bool ok = true;
         int line = lineStr.toInt(&ok);
         if (ok) {
@@ -341,11 +341,11 @@ void Command::execute(QString text) {
     // search next occurrence of a string
     // ----------------------
 
-    if (command.size() >= 1 && command.at(0) == "/") {
+    if (command.size() >= 1 && command.at(0) == '/') {
         QString terms = "";
         if (command.size() > 1) {
             QStringList search;
-            QStringRef first = command.rightRef(command.size() - 1);
+            QStringView first = QStringView{command}.right(command.size() - 1);
             search << first.toString();
             for (int i = 1; i < list.size(); i++) {
                search << list.at(i);

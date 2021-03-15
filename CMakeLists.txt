@@ -1,4 +1,4 @@
-# macOS build: CMAKE_PREFIX_PATH=/usr/local/Cellar/qt/5.14.1 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
+# macOS build: CMAKE_PREFIX_PATH=/usr/local/Cellar/qt/6.0.2 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
 
 cmake_minimum_required(VERSION 3.1.0)
 
@@ -12,7 +12,7 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
 set(SOURCES
     main.cpp
@@ -54,4 +54,4 @@ else()
     add_executable(meh ${SOURCES})
 endif()
 
-target_link_libraries(meh Qt5::Widgets)
+target_link_libraries(meh Qt6::Widgets)

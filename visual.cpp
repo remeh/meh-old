@@ -62,7 +62,7 @@ void Editor::keyPressEventVisual(QKeyEvent* event, bool ctrl, bool shift) {
             {
                 QTextCursor cursor = this->textCursor();
                 QChar c = this->document()->characterAt(cursor.position()+1);
-                if (c != "\u2029") {
+                if (c != u'\u2029') {
                     this->moveCursor(QTextCursor::Right, QTextCursor::KeepAnchor);
                 }
             }
@@ -123,7 +123,8 @@ void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool shift) {
             break;
         case Qt::Key_Y:
             {
-                if (this->document()->characterAt(this->textCursor().position()) == "\u2029") {
+                QChar c = this->document()->characterAt(this->textCursor().position());
+                if (c == u'\u2029') {
                     QTextCursor cursor = this->textCursor();
                     cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
                     this->setTextCursor(cursor);
@@ -137,13 +138,16 @@ void Editor::keyPressEventVisualLine(QKeyEvent* event, bool, bool shift) {
             return;
         case Qt::Key_D:
         case Qt::Key_X:
-            if (this->document()->characterAt(this->textCursor().position()) == "\u2029") {
-                QTextCursor cursor = this->textCursor();
-                cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-                this->setTextCursor(cursor);
+            {
+                QChar c = this->document()->characterAt(this->textCursor().position());
+                if (c == u'\u2029') {
+                    QTextCursor cursor = this->textCursor();
+                    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                    this->setTextCursor(cursor);
+                }
+                this->cut();
+                this->setMode(MODE_NORMAL);
             }
-            this->cut();
-            this->setMode(MODE_NORMAL);
             return;
         case Qt::Key_K:
             this->moveCursor(QTextCursor::Up, QTextCursor::KeepAnchor);
