@@ -281,6 +281,10 @@ private:
     // checkpoints stored.
     QList<Checkpoint> checkpoints;
 
+    // getOneLine returns the given line in the given file.
+    // It returns the last line of the file if line doesn't exist.
+    const QString getOneLine(const QString filename, int line);
+
     // ----------------------
 
     TasksPlugin *tasksPlugin;

@@ -8,6 +8,10 @@ Exec::Exec(Window* window) : window(window), command("") {
 }
 
 void Exec::onResults() {
+    if (!this->process) {
+        return;
+    }
+
     for (QByteArray readData = this->process->readLine(); readData.size() > 0; readData = this->process->readLine()) {
         this->data.append(readData);
     }
@@ -15,10 +19,12 @@ void Exec::onResults() {
 
 void Exec::onErrorOccurred() {
     if (this->process) {
-        this->window->getStatusBar()->setMessage("An error occurred while running git blame.");
         delete this->process;
         this->process = nullptr;
     }
+
+    this->window->getStatusBar()->setMessage("An error occurred while running: " + this->command);
+    this->window->getStatusBar()->showMessage();
 }
 
 void Exec::onFinished() {
@@ -59,11 +65,12 @@ void Exec::start(const QString& baseDir, QStringList args) {
 
     const QString& command = args[0];
     args.removeFirst();
-    this->process->start(command, args);
 
     // connect the events
     connect(this->process, &QProcess::readyReadStandardOutput, this, &Exec::onResults);
     connect(this->process, &QProcess::readyReadStandardError, this, &Exec::onResults);
     connect(this->process, &QProcess::errorOccurred, this, &Exec::onErrorOccurred);
     connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Exec::onFinished);
+
+    this->process->start(command, args);
 }

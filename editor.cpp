@@ -1359,10 +1359,13 @@ void Editor::lspInterpret(QJsonDocument json) {
                     if (file.startsWith("file://")) {
                         file = file.remove(0, 7);
                     }
+
+                    const QString targetLine = this->getOneLine(file, line);
+
                     if (file.startsWith(this->window->getBaseDir())) {
                         file = file.remove(0, this->window->getBaseDir().size());
                     }
-                    this->window->getRefWidget()->insert(file, QString::number(line), "");
+                    this->window->getRefWidget()->insert(file, QString::number(line), targetLine);
                 }
                 this->window->getRefWidget()->fitContent();
                 this->window->getRefWidget()->show();
@@ -1370,6 +1373,16 @@ void Editor::lspInterpret(QJsonDocument json) {
                 return;
             }
     }
+}
+
+const QString Editor::getOneLine(const QString filename, int line) {
+    QFile file(filename);
+    QString rv;
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        for (int i = 0; i < line-1 && !file.atEnd(); i++) { file.readLine(); }
+        rv = file.readLine().trimmed();
+    }
+    return rv;
 }
 
 // line area

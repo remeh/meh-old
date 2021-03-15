@@ -11,7 +11,7 @@ void LineNumberArea::paintEvent(QPaintEvent *event) {
 }
 
 void LineNumberArea::mousePressEvent(QMouseEvent *event) {
-    int line = this->editor->lineNumberAtY(event->y());
+    int line = this->editor->lineNumberAtY(event->position().y());
     if (line == -1) {
         return;
     }
