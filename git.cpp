@@ -1,3 +1,5 @@
+#include <QRegularExpression>
+
 #include "buffer.h"
 #include "git.h"
 #include "window.h"
@@ -31,7 +33,9 @@ void Git::onFinished() {
     switch (this->command) {
         case GIT_BLAME:
             {
-                Buffer* buffer = new Buffer(this->data);
+                QString str = this->data;
+                str = str.replace(QRegularExpression("\\)\\s*\n"), ")\n");
+                Buffer* buffer = new Buffer(str.toUtf8());
                 buffer->setType(BUFFER_TYPE_GIT_BLAME);
                 buffer->setName(this->bufferName);
                 this->window->getEditor()->setCurrentBuffer(buffer);
@@ -40,7 +44,9 @@ void Git::onFinished() {
             break;
         case GIT_SHOW:
             {
-                Buffer* buffer = new Buffer(this->data);
+                QString str = this->data;
+                str = str.replace(QRegularExpression("\n\\s*\n"), "\n\n");
+                Buffer* buffer = new Buffer(str.toUtf8());
                 buffer->setType(BUFFER_TYPE_GIT_SHOW);
                 buffer->setName(this->bufferName);
                 this->window->getEditor()->setCurrentBuffer(buffer);
@@ -49,7 +55,9 @@ void Git::onFinished() {
             break;
         case GIT_DIFF:
             {
-                Buffer* buffer = new Buffer(this->data);
+                QString str = this->data;
+                str = str.replace(QRegularExpression("\n\\s*\n"), "\n\n");
+                Buffer* buffer = new Buffer(str.toUtf8());
                 buffer->setType(BUFFER_TYPE_GIT_DIFF);
                 buffer->setName(this->bufferName);
                 this->window->getEditor()->setCurrentBuffer(buffer);
