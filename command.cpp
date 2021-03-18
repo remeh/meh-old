@@ -80,6 +80,16 @@ void Command::execute(QString text) {
     QStringList list = text.split(" ");
     const QString& command = list[0];
 
+    // misc commands
+    // ----------------------
+
+    if (command == ":pwd" || command == ":basedir") {
+        this->window->getStatusBar()->setMessage("Base dir: " + this->window->getBaseDir());
+        this->window->getStatusBar()->showMessage();
+        return;
+    }
+
+
     // quit
     // ----------------------
 
@@ -306,6 +316,23 @@ void Command::execute(QString text) {
         figlet.waitForFinished();
         QByteArray data = figlet.readAll();
         this->window->getEditor()->insertPlainText(data);
+        return;
+    }
+
+    if (command.startsWith(":title")) {
+        QString copy = text.replace(":title ", "");
+        QString rv = "#";
+        for (int i = 0; i < copy.size()+3; i++) {
+            rv += "#";
+        }
+        rv += "\n";
+        rv += "# " + copy + " #\n";
+        rv += "#";
+        for (int i = 0; i < copy.size()+3; i++) {
+            rv += "#";
+        }
+        rv += "\n";
+        this->window->getEditor()->insertPlainText(rv);
         return;
     }
 
