@@ -680,31 +680,27 @@ void Editor::mousePressEvent(QMouseEvent* event) {
         if (this->mode == MODE_NORMAL) {
             this->setMode(MODE_INSERT);
         }
-
-        bool shift = event->modifiers() & Qt::ShiftModifier;
-        #ifdef Q_OS_MAC
-            bool ctrl = event->modifiers() & Qt::MetaModifier;
-        #else
-            bool ctrl = event->modifiers() & Qt::ControlModifier;
-        #endif
-
-        if (ctrl && this->currentBuffer != nullptr) {
-            // position the cursor, this way, `currentLineNumber` and `currentColumn`
-            // will return the correct value.
-            QPlainTextEdit::mousePressEvent(event);
-
-            LSP* lsp = this->lspManager->getLSP(this->currentBuffer);
-            if (lsp == nullptr) {
-                this->window->getStatusBar()->setMessage("No LSP server running."); return;
-                return;
-            }
-            int reqId = QRandomGenerator::global()->generate();
-            lsp->definition(reqId, this->currentBuffer->getFilename(),
-                            this->currentLineNumber(),
-                            this->currentColumn());
-            this->lspManager->setExecutedAction(reqId, LSP_ACTION_DEFINITION, this->currentBuffer);
+    }
+    if (event->button() == Qt::MiddleButton) {
+        if (this->currentBuffer == nullptr) {
             return;
         }
+
+        // position the cursor, this way, `currentLineNumber` and `currentColumn`
+        // will return the correct value.
+        QPlainTextEdit::mousePressEvent(event);
+
+        LSP* lsp = this->lspManager->getLSP(this->currentBuffer);
+        if (lsp == nullptr) {
+            this->window->getStatusBar()->setMessage("No LSP server running."); return;
+            return;
+        }
+        int reqId = QRandomGenerator::global()->generate();
+        lsp->definition(reqId, this->currentBuffer->getFilename(),
+                        this->currentLineNumber(),
+                        this->currentColumn());
+        this->lspManager->setExecutedAction(reqId, LSP_ACTION_DEFINITION, this->currentBuffer);
+        return;
     }
     if (event->button() == Qt::ForwardButton) {
         if (this->mode == MODE_NORMAL) {
