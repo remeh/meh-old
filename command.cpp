@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QDir>
 #include <QMessageBox>
 #include <QRandomGenerator>
 #include <QSettings>
@@ -89,6 +90,27 @@ void Command::execute(QString text) {
         return;
     }
 
+    if (command == ":cd") {
+        list.removeFirst();
+        if (list.size() == 0) {
+            return;
+        }
+        QString path = list.join(" ").trimmed();
+        QString bd = this->window->getBaseDir();
+        if (path.startsWith("/")) {
+            bd = path;
+        } else {
+            bd += path;
+        }
+        QDir d(bd);
+        if (!d.exists()) {
+            this->window->getStatusBar()->setMessage("Can't set base dir to: " + d.absolutePath() + "\nIt doesn't exist");
+            return;
+        }
+        this->window->setBaseDir(d.absolutePath());
+        this->window->getStatusBar()->setMessage("Base dir set to: " + this->window->getBaseDir());
+        return;
+    }
 
     // quit
     // ----------------------
