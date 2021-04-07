@@ -157,6 +157,20 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             }
             return;
         case Qt::Key_K:
+            if (shift) {
+                QString indent = this->currentLineIndent();
+                QTextCursor cursor = this->textCursor();
+                cursor.beginEditBlock();
+                if (this->document()->characterAt(cursor.position()-1) == ' ') {
+                    cursor.movePosition(QTextCursor::Left);
+                }
+                if (this->document()->characterAt(cursor.position()) == ' ') {
+                    cursor.deleteChar();
+                }
+                cursor.insertText("\n" + indent);
+                cursor.endEditBlock();
+                return;
+            }
             this->up();
             return;
         case Qt::Key_J:
@@ -297,4 +311,3 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
            return;
     }
 }
-
