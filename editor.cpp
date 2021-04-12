@@ -1410,8 +1410,22 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
+
+            // background
             if (diags.contains(blockNumber + 1)) {
-                painter.setPen(QColor::fromRgb(250, 50, 50));
+              // use differents red if it's on the current line or not
+              if (currentLine == blockNumber+1) {
+                painter.fillRect(0, top, this->window->width(), fontMetrics().height(), QColor(100,30,30));
+              } else {
+                painter.fillRect(0, top, this->window->width(), fontMetrics().height(), QColor(70,30,30));
+              }
+            } else if (currentLine == blockNumber+1) {
+                painter.fillRect(0, top, lineNumberArea->width(), fontMetrics().height(), this->highlightedLine);
+            }
+
+            // foreground
+            if (diags.contains(blockNumber + 1)) {
+                painter.setPen(QColor::fromRgb(150, 150, 150));
             } else if (currentLine == blockNumber+1) {
                 painter.setPen(QColor::fromRgb(200, 200, 200));
             } else {
