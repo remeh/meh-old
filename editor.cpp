@@ -164,17 +164,7 @@ void Editor::onWindowResized(QResizeEvent* event) {
 
 void Editor::onCursorPositionChanged() {
     this->selectionTimer->start(300);
-
-    QList<QTextEdit::ExtraSelection> extraSelections;
-    QTextEdit::ExtraSelection selection;
-    selection.format.setBackground(this->highlightedLine);
-    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-    selection.cursor = textCursor();
-    selection.cursor.clearSelection();
-    extraSelections.append(selection);
-    this->setExtraSelections(extraSelections);
-
-    // NOTE(remy): block number should not only be equals to line number...
+    // update the status bar with the current line number
     this->getStatusBar()->setLineNumber(this->textCursor().blockNumber() + 1);
 }
 

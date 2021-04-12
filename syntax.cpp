@@ -30,8 +30,9 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
         highlightingRules.append(rule);
     }
 
-    selectionFormat.setBackground(QColor::fromRgb(120,120,120));
-    selectionFormat.setForeground(QColor::fromRgb(255,255,255));
+    selectionFormat.setUnderlineColor(QColor::fromRgb(70,150,70));
+    selectionFormat.setFontUnderline(true);
+    selectionFormat.setUnderlineStyle(QTextCharFormat::SingleUnderline);
 
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::gray);
