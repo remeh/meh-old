@@ -90,7 +90,6 @@ LSP* LSPManager::start(const QString& language) {
 }
 
 LSP* LSPManager::forLanguage(const QString& language) {
-    // XXX(remy):
     QString l = language;
     if (l == "h") { l = "cpp"; }
     for (int i = 0; i < this->lsps.size(); i++) {
@@ -127,6 +126,18 @@ bool LSPManager::manageBuffer(Buffer* buffer) {
         return true;
     }
     return false;
+}
+
+void LSPManager::reload(Buffer *buffer) {
+    Q_ASSERT(buffer != nullptr);
+
+    this->lspsPerFile.clear();
+    for (int i = 0; i < lsps.size(); i++) {
+        LSP* lsp = lsps.takeAt(i);
+        delete lsp;
+    }
+
+    this->manageBuffer(buffer);
 }
 
 LSP* LSPManager::getLSP(Buffer* buffer) {

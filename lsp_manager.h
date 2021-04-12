@@ -45,6 +45,10 @@ public:
     // If it is already managed, it will refresh it in the LSP cache.
     bool manageBuffer(Buffer* buffer);
 
+    // reload deletes all existing lsp instances and restart one for
+    // the given buffer
+    void reload(Buffer* buffer);
+
     // getLSP returns the LSP server managing the given buffer.
     LSP* getLSP(Buffer* buffer);
 
