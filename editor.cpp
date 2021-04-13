@@ -736,12 +736,14 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                 {
                     QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageUp, Qt::NoModifier);
                     QPlainTextEdit::keyPressEvent(&pageEvent);
+                    this->selectionTimer->stop(); // we don't want to refresh the highlight
                 }
                 return;
             case Qt::Key_D:
                 {
                     QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageDown, Qt::NoModifier);
                     QPlainTextEdit::keyPressEvent(&pageEvent);
+                    this->selectionTimer->stop(); // we don't want to refresh the highlight
                 }
                 return;
             case Qt::Key_Return:
