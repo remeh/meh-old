@@ -131,6 +131,10 @@ bool LSPManager::manageBuffer(Buffer* buffer) {
 void LSPManager::reload(Buffer *buffer) {
     Q_ASSERT(buffer != nullptr);
 
+    if (this->cleanTimer != nullptr) {
+        this->cleanTimer->stop();
+    }
+
     this->lspsPerFile.clear();
     for (int i = 0; i < lsps.size(); i++) {
         LSP* lsp = lsps.takeAt(i);

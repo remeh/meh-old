@@ -30,7 +30,7 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
         highlightingRules.append(rule);
     }
 
-    selectionFormat.setUnderlineColor(QColor::fromRgb(70,150,70));
+    selectionFormat.setUnderlineColor(QColor::fromRgb(153,215,0));
     selectionFormat.setFontUnderline(true);
     selectionFormat.setUnderlineStyle(QTextCharFormat::SingleUnderline);
 
