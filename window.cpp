@@ -95,7 +95,7 @@ void Window::closeEvent(QCloseEvent* event) {
     }
 }
 
-bool Window::areYouSure() {
+bool Window::areYouSure(const QString& message) {
     if (this->getEditor() != nullptr) {
         if (this->getEditor()->getCurrentBuffer() == nullptr) {
             return true;
@@ -106,10 +106,14 @@ bool Window::areYouSure() {
     }
 
     QMessageBox msgBox;
-    msgBox.setText("Are you sure to close the app?");
+    msgBox.setText(message);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Yes);
     return msgBox.exec() == QMessageBox::Yes;
+}
+
+bool Window::areYouSure() {
+    return this->areYouSure("Are you sure to close the app?");
 }
 
 void Window::openCommand() {

@@ -85,6 +85,7 @@ public:
 
     // areYouSure shows a "Are you sure?" message box
     bool areYouSure();
+    bool areYouSure(const QString& message);
 
 protected:
 

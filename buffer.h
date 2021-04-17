@@ -36,6 +36,9 @@ public:
     // on disk if has not been already done.
     QByteArray read();
 
+    // reload returns the content of the buffer as it is on disk.
+    QByteArray reload();
+
     // save saves the file on disk.
     void save(Editor* editor);
 
@@ -90,7 +93,7 @@ private:
     QString filename;
     QString name; // if the buffer doesn't has a filename attached, it may have a name
 
-    bool readFromDisk;
+    bool alreadyReadFromDisk;
     QByteArray data;
 
     int bufferType;

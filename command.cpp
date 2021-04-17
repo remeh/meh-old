@@ -408,8 +408,10 @@ void Command::execute(QString text) {
         return;
     }
 
-    // open a file
+    // file
     // ----------------------
+
+    // open
 
     if (command == ":e" && list.size() > 1) {
         for (int i = 1; i < list.size(); i++) {
@@ -419,8 +421,27 @@ void Command::execute(QString text) {
         return;
     }
 
+    // reload
+
+    if (command == ":reload") {
+        Buffer* buffer = this->window->getEditor()->getCurrentBuffer();
+        if (buffer == nullptr) {
+            return;
+        }
+        if (!this->window->areYouSure("Are you sure to reload this file? Last changes may be lost.")) {
+            return;
+        }
+
+        int position = this->window->getEditor()->textCursor().position();
+        this->window->getEditor()->setPlainText(buffer->reload());
+        QTextCursor cursor = this->window->getEditor()->textCursor();
+        cursor.setPosition(position);
+        this->window->getEditor()->setTextCursor(cursor);
+        this->window->getEditor()->centerCursor();
+        return;
+    }
+
     // save
-    // ----------------------
 
     if (command == ":w") {
         if (list.size() > 1) {

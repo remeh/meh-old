@@ -12,13 +12,13 @@
 Buffer::Buffer() :
     modified(false),
     filename(""),
-    readFromDisk(false),
+    alreadyReadFromDisk(false),
     bufferType(BUFFER_TYPE_UNKNOWN) {
 }
 
 Buffer::Buffer(QString filename) :
     modified(false),
-    readFromDisk(false),
+    alreadyReadFromDisk(false),
     bufferType(BUFFER_TYPE_FILE) {
     // resolve the absolute path of this
     QFileInfo info(filename);
@@ -28,13 +28,13 @@ Buffer::Buffer(QString filename) :
 Buffer::Buffer(QByteArray data) :
     modified(false),
     filename(""),
-    readFromDisk(false),
+    alreadyReadFromDisk(false),
     bufferType(BUFFER_TYPE_UNKNOWN) {
     this->data = data;
 };
 
 QByteArray Buffer::read() {
-    if (readFromDisk) {
+    if (alreadyReadFromDisk) {
         return this->data;
     }
 
@@ -55,10 +55,15 @@ QByteArray Buffer::read() {
         file.open(QIODevice::ReadOnly);
         this->data = file.readAll();
         file.close();
-        this->readFromDisk = true;
+        this->alreadyReadFromDisk = true;
     }
 
     return this->data;
+}
+
+QByteArray Buffer::reload() {
+    this->alreadyReadFromDisk = false;
+    return this->read();
 }
 
 QString Buffer::getId() {
@@ -119,7 +124,7 @@ void Buffer::save(Editor* editor) {
     file.close();
 
     if (this->postProcess(editor)) {
-        this->readFromDisk = false;
+        this->alreadyReadFromDisk = false;
         if (editor->getCurrentBuffer() == this) {
             // store some cursor / scroll positions
             QTextCursor cursor = editor->textCursor();
