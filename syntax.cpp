@@ -41,7 +41,10 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     highlightingRules.append(rule);
 
     quotationFormat.setForeground(QColor::fromRgb(98,98,98));
-    rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
+    rule.pattern = QRegularExpression(QStringLiteral("\"(.*?)\""));
+    rule.format = quotationFormat;
+    highlightingRules.append(rule);
+    rule.pattern = QRegularExpression(QStringLiteral("'(.*?)'"));
     rule.format = quotationFormat;
     highlightingRules.append(rule);
 
