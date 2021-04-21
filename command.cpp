@@ -271,6 +271,7 @@ void Command::execute(QString text) {
 
     if (command == ":rlsp" || command == ":reloadlsp") {
         this->window->getEditor()->lspManager->reload(currentBuffer);
+        this->window->getStatusBar()->setLspRunning(false);
     }
 
     // close the current bnuffer
