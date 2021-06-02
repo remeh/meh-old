@@ -1,4 +1,9 @@
+#include <QApplication>
+#include <QDir>
 #include <QFileInfo>
+#include <QLocalSocket>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QString>
 #include <QMessageBox>
 
@@ -13,9 +18,10 @@
 #include "statusbar.h"
 #include "window.h"
 
-Window::Window(QWidget* parent) :
+Window::Window(QApplication* app, QWidget* parent) :
+    app(app),
     QWidget(parent),
-    editor(nullptr) {
+    commandServer(this) {
     // widgets
     // ----------------------
     this->command = new Command(this);
@@ -31,11 +37,6 @@ Window::Window(QWidget* parent) :
     // ----------------------
     this->statusBar = new StatusBar(this);
     this->statusBar->show();
-
-    // editor
-    // ----------------------
-
-    this->editor = new Editor(this);
 
     // replace
     // ----------------------
@@ -61,13 +62,27 @@ Window::Window(QWidget* parent) :
     this->grep = new Grep(this);
     this->grep->hide();
 
+    // prepare the lsp manager
+    // ----------------------
+
+    this->lspManager = new LSPManager(this);
+
     // layout
     // ----------------------
+
+    this->tabs = new QTabWidget();
+    this->tabs->setDocumentMode(true);
+    this->tabs->setTabsClosable(true);
+    this->tabs->setUsesScrollButtons(true);
+    this->tabs->setIconSize(QSize(24,24));
+    this->tabs->setElideMode(Qt::ElideNone);
+    this->tabs->setFocusPolicy(Qt::NoFocus);
+    this->tabs->setMovable(true);
 
     this->layout = new QGridLayout();
     this->layout->setContentsMargins(0, 0, 0, 0);
     this->layout->setVerticalSpacing(1);
-    this->layout->addWidget(this->editor);
+    this->layout->addWidget(this->tabs);
     this->layout->addWidget(this->command);
     this->layout->addWidget(this->filesLookup);
     this->layout->addWidget(this->completer);
@@ -81,12 +96,49 @@ Window::Window(QWidget* parent) :
 
     this->git = new Git(this);
     this->exec = new Exec(this);
+
+    // command server
+    // --------------
+
+    commandServer.listen("/tmp/meh.sock");
+
+    connect(this->tabs, &QTabWidget::tabCloseRequested, this, &Window::onCloseTab);
+    connect(&this->commandServer, &QLocalServer::newConnection, this, &Window::onNewSocketCommand);
 }
 
 Window::~Window() {
+    // XXX(remy): do I have to delete all editors myself since they are owned
+    // by the QTabWidget?
+
+    delete this->tabs;
     delete this->grep;
     delete this->git;
     delete this->exec;
+    delete this->lspManager;
+}
+
+void Window::onNewSocketCommand() {
+    qDebug() << "received a command";
+    QLocalSocket* socket = this->commandServer.nextPendingConnection();
+    if (socket == nullptr) {
+        return;
+    }
+    socket->waitForDisconnected(500);
+    QByteArray data = socket->readAll();
+    socket->close();
+
+    if (this->app) {
+        this->app->alert(this, 10000);
+    }
+
+    if (data.startsWith("open ")) {
+        data.remove(0, 5);
+        QStringList list = QString(data).split("###");
+        for (int i = 0; i < list.size(); i++) {
+            QString filename = list.at(i);
+            this->setCurrentEditor(filename);
+        }
+    }
 }
 
 void Window::closeEvent(QCloseEvent* event) {
@@ -97,10 +149,10 @@ void Window::closeEvent(QCloseEvent* event) {
 
 bool Window::areYouSure(const QString& message) {
     if (this->getEditor() != nullptr) {
-        if (this->getEditor()->getCurrentBuffer() == nullptr) {
+        if (this->getEditor()->getBuffer() == nullptr) {
             return true;
         }
-        if (this->getEditor()->getCurrentBuffer()->isGitTempFile()) {
+        if (this->getEditor()->getBuffer()->isGitTempFile()) {
             return true;
         }
     }
@@ -108,8 +160,15 @@ bool Window::areYouSure(const QString& message) {
     QMessageBox msgBox;
     msgBox.setText(message);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Yes);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
     return msgBox.exec() == QMessageBox::Yes;
+}
+
+void Window::onCloseTab(int index) {
+    Editor* editor = this->getEditor(index);
+    if (editor != nullptr) {
+        this->closeEditor(editor->getId());
+    }
 }
 
 bool Window::areYouSure() {
@@ -123,8 +182,8 @@ void Window::openCommand() {
 
 void Window::closeCommand() {
     this->command->hide();
-    if (this->editor) {
-        this->editor->setMode(MODE_NORMAL);
+    if (this->getEditor()) {
+        this->getEditor()->setMode(MODE_NORMAL);
     }
 }
 
@@ -199,7 +258,447 @@ void Window::setBaseDir(const QString& dir) {
 }
 
 void Window::resizeEvent(QResizeEvent* event) {
-    if (this->editor != nullptr) {
-        this->editor->onWindowResized(event);
+    if (this->getEditor() != nullptr) {
+        this->getEditor()->onWindowResized(event);
+    }
+}
+
+// buffers
+// -----------------
+
+// XXX(remy): merge newEditor methods
+
+Editor* Window::newEditor(QString name, QByteArray content) {
+    // XXX(remy): do not open the same file multiple times
+
+    // we want to create a new Editor with this buffer.
+    Editor* editor = new Editor(this);
+    Buffer* buffer = new Buffer(editor, name, content);
+    editor->setBuffer(buffer);
+    int tabIdx = this->tabs->addTab(editor, editor->getId());
+    this->tabs->setCurrentIndex(tabIdx);
+    this->setCurrentEditor(editor->getId());
+    return editor;
+}
+
+Editor* Window::newEditor(QString name, QString filename) {
+    // XXX(remy): do not open the same file multiple times
+
+    // we want to create a new Editor with this buffer.
+    Editor* editor = new Editor(this);
+    Buffer* buffer = new Buffer(editor, name, filename);
+    editor->setBuffer(buffer);
+
+    QFileInfo fi(filename);
+    QString label;
+    QString dirName = fi.dir().dirName();
+    if (dirName != ".") {
+        label = dirName + "/" + fi.fileName();
+    } else {
+        label = fi.fileName();
+    }
+    // FIXME(remy): use CSS rule?
+    label.prepend("   ");
+    label.append("   ");
+
+    int tabIdx = this->tabs->addTab(editor, editor->getIcon(), label);
+    this->setCurrentEditor(editor->getId());
+    return editor;
+}
+
+void Window::save() {
+    Q_ASSERT(this->getEditor() != nullptr);
+    this->getEditor()->save();
+}
+
+void Window::saveAll() {
+    // save other buffers
+    for (Editor* editor : this->getEditors()) {
+        editor->save();
+    }
+}
+
+bool Window::hasBuffer(const QString& id) {
+    return this->getEditor(id) != nullptr;
+}
+
+Editor* Window::getEditor() {
+    if (this->tabs == nullptr || this->tabs->count() == 0) {
+        return nullptr;
+    }
+
+    // retrieve the editor from the currently opened tab
+    QWidget* page = this->tabs->currentWidget();
+    if (page == nullptr) {
+        return nullptr;
+    }
+    return static_cast<Editor*>(page);
+}
+
+// XXX(remy): factorize getEditor and getEditorTabIndex
+
+Editor* Window::getEditor(const QString& id) {
+    for (int i = 0; i < this->tabs->count(); i++) {
+        QWidget* page = this->tabs->widget(i);
+        if (page == nullptr) {
+            qDebug() << "Window::closeEditor: nullptr page, should never happen";
+            continue;
+        }
+        Editor* ed = static_cast<Editor*>(page);
+        if (ed == nullptr) {
+            qDebug() << "Window::closeEditor: can't case page, should never happen";
+            continue;
+        }
+        if (ed->getId() == id) {
+            return ed;
+        }
+    }
+    return nullptr;
+}
+
+Editor* Window::getEditor(int tabIndex) {
+    QList<Editor*> editors = this->getEditors();
+    return editors.at(tabIndex);
+}
+
+QList<Editor*> Window::getEditors() {
+    QList<Editor*> list;
+    for (int i = 0; i < this->tabs->count(); i++) {
+        QWidget* page = this->tabs->widget(i);
+        if (page == nullptr) {
+            qDebug() << "Window::closeEditor: nullptr page, should never happen";
+            continue;
+        }
+        Editor* ed = static_cast<Editor*>(page);
+        if (ed == nullptr) {
+            qDebug() << "Window::closeEditor: can't case page, should never happen";
+            continue;
+        }
+        list.append(ed);
+    }
+    return list;
+}
+
+int Window::getEditorTabIndex(Editor* editor) {
+    Q_ASSERT(editor != nullptr);
+    return this->getEditorTabIndex(editor->getId());
+}
+
+int Window::getEditorTabIndex(const QString& id) {
+    for (int i = 0; i < this->tabs->count(); i++) {
+        QWidget* page = this->tabs->widget(i);
+        if (page == nullptr) {
+            qDebug() << "Window::closeEditor: nullptr page, should never happen";
+            continue;
+        }
+        Editor* ed = static_cast<Editor*>(page);
+        if (ed == nullptr) {
+            qDebug() << "Window::closeEditor: can't cast page, should never happen";
+            continue;
+        }
+        if (ed->getId() == id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+Editor* Window::setCurrentEditor(QString id) {
+    Editor* currentEditor = this->getEditor();
+    if (currentEditor != nullptr) {
+        this->previousEditorId = currentEditor->getId();
+    }
+
+    int tabIndex = this->getEditorTabIndex(id);
+    if (tabIndex >= 0) {
+        this->tabs->setCurrentIndex(tabIndex);
+        Editor* editor = this->getEditor();
+        this->statusBar->setEditor(editor);
+        return editor;
+    }
+
+    // opens it as a file
+    return this->newEditor(id, id);
+}
+
+void Window::closeCurrentEditor() {
+    Editor* editor = this->getEditor();
+    if (editor == nullptr) {
+        return;
+    }
+
+    return this->closeEditor(editor->getId());
+}
+
+void Window::closeEditor(const QString& id) {
+    // XXX(remy): is there any Qt signals to connect?
+
+    // TODO(remy): we are going two times through the list of tabs here
+    // we may want to do something more optimized. I've done it this way
+    // for the time being since it avoid code duplication and is way more readable.
+    Editor* editor = this->getEditor(id);
+
+    if (editor == nullptr) {
+        qDebug() << "Window::closeEditor:" << "can't find editor with id:" << id;
+    }
+
+    if (editor->getBuffer()->modified) {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Unsaved bffer");
+            msgBox.setText("The buffer you want to close has modifications. Close anyway?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+            msgBox.setDefaultButton(QMessageBox::Cancel);
+            if (msgBox.exec() == QMessageBox::Cancel) {
+                return;
+            }
+    }
+
+    int tabIdx = this->getEditorTabIndex(id);
+
+    this->tabs->removeTab(tabIdx);
+    delete editor; // since we use removeTab, it's not done by the QTabWidget
+
+    if (this->checkpoints.size() > 0) {
+        this->lastCheckpoint();
+        return;
+    }
+
+    if (this->getEditor() != nullptr) {
+        this->setCurrentEditor(this->getEditor()->getId());
+        return;
+    }
+
+    this->newEditor("notes", QString("/tmp/meh-notes"));
+}
+
+// checkpoints
+// -----------
+
+void Window::saveCheckpoint() {
+    if (this->getEditor() == nullptr || this->getEditor()->getBuffer() == nullptr) {
+        return;
+    }
+
+    QString id = this->getEditor()->getId();
+    int position = this->getEditor()->textCursor().position();
+    Checkpoint c(id, position);
+
+    if (this->checkpoints.isEmpty()) {
+        this->checkpoints.append(c);
+        return;
+    }
+
+    if (!this->checkpoints.isEmpty()) {
+        Checkpoint last = this->checkpoints.last();
+        if (last.id != id || last.position != position) {
+            this->checkpoints.append(c);
+        }
+    }
+}
+
+void Window::lastCheckpoint() {
+    while (!this->checkpoints.isEmpty()) {
+        Checkpoint c = this->checkpoints.takeLast();
+        Editor* editor = this->getEditor(c.id);
+        if (editor != nullptr) {
+            this->setCurrentEditor(c.id);
+            QTextCursor cursor = editor->textCursor();
+            cursor.setPosition(c.position);
+            editor->setTextCursor(cursor);
+            // we've restored one, we can leave
+            return;
+        }
+    }
+}
+
+// lsp
+// -------------
+
+void Window::showLSPDiagnosticsOfLine(const QString& buffId, int line) {
+    auto allDiags = this->getLSPManager()->getDiagnostics(buffId);
+    auto lineDiags = allDiags[line];
+    if (lineDiags.size() == 0) {
+        return;
+    }
+
+    for (int i = 0; i < lineDiags.size(); i++) {
+        auto diag = lineDiags[i];
+        if (diag.message.size() > 0) {
+            QFileInfo fi = QFileInfo(diag.absFilename);
+            QString message = fi.fileName() + ":" + QString::number(diag.line) + " " + diag.message;
+            this->getStatusBar()->setMessage(message);
+        }
+    }
+}
+
+void Window::lspInterpretMessages(const QByteArray& data) {
+    QList<QJsonDocument> list = LSPReader::readMessage(data);
+    if (list.size() == 0) {
+        return;
+    }
+
+    for (int i = 0; i < list.size(); i++) {
+        this->lspInterpret(list[i]);
+    }
+}
+
+
+void Window::lspInterpret(QJsonDocument json) {
+    if (json.isNull() || json.isEmpty()) {
+        return;
+    }
+
+    LSPAction action = this->lspManager->getExecutedAction(json["id"].toInt());
+    if (action.requestId == 0) {
+        if (json["method"].isNull()) {
+            return;
+        }
+        // showMessage
+        // -----------
+        if (json["method"].toString() == "window/showMessage") {
+            if (!json["params"].isNull()) {
+                const QString& msg = json["params"]["message"].toString();
+                if (msg.size() > 0) {
+                    this->getStatusBar()->setMessage(msg);
+                }
+            }
+        // publishDiagnostics
+        // ------------------
+        } else if (json["method"] == "textDocument/publishDiagnostics") {
+            if (!json["params"].isNull() && !json["params"]["diagnostics"].isNull()) {
+                if (!json["params"]["diagnostics"].isArray()) {
+                    qWarning() << "lspInterpret: \"diagnostics\" is not an array";
+                    return;
+                }
+                if (json["params"]["uri"].isNull()) {
+                    qWarning() << "lspInterpret: no \"uri\" field in diagnostic";
+                    return;
+                }
+
+                auto diags = json["params"]["diagnostics"].toArray();
+                const QString& uri = QFileInfo(json["params"]["uri"].toString().replace("file://", "")).absoluteFilePath();
+
+                this->lspManager->clearDiagnostics(uri);
+
+                for (int i = 0; i < diags.size(); i++) {
+                    QJsonObject diag = diags[i].toObject();
+                    const QString& msg = diag["message"].toString();
+                    if (!diag["range"].isNull() && !diag["range"].toObject()["start"].isNull()
+                            && !diag["range"].toObject()["start"].toObject()["line"].isNull()) {
+                        int line = diag["range"].toObject()["start"].toObject()["line"].toInt();
+                        LSPDiagnostic diag;
+                        diag.line = line + 1;
+                        diag.message = msg;
+                        diag.absFilename = uri;
+                        this->lspManager->addDiagnostic(uri, diag);
+                    }
+                }
+                this->repaint();
+            }
+        }
+        return;
+    }
+
+    switch (action.action) {
+        case LSP_ACTION_DECLARATION:
+        case LSP_ACTION_DEFINITION:
+            {
+                // TODO(remy): deal with multiple results
+                int line = json["result"][0]["range"]["start"]["line"].toInt();
+                int column = json["result"][0]["range"]["start"]["character"].toInt();
+                QString file = json["result"][0]["uri"].toString();
+                if (file.isEmpty()) {
+                    this->getStatusBar()->setMessage("Nothing found.");
+                    return;
+                }
+                file.remove(0,7); // remove the file://
+                this->saveCheckpoint();
+                this->setCurrentEditor(file);
+                this->getEditor()->goToLine(line + 1);
+                this->getEditor()->goToColumn(column);
+                return;
+            }
+        case LSP_ACTION_COMPLETION:
+            {
+                if (json["result"].isNull()) {
+                    this->getStatusBar()->setMessage("Nothing found.");
+                    return;
+                }
+
+                if (action.buffer->getId() != this->getEditor()->getId()) {
+                    qDebug() << "debug: received an lsp response for another editor than the current one";
+                    return;
+                }
+
+                LSP* lsp = this->lspManager->getLSP(this->getEditor()->getId()) ;
+                if (lsp == nullptr) {
+                    this->getStatusBar()->setMessage("Nothing found.");
+                    return;
+                }
+
+                auto entries = lsp->getEntries(json);
+                if (entries.size() == 0) {
+                    this->getStatusBar()->setMessage("Nothing found.");
+                    return;
+                }
+
+                const QString& base = this->getEditor()->getWordUnderCursor();
+                this->openCompleter(base, entries);
+                return;
+            }
+        case LSP_ACTION_HOVER:
+            {
+                if (json["result"].isNull() || json["result"]["contents"].isNull()) {
+                    this->getStatusBar()->setMessage("Nothing found.");
+                    return;
+                }
+
+                auto contents = json["result"]["contents"].toObject();
+                this->getStatusBar()->setMessage(contents["value"].toString());
+                return;
+            }
+        case LSP_ACTION_SIGNATURE_HELP:
+            {
+                if (!json["result"].isNull() && !json["result"]["signatures"].isNull() && json["result"]["signatures"].toArray().size() > 0) {
+                    QString message;
+                    QJsonArray signatures = json["result"]["signatures"].toArray();
+                    for (int i = 0; i < signatures.size(); i++) {
+                        QJsonValue signature = signatures[i];
+                        message.append(signature["label"].toString()).append("\n");
+                        message.append(signature["documentation"].toString());
+                    }
+                    this->getStatusBar()->setMessage(message);
+                    return;
+                }
+                this->getStatusBar()->setMessage("Nothing found.");
+                return;
+            }
+        case LSP_ACTION_REFERENCES:
+            {
+                // TODO(remy): error management
+                this->getRefWidget()->clear();
+                this->getRefWidget()->hide();
+                QJsonArray list = json["result"].toArray();
+                for (int i = 0; i < list.size(); i++) {
+                    QJsonObject entry = list[i].toObject();
+                    int line = entry["range"].toObject()["start"].toObject()["line"].toInt();
+                    line += 1;
+                    QString file = entry["uri"].toString();
+                    if (file.startsWith("file://")) {
+                        file = file.remove(0, 7);
+                    }
+
+                    const QString targetLine = this->getEditor()->getOneLine(file, line);
+
+                    if (file.startsWith(this->getBaseDir())) {
+                        file = file.remove(0, this->getBaseDir().size());
+                    }
+                    this->getRefWidget()->insert(file, QString::number(line), targetLine);
+                }
+                this->getRefWidget()->fitContent();
+                this->getRefWidget()->show();
+                this->getRefWidget()->setFocus();
+                return;
+            }
     }
 }

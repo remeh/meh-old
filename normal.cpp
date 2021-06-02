@@ -264,7 +264,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             return;
 
         case Qt::Key_G:
-            this->saveCheckpoint();
+            this->window->saveCheckpoint();
             if (shift) {
                 this->moveCursor(QTextCursor::End);
             } else {
@@ -303,10 +303,10 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
 
        case Qt::Key_S:
            if (shift) {
-               this->lastCheckpoint();
+               this->window->lastCheckpoint();
                this->centerCursor();
            } else {
-               this->saveCheckpoint();
+               this->window->saveCheckpoint();
            }
            return;
     }

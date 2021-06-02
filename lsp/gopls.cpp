@@ -27,7 +27,7 @@ void LSPGopls::readStandardOutput() {
         return;
     }
     QByteArray data = this->lspServer.readAll();
-    this->window->getEditor()->lspInterpretMessages(data);
+    this->window->lspInterpretMessages(data);
 }
 
 // --------------------------
@@ -41,15 +41,19 @@ bool LSPGopls::start() {
     return this->serverSpawned;
 }
 
-void LSPGopls::initialize() {
+void LSPGopls::initialize(Buffer* buffer) {
+    Q_ASSERT(buffer != nullptr);
+
     const QString& initialize = this->writer.initialize(this->baseDir);
     const QString& initialized = this->writer.initialized();
-    this->window->getEditor()->lspManager->setExecutedAction(1, LSP_ACTION_INIT, this->window->getEditor()->getCurrentBuffer());
+    this->window->getLSPManager()->setExecutedAction(1, LSP_ACTION_INIT, buffer);
     this->lspServer.write(initialize.toUtf8());
     this->lspServer.write(initialized.toUtf8());
 }
 
 void LSPGopls::openFile(Buffer* buffer) {
+    Q_ASSERT(buffer != nullptr);
+
     const QString& msg = this->writer.openFile(buffer, buffer->getFilename(), "go");
     this->lspServer.write(msg.toUtf8());
 }

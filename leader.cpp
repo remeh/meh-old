@@ -7,7 +7,7 @@
 #include "window.h"
 
 void Editor::leaderModeSelectSubMode() {
-    if (this->currentBuffer == nullptr) {
+    if (this->buffer == nullptr) {
         this->setSubMode(NO_SUBMODE);
         this->setMode(MODE_NORMAL);
         return;
@@ -16,7 +16,7 @@ void Editor::leaderModeSelectSubMode() {
     // select the plugin to interpret the command
     // ------------------------------------------
 
-    if (this->currentBufferExtension() == "tasks") {
+    if (this->bufferExtension() == "tasks") {
         this->getStatusBar()->setMode("TASKS");
         this->setSubMode(SUBMODE_tasks);
         return;

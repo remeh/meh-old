@@ -89,9 +89,11 @@ void FilesLookup::lookupBuffers() {
     this->buffers.clear();
     this->filteredBuffers.clear();
 
-    QList<Buffer*> buffers = this->window->getEditor()->getBuffers().values();
-    for (int i = 0; i < buffers.size(); i++) {
-        Buffer* buffer = buffers.at(i);
+    this->list->setSortingEnabled(false);
+
+    QList<Editor*> editors = this->window->getEditors();
+    for (int i = 0; i < editors.size(); i++) {
+        Buffer* buffer = editors.at(i)->getBuffer();
         QString value = buffer->getId();
 
         // remove basedir of filenames
@@ -119,6 +121,8 @@ void FilesLookup::lookupDir(QString filepath) {
     this->filteredDirs.clear();
     this->buffers.clear();
     this->filteredBuffers.clear();
+
+    this->list->setSortingEnabled(true);
 
     if (filepath.endsWith("/")) {
         this->base += filepath;
@@ -153,13 +157,12 @@ bool FilesLookup::openSelection() {
     QString type = item->data(FILESLOOKUP_DATA_TYPE).toString();
 
     if (type == "file") {
-        QFileInfo info(this->base + "/" + id);
-        this->window->getEditor()->saveCheckpoint();
-        this->window->getEditor()->selectOrCreateBuffer(info.absoluteFilePath());
+        this->window->saveCheckpoint();
+        this->window->setCurrentEditor(id);
         return true;
     } else if (type == "buffer") {
-        this->window->getEditor()->saveCheckpoint();
-        this->window->getEditor()->selectOrCreateBuffer(id);
+        this->window->saveCheckpoint();
+        this->window->setCurrentEditor(id);
         return true;
     } else if (type == "directory") {
         this->lookupDir(id);
@@ -294,13 +297,14 @@ void FilesLookup::refreshList() {
     }
     it = this->filteredFiles.begin();
     while (it != this->filteredFiles.end()) {
+        QString fullPath = this->base + *it;
         QIcon icon = QIcon(":/res/plus.png");
-        if (this->window->getEditor()->hasBuffer(*it)) {
+        if (this->window->hasBuffer(fullPath)) {
             icon = QIcon(":/res/edit.png");
         }
         QListWidgetItem* item = new QListWidgetItem(icon, *it, this->list);
         item->setData(FILESLOOKUP_DATA_TYPE, "file");
-        item->setData(FILESLOOKUP_DATA_ID, *it);
+        item->setData(FILESLOOKUP_DATA_ID, fullPath);
         item->setText(*it);
         ++it;
     }

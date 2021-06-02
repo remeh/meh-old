@@ -62,7 +62,7 @@ public:
     virtual bool start() = 0;
     virtual void openFile(Buffer* buffer) = 0;
     virtual void refreshFile(Buffer* buffer) = 0;
-    virtual void initialize() = 0;
+    virtual void initialize(Buffer* buffer) = 0;
     virtual void definition(int reqId, const QString& filename, int line, int column) = 0;
     virtual void declaration(int reqId, const QString& filename, int line, int column) = 0;
     virtual void hover(int reqId, const QString& filename, int line, int column) = 0;

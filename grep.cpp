@@ -79,6 +79,8 @@ void Grep::readAndAppendResult(const QString& result) {
         parts[0] = parts[0].remove(0, 2);
     }
 
+    parts[0] = this->window->getBaseDir() + parts[0];
+
     this->window->getRefWidget()->insert(parts[0], parts[1], parts[2]);
 }
 

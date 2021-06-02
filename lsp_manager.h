@@ -39,7 +39,7 @@ public:
     // the given language. Synchronous calls returning a nullptr
     // if an error occurred. This pointer returned must not be
     // freed.
-    LSP* start(const QString& language);
+    LSP* start(Buffer* buffer, const QString& language);
 
     // manageBuffer let the LSP server managers the given buffer.
     // If it is already managed, it will refresh it in the LSP cache.
@@ -50,7 +50,7 @@ public:
     void reload(Buffer* buffer);
 
     // getLSP returns the LSP server managing the given buffer.
-    LSP* getLSP(Buffer* buffer);
+    LSP* getLSP(const QString& id);
 
     // setExecutedAction stores which action has been executed for the given
     // request ID. The buffer the user was into at this moment is also stored.

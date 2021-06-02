@@ -20,7 +20,7 @@ public:
     bool start() override;
     void openFile(Buffer* buffer) override;
     void refreshFile(Buffer* buffer) override;
-    void initialize() override;
+    void initialize(Buffer* buffer) override;
     void definition(int reqId, const QString& filename, int line, int column) override;
     void declaration(int reqId, const QString& filename, int line, int column) override;
     void hover(int reqId, const QString& filename, int line, int column) override;

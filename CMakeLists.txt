@@ -13,6 +13,7 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
 endif()
 
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Network REQUIRED)
 
 set(SOURCES
     main.cpp
@@ -55,3 +56,4 @@ else()
 endif()
 
 target_link_libraries(meh Qt6::Widgets)
+target_link_libraries(meh Qt6::Network)

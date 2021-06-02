@@ -2,6 +2,7 @@
 
 #include "editor.h"
 #include "line_number_area.h"
+#include "window.h"
 
 LineNumberArea::LineNumberArea(Editor* editor) : QWidget(editor), editor(editor) {
 }
@@ -16,7 +17,7 @@ void LineNumberArea::mousePressEvent(QMouseEvent *event) {
         return;
     }
 
-    this->editor->showLSPDiagnosticsOfLine(line);
+    this->editor->getWindow()->showLSPDiagnosticsOfLine(this->editor->getId(), line);
 }
 
 QSize LineNumberArea::sizeHint() const {

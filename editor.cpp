@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QFont>
 #include <QFontMetrics>
+#include <QIcon>
 #include <QImage>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -44,8 +45,9 @@ Editor::Editor(Window* window) :
     QPlainTextEdit(window),
     currentCompleter(nullptr),
     window(window),
-    currentBuffer(nullptr),
+    buffer(nullptr),
     mode(MODE_NORMAL),
+    tabIndex(-1),
     highlightedLine(QColor::fromRgb(50, 50, 50)) {
     Q_ASSERT(window != nullptr);
 
@@ -73,11 +75,6 @@ Editor::Editor(Window* window) :
     // ----------------------
 
     this->syntax = new Syntax(this->document());
-
-    // prepare the lsp manager
-    // ----------------------
-
-    this->lspManager = new LSPManager(this->window);
 
     // selection timer
     // ----------------------
@@ -122,21 +119,14 @@ Editor::Editor(Window* window) :
 }
 
 Editor::~Editor() {
-    if (this->currentBuffer != nullptr) {
-        this->currentBuffer->onLeave(this); // store settings
-        this->currentBuffer->onClose(this);
-        delete this->currentBuffer;
-    }
-    QList<Buffer*> buf = this->buffers.values();
-    for (int i = 0; i < buf.size(); i++) {
-        if (buf.at(i) != nullptr) {
-            this->deleteBuffer(buf.at(i));
-        }
+    if (this->buffer != nullptr) {
+        this->buffer->onLeave(); // store settings
+        this->buffer->onClose();
+        delete this->buffer;
     }
 
     delete this->selectionTimer;
     delete this->lspRefreshTimer;
-    delete this->lspManager;
     if (this->currentCompleter) {
         delete this->currentCompleter;
     }
@@ -148,7 +138,7 @@ QFont Editor::getFont() {
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
     #ifdef Q_OS_MAC
-    font.setPointSize(14);
+    font.setPointSize(16);
     #else
     font.setPointSize(11);
     #endif
@@ -173,11 +163,11 @@ void Editor::onSelectionChanged() {
 }
 
 void Editor::onTriggerLspRefresh() {
-    if (this->currentBuffer == nullptr) {
+    if (this->buffer == nullptr) {
         return;
     }
-    this->currentBuffer->refreshData(this);
-    this->lspManager->manageBuffer(this->currentBuffer);
+    this->buffer->refreshData(this->window);
+    this->window->getLSPManager()->manageBuffer(this->buffer);
     this->lspRefreshTimer->stop();
 }
 
@@ -206,8 +196,8 @@ void Editor::highlightText(QString text) {
 }
 
 void Editor::onChange(bool changed) {
-    if (this->currentBuffer != nullptr && changed) {
-        this->currentBuffer->modified = changed;
+    if (this->buffer != nullptr && changed) {
+        this->buffer->modified = changed;
     }
     this->getStatusBar()->setModified(changed);
 }
@@ -217,155 +207,50 @@ void Editor::onContentsChange(int position, int charsRemoved, int charsAdded) {
 }
 
 void Editor::save() {
-    if (!this->currentBuffer) { return; }
-
-    this->currentBuffer->save(this);
+    if (!this->buffer) { return; }
+    this->buffer->save(this->window);
     this->document()->setModified(false);
     this->getStatusBar()->setModified(false);
 }
 
-void Editor::saveAll() {
-    // save the current buffer.
-    this->save();
-
-    // save other buffers
-    QList<Buffer*> buff = this->buffers.values();
-    for (int i = 0; i < buff.size(); i++) {
-        if (buff.at(i)->modified) {
-            // TODO(remy): save this buffer only if it is a file
-            buff.at(i)->save(this);
-        }
-    }
-
-    this->document()->setModified(false);
-    this->getStatusBar()->setModified(false);
-}
-
-void Editor::setCurrentBuffer(Buffer* buffer) {
-    Q_ASSERT(buffer != NULL);
+void Editor::setBuffer(Buffer* buffer) {
+    Q_ASSERT(buffer != nullptr);
     disconnect(this, &QPlainTextEdit::modificationChanged, this, &Editor::onChange);
     disconnect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
-    if (this->currentBuffer != nullptr) {
-        this->currentBuffer->onLeave(this);
-        // we're leaving this one, append it to the end of the buffers list.
-        this->buffersPos.append(this->currentBuffer->getId());
-        this->buffers[this->currentBuffer->getId()] = this->currentBuffer;
+
+    // if this editor is already responsible of a buffer,
+    if (this->buffer != nullptr) {
+        this->buffer->onLeave();
+        this->buffer->onClose();
+        // XXX(remy): may not be enough
+        delete this->buffer;
+        this->buffer = nullptr;
     }
 
-    this->currentBuffer = buffer;
-    this->currentBuffer->onEnter(this);
-    this->document()->setModified(this->currentBuffer->modified);
+    buffer->onEnter();
+    this->document()->setModified(buffer->modified);
 
-    if (this->currentBufferExtension() == "tasks") {
-        this->window->setWindowIcon(QIcon(":res/icon-check.png"));
-    } else if (this->currentBufferExtension().size() > 0) {
+    connect(this, &QPlainTextEdit::modificationChanged, this, &Editor::onChange);
+    connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
+    this->buffer = buffer;
+}
+
+QIcon Editor::getIcon() {
+    if (this->bufferExtension() == "tasks") {
+        return QIcon(":res/icon-check.png");
+    } else if (this->bufferExtension().size() > 0) {
         QPixmap pixmap(QPixmap::fromImage(QImage(":res/icon-empty.png")));
         QPainter painter(&pixmap);
         painter.setPen(QColor(0, 0, 0));
         #ifdef Q_OS_MAC
-        painter.setFont(QFont(font().family(), 160));
+        painter.setFont(QFont(font().family(), 240));
         #else
-        painter.setFont(QFont(font().family(), 140));
+        painter.setFont(QFont(font().family(), 200));
         #endif
-        painter.drawText(QRect(60, 75, 390, 245), Qt::AlignCenter, this->currentBufferExtension());
-        this->window->setWindowIcon(QIcon(pixmap));
-    } else {
-        this->window->setWindowIcon(QIcon(":res/icon.png"));
+        painter.drawText(QRect(60, 75, 390, 245), Qt::AlignCenter, this->bufferExtension());
+        return QIcon(pixmap);
     }
-
-    if (this->getStatusBar() != nullptr) {
-        this->getStatusBar()->setBuffer(buffer);
-    }
-
-    connect(this, &QPlainTextEdit::modificationChanged, this, &Editor::onChange);
-    connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
-}
-
-void Editor::selectOrCreateBuffer(const QString& id) {
-    // do not do anything if the current file is the buffer we try to open
-    if (this->currentBuffer != nullptr && this->currentBuffer->getId() == id) {
-        return;
-    }
-
-    Buffer* buffer = this->buffers.take(id);
-    if (buffer == nullptr) {
-        // check that this file has not been opened by another instance
-        // of the editor.
-        if (this->alreadyOpened(id)) {
-            QMessageBox msgBox;
-            msgBox.setWindowTitle("Already opened");
-            msgBox.setText("This file is already opened by another instance of meh, do you still want to open it?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-            msgBox.setDefaultButton(QMessageBox::Cancel);
-            if (msgBox.exec() == QMessageBox::Cancel) {
-                return;
-            }
-        }
-
-        // this file has never been opened, open it
-        // TODO(remy): 	it will automatically consider it as a filename within this constructor
-        // 				maybe we would prefer to have an empty constructor and a setFilename method?
-        buffer = new Buffer(id);
-        // store somewhere that it is now open by someone
-        this->storeOpenedState(id);
-    } else {
-        int pos = this->buffersPos.indexOf(id);
-        if (pos >= 0) { // should not happen
-            this->buffersPos.remove(pos);
-        } else {
-            qDebug() << "pos == -1 in selectOrCreateBuffer, should never happen.";
-        }
-    }
-
-    this->window->setWindowTitle("meh - " + id);
-    this->setCurrentBuffer(buffer);
-    lspManager->manageBuffer(buffer);
-}
-
-void Editor::closeCurrentBuffer() {
-    if (this->currentBuffer == nullptr) {
-        return;
-    }
-
-    this->deleteBuffer(this->currentBuffer);
-    this->currentBuffer = nullptr;
-
-    if (this->buffers.size() == 0) {
-        // TODO(remy): do we want to open a scratch buffer here?
-        this->setPlainText(""); // clear
-        this->window->setWindowTitle("meh - no file");
-        return;
-    }
-
-    // NOTE(remy): don't remove it here, just take a ref,
-    // the selectOrCreateBuffer takes care of the list order etc.
-    if (this->buffersPos.size() == 0) {
-        return;
-    }
-
-    const QString& id = this->buffersPos.last();
-    this->selectOrCreateBuffer(id);
-}
-
-void Editor::deleteBuffer(Buffer* buffer) {
-    if (buffer == nullptr) {
-        return;
-    }
-
-    buffer->onLeave(this);
-    buffer->onClose(this);
-    buffersPos.removeOne(buffer->getId());
-    delete buffer;
-}
-
-bool Editor::hasBuffer(const QString& id) {
-    if (this->currentBuffer == nullptr) {
-        return false;
-    }
-
-    QFileInfo info(id);
-    return this->currentBuffer->getId() == id ||
-            this->buffers.contains(info.absoluteFilePath());
+    return QIcon(":res/icon.png");
 }
 
 bool Editor::alreadyOpened(const QString& filename) {
@@ -470,22 +355,22 @@ void Editor::setSubMode(int subMode) {
     this->subMode = subMode;
 }
 
-QStringList Editor::modifiedBuffers() {
-    QStringList rv;
-
-    if (this->currentBuffer != nullptr && this->currentBuffer->modified) {
-        rv << this->currentBuffer->getId();
-    }
-
-    QList<Buffer*> buff = this->buffers.values();
-    for (int i = 0; i < buff.size(); i++) {
-        if (buff.at(i)->modified) {
-            rv << buff.at(i)->getId();
-        }
-    }
-
-    return rv;
-}
+//QStringList Editor::modifiedBuffers() {
+//    QStringList rv;
+//
+//    if (this->currentBuffer != nullptr && this->currentBuffer->modified) {
+//        rv << this->currentBuffer->getId();
+//    }
+//
+//    QList<Buffer*> buff = this->buffers.values();
+//    for (int i = 0; i < buff.size(); i++) {
+//        if (buff.at(i)->modified) {
+//            rv << buff.at(i)->getId();
+//        }
+//    }
+//
+//    return rv;
+//}
 
 void Editor::goToLine(int lineNumber) {
     // note that the findBlockByNumber starts with 0
@@ -672,25 +557,27 @@ void Editor::mousePressEvent(QMouseEvent* event) {
         }
     }
     if (event->button() == Qt::MiddleButton) {
-        if (this->currentBuffer == nullptr) {
-            return;
-        }
-
-        // position the cursor, this way, `currentLineNumber` and `currentColumn`
-        // will return the correct value.
-        QPlainTextEdit::mousePressEvent(event);
-
-        LSP* lsp = this->lspManager->getLSP(this->currentBuffer);
-        if (lsp == nullptr) {
-            this->window->getStatusBar()->setMessage("No LSP server running."); return;
-            return;
-        }
-        int reqId = QRandomGenerator::global()->generate();
-        lsp->definition(reqId, this->currentBuffer->getFilename(),
-                        this->currentLineNumber(),
-                        this->currentColumn());
-        this->lspManager->setExecutedAction(reqId, LSP_ACTION_DEFINITION, this->currentBuffer);
-        return;
+        // XXX(remy): reimplement me
+        qDebug() << "Editor::mousePressEvent" << "MiddleButton";
+//        if (this->currentBuffer == nullptr) {
+//            return;
+//        }
+//
+//        // position the cursor, this way, `currentLineNumber` and `currentColumn`
+//        // will return the correct value.
+//        QPlainTextEdit::mousePressEvent(event);
+//
+//        LSP* lsp = this->lspManager->getLSP(this->currentBuffer);
+//        if (lsp == nullptr) {
+//            this->window->getStatusBar()->setMessage("No LSP server running."); return;
+//            return;
+//        }
+//        int reqId = QRandomGenerator::global()->generate();
+//        lsp->definition(reqId, this->currentBuffer->getFilename(),
+//                        this->currentLineNumber(),
+//                        this->currentColumn());
+//        this->lspManager->setExecutedAction(reqId, LSP_ACTION_DEFINITION, this->currentBuffer);
+//        return;
     }
     if (event->button() == Qt::ForwardButton) {
         if (this->mode == MODE_NORMAL) {
@@ -701,13 +588,15 @@ void Editor::mousePressEvent(QMouseEvent* event) {
         return;
     }
     if (event->button() == Qt::BackButton) {
-        if (this->buffers.size() > 0) {
-            // NOTE(remy): don't remove it here, just take a ref,
-            // the selectOrCreateBuffer takes care of the list order etc.
-            const QString& id = this->buffersPos.last();
-            this->selectOrCreateBuffer(id);
-        }
-        return;
+        // XXX(remy): reimplement me
+         qDebug() << "Editor::mousePressEvent" << "BackButton";
+//        if (this->buffers.size() > 0) {
+//            // NOTE(remy): don't remove it here, just take a ref,
+//            // the selectOrCreateBuffer takes care of the list order etc.
+//            const QString& id = this->buffersPos.last();
+//            this->selectOrCreateBuffer(id);
+//        }
+//        return;
     }
 
     QPlainTextEdit::mousePressEvent(event);
@@ -769,6 +658,38 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                 this->right();
                 return;
 
+            // iterate through tabs
+            case Qt::Key_Up:
+            case Qt::Key_Down:
+                {
+                    int key = event->key();
+                    Editor* current = this->window->getEditor();
+                    Editor* next = nullptr;
+
+                    if (current == nullptr) { return; }
+
+                    int tabIdx = this->window->getEditorTabIndex(current);
+                    int tabsCount = this->window->getTabsCount();
+                    if (key == Qt::Key_Up) {
+                        if (tabIdx == 0) {
+                            tabIdx = tabsCount - 1;
+                        } else {
+                            tabIdx--;
+                        }
+                    } else {
+                        if (tabIdx == tabsCount-1) {
+                            tabIdx = 0;
+                        } else {
+                            tabIdx++;
+                        }
+                    }
+                    next = this->window->getEditor(tabIdx);
+                    if (next != nullptr) {
+                        this->window->setCurrentEditor(next->getId());
+                    }
+                }
+                return;
+
             // delete previous word
             case Qt::Key_W:
                 {
@@ -783,13 +704,9 @@ void Editor::keyPressEvent(QKeyEvent* event) {
             // switch to the other buffer
             case Qt::Key_O:
                 {
-                    if (this->buffersPos.size() == 0) {
-                        return;
+                    if (!this->window->getPreviousEditorId().isEmpty()) {
+                        this->window->setCurrentEditor(this->window->getPreviousEditorId());
                     }
-                    // NOTE(remy): don't remove it here, just take a ref,
-                    // the selectOrCreateBuffer takes care of the list order etc.
-                    const QString& filename = this->buffersPos.last();
-                    this->selectOrCreateBuffer(filename);
                 }
                 return;
 
@@ -1075,7 +992,12 @@ QString Editor::getWordUnderCursor() {
 }
 
 void Editor::lspAutocomplete() {
-    LSP* lsp = this->lspManager->getLSP(currentBuffer);
+    LSPManager* manager = this->window->getLSPManager();
+    if (manager == nullptr) {
+        return;
+    }
+
+    LSP* lsp = manager->getLSP(this->getId());
     int reqId = QRandomGenerator::global()->generate();
     if (reqId < 0) { reqId *= -1; }
 
@@ -1083,8 +1005,9 @@ void Editor::lspAutocomplete() {
         this->window->getStatusBar()->setMessage("No LSP server running for this buffer.");
         return;
     }
-    lsp->completion(reqId, currentBuffer->getFilename(), this->currentLineNumber(), this->currentColumn());
-    this->lspManager->setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
+
+    lsp->completion(reqId, this->buffer->getFilename(), this->currentLineNumber(), this->currentColumn());
+    manager->setExecutedAction(reqId, LSP_ACTION_COMPLETION, this->buffer);
 }
 
 void Editor::autocomplete() {
@@ -1100,9 +1023,9 @@ void Editor::autocomplete() {
         list << match.captured();
     }
 
-    QList<Buffer*> buffers = this->buffers.values();
-    for (int i = 0; i < buffers.size(); i++) {
-        QRegularExpressionMatchIterator it = rx.globalMatch(buffers[i]->getData());
+    QList<Editor*> editors = this->window->getEditors();
+    for (int i = 0; i < editors.size(); i++) {
+        QRegularExpressionMatchIterator it = rx.globalMatch(editors[i]->getBuffer()->getData());
         while (it.hasNext()) {
             QRegularExpressionMatch match = it.next();
             list << match.captured();
@@ -1153,12 +1076,12 @@ int Editor::findPreviousOneInCurrentLine(QChar c) {
     return 0;
 }
 
-QString Editor::currentBufferExtension() {
-    if (this->currentBuffer == nullptr) {
+QString Editor::bufferExtension() {
+    if (this->buffer == nullptr) {
         return "";
     }
 
-    QStringList parts = this->currentBuffer->getFilename().split(".");
+    QStringList parts = this->buffer->getFilename().split(".");
     if (parts.size() == 1) {
         return "";
     }
@@ -1179,188 +1102,6 @@ int Editor::findNextOneInCurrentLine(QChar c) {
 
 StatusBar* Editor::getStatusBar() {
     return this->window->getStatusBar();
-}
-
-void Editor::showLSPDiagnosticsOfLine(int line) {
-    auto allDiags = this->lspManager->getDiagnostics(this->window->getEditor()->getCurrentBuffer()->getFilename());
-    auto lineDiags = allDiags[line];
-    if (lineDiags.size() == 0) {
-        return;
-    }
-
-    for (int i = 0; i < lineDiags.size(); i++) {
-        auto diag = lineDiags[i];
-        if (diag.message.size() > 0) {
-            QFileInfo fi = QFileInfo(diag.absFilename);
-            QString message = fi.fileName() + ":" + QString::number(diag.line) + " " + diag.message;
-            this->window->getStatusBar()->setMessage(message);
-        }
-    }
-}
-
-void Editor::lspInterpretMessages(const QByteArray& data) {
-    QList<QJsonDocument> list = LSPReader::readMessage(data);
-    if (list.size() == 0) {
-        return;
-    }
-
-    for (int i = 0; i < list.size(); i++) {
-        this->lspInterpret(list[i]);
-    }
-}
-
-void Editor::lspInterpret(QJsonDocument json) {
-    if (json.isNull() || json.isEmpty()) {
-        return;
-    }
-
-    LSPAction action = this->lspManager->getExecutedAction(json["id"].toInt());
-    if (action.requestId == 0) {
-        if (json["method"].isNull()) {
-            return;
-        }
-        // showMessage
-        // -----------
-        if (json["method"].toString() == "window/showMessage") {
-            if (!json["params"].isNull()) {
-                const QString& msg = json["params"]["message"].toString();
-                if (msg.size() > 0) {
-                    this->window->getStatusBar()->setMessage(msg);
-                }
-            }
-        // publishDiagnostics
-        // ------------------
-        } else if (json["method"] == "textDocument/publishDiagnostics") {
-            if (!json["params"].isNull() && !json["params"]["diagnostics"].isNull()) {
-                if (!json["params"]["diagnostics"].isArray()) {
-                    qWarning() << "lspInterpret: \"diagnostics\" is not an array";
-                    return;
-                }
-                if (json["params"]["uri"].isNull()) {
-                    qWarning() << "lspInterpret: no \"uri\" field in diagnostic";
-                    return;
-                }
-
-                auto diags = json["params"]["diagnostics"].toArray();
-                const QString& uri = QFileInfo(json["params"]["uri"].toString().replace("file://", "")).absoluteFilePath();
-
-                this->lspManager->clearDiagnostics(uri);
-
-                for (int i = 0; i < diags.size(); i++) {
-                    QJsonObject diag = diags[i].toObject();
-                    const QString& msg = diag["message"].toString();
-                    if (!diag["range"].isNull() && !diag["range"].toObject()["start"].isNull()
-                            && !diag["range"].toObject()["start"].toObject()["line"].isNull()) {
-                        int line = diag["range"].toObject()["start"].toObject()["line"].toInt();
-                        LSPDiagnostic diag;
-                        diag.line = line + 1;
-                        diag.message = msg;
-                        diag.absFilename = uri;
-                        this->lspManager->addDiagnostic(uri, diag);
-                    }
-                }
-                this->repaint();
-            }
-        }
-        return;
-    }
-
-    switch (action.action) {
-        case LSP_ACTION_DECLARATION:
-        case LSP_ACTION_DEFINITION:
-            {
-                // TODO(remy): deal with multiple results
-                int line = json["result"][0]["range"]["start"]["line"].toInt();
-                int column = json["result"][0]["range"]["start"]["character"].toInt();
-                QString file = json["result"][0]["uri"].toString();
-                if (file.isEmpty()) {
-                    this->window->getStatusBar()->setMessage("Nothing found.");
-                    return;
-                }
-                file.remove(0,7); // remove the file://
-                this->saveCheckpoint();
-                this->selectOrCreateBuffer(file);
-                this->goToLine(line + 1);
-                this->goToColumn(column);
-                return;
-            }
-        case LSP_ACTION_COMPLETION:
-            {
-                if (json["result"].isNull()) {
-                    this->window->getStatusBar()->setMessage("Nothing found.");
-                    return;
-                }
-
-                LSP* lsp = this->lspManager->getLSP(this->currentBuffer) ;
-                if (lsp == nullptr) {
-                    this->window->getStatusBar()->setMessage("Nothing found.");
-                    return;
-                }
-
-                auto entries = lsp->getEntries(json);
-                if (entries.size() == 0) {
-                    this->window->getStatusBar()->setMessage("Nothing found.");
-                    return;
-                }
-                const QString& base = this->getWordUnderCursor();
-                this->window->openCompleter(base, entries);
-                return;
-            }
-        case LSP_ACTION_HOVER:
-            {
-                if (json["result"].isNull() || json["result"]["contents"].isNull()) {
-                    this->window->getStatusBar()->setMessage("Nothing found.");
-                    return;
-                }
-
-                auto contents = json["result"]["contents"].toObject();
-                this->window->getStatusBar()->setMessage(contents["value"].toString());
-                return;
-            }
-        case LSP_ACTION_SIGNATURE_HELP:
-            {
-                if (!json["result"].isNull() && !json["result"]["signatures"].isNull() && json["result"]["signatures"].toArray().size() > 0) {
-                    QString message;
-                    QJsonArray signatures = json["result"]["signatures"].toArray();
-                    for (int i = 0; i < signatures.size(); i++) {
-                        QJsonValue signature = signatures[i];
-                        message.append(signature["label"].toString()).append("\n");
-                        message.append(signature["documentation"].toString());
-                    }
-                    this->window->getStatusBar()->setMessage(message);
-                    return;
-                }
-                this->window->getStatusBar()->setMessage("Nothing found.");
-                return;
-            }
-        case LSP_ACTION_REFERENCES:
-            {
-                // TODO(remy): error management
-                this->window->getRefWidget()->clear();
-                this->window->getRefWidget()->hide();
-                QJsonArray list = json["result"].toArray();
-                for (int i = 0; i < list.size(); i++) {
-                    QJsonObject entry = list[i].toObject();
-                    int line = entry["range"].toObject()["start"].toObject()["line"].toInt();
-                    line += 1;
-                    QString file = entry["uri"].toString();
-                    if (file.startsWith("file://")) {
-                        file = file.remove(0, 7);
-                    }
-
-                    const QString targetLine = this->getOneLine(file, line);
-
-                    if (file.startsWith(this->window->getBaseDir())) {
-                        file = file.remove(0, this->window->getBaseDir().size());
-                    }
-                    this->window->getRefWidget()->insert(file, QString::number(line), targetLine);
-                }
-                this->window->getRefWidget()->fitContent();
-                this->window->getRefWidget()->show();
-                this->window->getRefWidget()->setFocus();
-                return;
-            }
-    }
 }
 
 const QString Editor::getOneLine(const QString filename, int line) {
@@ -1393,7 +1134,9 @@ void Editor::onUpdateLineNumberArea(const QRect &rect, int dy) {
 }
 
 void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
-    if (this->currentBuffer == nullptr) {
+    Q_ASSERT(this->window != nullptr);
+
+    if (this->buffer == nullptr) {
         return;
     }
 
@@ -1405,7 +1148,7 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
     int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
 
-    QMap<int, QList<LSPDiagnostic>> diags = this->lspManager->getDiagnostics(this->currentBuffer->getFilename());
+    QMap<int, QList<LSPDiagnostic>> diags = this->window->getLSPManager()->getDiagnostics(this->buffer->getFilename());
 
     int currentLine = this->currentLineNumber();
 
@@ -1474,39 +1217,4 @@ int Editor::lineNumberAtY(int y) {
     }
 
     return -1;
-}
-
-// checkpoints
-// -----------
-
-void Editor::saveCheckpoint() {
-    if (this->getCurrentBuffer() == nullptr) {
-        return;
-    }
-
-    QString filename = this->getCurrentBuffer()->getFilename();
-    int position = this->textCursor().position();
-    Checkpoint c(filename, position);
-
-    if (this->checkpoints.isEmpty()) {
-        this->checkpoints.append(c);
-        return;
-    }
-
-    if (!this->checkpoints.isEmpty()) {
-        Checkpoint last = this->checkpoints.last();
-        if (last.filename != filename || last.position != position) {
-            this->checkpoints.append(c);
-        }
-    }
-}
-
-void Editor::lastCheckpoint() {
-    if (!this->checkpoints.isEmpty()) {
-        Checkpoint c = this->checkpoints.takeLast();
-        this->selectOrCreateBuffer(c.filename);
-        QTextCursor cursor = this->textCursor();
-        cursor.setPosition(c.position);
-        this->setTextCursor(cursor);
-    }
 }
