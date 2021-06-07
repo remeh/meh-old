@@ -47,6 +47,11 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     rule.pattern = QRegularExpression(QStringLiteral("'(.*?)'"));
     rule.format = quotationFormat;
     highlightingRules.append(rule);
+    quotationFormat.setForeground(Qt::gray);
+    quotationFormat.setFontItalic(true);
+    rule.pattern = QRegularExpression(QStringLiteral("`(.*?)`"));
+    rule.format = quotationFormat;
+    highlightingRules.append(rule);
 
     // TODO(remy): add the same for instanciation in Go / Zig
     functionFormat.setFontItalic(true);
