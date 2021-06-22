@@ -40,6 +40,12 @@ void ReferencesWidget::fitContent() {
     }
 }
 
+void ReferencesWidget::sort(int column, Qt::SortOrder order) {
+    if (this->tree) {
+        this->tree->sortItems(column, order);
+    }
+}
+
 void ReferencesWidget::show() {
     this->tree->show();
     this->label->setFocus();

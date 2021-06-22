@@ -14,7 +14,7 @@
 Command::Command(Window* window) :
     window(window) {
     Q_ASSERT(window != NULL);
-    this->setFont(window->getEditor()->getFont());
+    this->setFont(Editor::getFont());
 }
 
 void Command::keyPressEvent(QKeyEvent* event) {

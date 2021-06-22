@@ -62,6 +62,7 @@ void Grep::onFinished() {
     }
 
     this->window->getRefWidget()->fitContent();
+    this->window->getRefWidget()->sort(0, Qt::AscendingOrder);
 }
 
 void Grep::keyPressEvent(QKeyEvent* event) {

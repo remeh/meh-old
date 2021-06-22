@@ -33,6 +33,7 @@ public:
     void setLabelText(QString string);
 
     void insert(const QString& file, const QString& lineNumber, const QString& text);
+    void sort(int column, Qt::SortOrder order);
 
     void onKeyPressEvent(QKeyEvent*);
 
