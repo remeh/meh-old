@@ -6,6 +6,7 @@
 
 #include "buffer.h"
 #include "editor.h"
+#include "git.h"
 #include "window.h"
 
 #include "qdebug.h"
@@ -167,7 +168,7 @@ void Buffer::save(Window* window) {
 }
 
 bool Buffer::isGitTempFile() {
-    return filename.endsWith(".git/COMMIT_EDITMSG") || filename.endsWith(".git/MERGE_MSG");
+    return Git::isGitTempFile(this->filename);
 }
 
 bool Buffer::postProcess() {

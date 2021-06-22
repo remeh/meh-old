@@ -143,3 +143,7 @@ void Git::diff(const QString& workDir, bool staged) {
     connect(this->process, &QProcess::errorOccurred, this, &Git::onErrorOccurred);
     connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Git::onFinished);
 }
+
+bool Git::isGitTempFile(const QString& filename) {
+    return filename.endsWith(".git/COMMIT_EDITMSG") || filename.endsWith(".git/MERGE_MSG");
+}

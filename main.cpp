@@ -11,6 +11,7 @@
 
 #include "buffer.h"
 #include "editor.h"
+#include "git.h"
 #include "window.h"
 
 #include "qdebug.h"
@@ -28,7 +29,8 @@ int main(int argv, char **args)
     QStringList arguments = QCoreApplication::arguments();
 
     if (!arguments.empty() && QFile::exists("/tmp/meh.sock") &&
-         arguments.size() >= 2 && arguments.at(1) != "-n") {
+         arguments.size() >= 2 && arguments.at(1) != "-n" &&
+         !Git::isGitTempFile(arguments.at(1))) {
         QLocalSocket socket;
         socket.connectToServer("/tmp/meh.sock");
         arguments.removeFirst();
