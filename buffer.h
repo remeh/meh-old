@@ -19,18 +19,22 @@
 // buffer is showing a command exec result
 #define BUFFER_TYPE_COMMAND	5
 
+class Window;
 class Editor;
-
 class Buffer
 {
 public:
-    Buffer();
+    Buffer(Editor* editor, QString name);
 
     // Buffer creates a buffer targeting a given file.
-    Buffer(QString filename);
+    Buffer(Editor* editor, QString name, QString filename);
 
     // Buffer creates a buffer showing the given data
-    Buffer(QByteArray data);
+    Buffer(Editor* editor, QString name, QByteArray data);
+
+    // getId returns an identifier for this buffer. This identifier will be generated using the
+    // type of buffer.
+    QString getId();
 
     // read returns the content of the buffer. It reads the content from the file
     // on disk if has not been already done.
@@ -40,7 +44,7 @@ public:
     QByteArray reload();
 
     // save saves the file on disk.
-    void save(Editor* editor);
+    void save(Window* window);
 
     const QString& getFilename() const { return this->filename; }
 
@@ -48,21 +52,21 @@ public:
 
     // refreshData refreshes the data of the current buffer with what's available
     // in the editor data.
-    void refreshData(Editor* editor);
+    void refreshData(Window* window);
 
     // onLeave is called when the Window is leaving this Buffer (to show another one).
-    void onLeave(Editor* editor);
+    void onLeave();
 
     // onClose is called when the current Buffer is being closed.
     // onClose does NOT call onLeave.
-    void onClose(Editor* editor);
+    void onClose();
 
     // onEnter is called when the window is starting to display this buffer.
-    void onEnter(Editor* editor);
+    void onEnter();
 
     // postProcess applies post processing to the current file.
     // Returns true if the file has changed since saving and should be reloaded.
-    bool postProcess(Editor* editor);
+    bool postProcess();
 
     // modified is true if something has changed in the buffer which has not be
     // stored on disk.
@@ -83,13 +87,11 @@ public:
     // getName returns the name of this buffer, which is used when there is no filename attached.
     const QString& getName() { return this->name; }
 
-    // getId returns an identifier for this buffer. This identifier will be generated using the
-    // type of buffer.
-    QString getId();
-
 protected:
 
 private:
+    Editor* editor; // editor containing this buffer
+
     QString filename;
     QString name; // if the buffer doesn't has a filename attached, it may have a name
 

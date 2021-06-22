@@ -53,7 +53,9 @@ void LSPManager::timeoutActions() {
     this->cleanTimer->start(2000); // run every 2s
 }
 
-LSP* LSPManager::start(const QString& language) {
+LSP* LSPManager::start(Buffer* buffer, const QString& language) {
+    Q_ASSERT(buffer != nullptr);
+
     if (language == "go") {
          LSP* lsp = new LSPGopls(window, window->getBaseDir());
          if (!lsp->start()) {
@@ -61,7 +63,7 @@ LSP* LSPManager::start(const QString& language) {
              delete lsp;
              return nullptr;
          }
-         lsp->initialize();
+         lsp->initialize(buffer);
          this->lsps.append(lsp);
          return lsp;
     } else if (language == "cpp" || language == "h") {
@@ -71,7 +73,7 @@ LSP* LSPManager::start(const QString& language) {
             delete lsp;
             return nullptr;
         }
-        lsp->initialize();
+        lsp->initialize(buffer);
         this->lsps.append(lsp);
         return lsp;
     } else if (language == "zig") {
@@ -81,7 +83,7 @@ LSP* LSPManager::start(const QString& language) {
             delete lsp;
             return nullptr;
         }
-        lsp->initialize();
+        lsp->initialize(buffer);
         this->lsps.append(lsp);
         return lsp;
     }
@@ -101,25 +103,25 @@ LSP* LSPManager::forLanguage(const QString& language) {
 }
 
 bool LSPManager::manageBuffer(Buffer* buffer) {
-    Q_ASSERT(window != nullptr);
+    Q_ASSERT(this->window != nullptr);
     Q_ASSERT(buffer != nullptr);
 
     // already managed
     bool refresh = false;
-    if (this->lspsPerFile.contains(buffer->getFilename())) {
+    if (this->lspsPerFile.contains(buffer->getId())) {
         refresh = true;
     }
 
     QFileInfo fi(buffer->getFilename());
     LSP* lsp = this->forLanguage(fi.suffix());
     if (lsp == nullptr) {
-        lsp = this->start(fi.suffix());
+        lsp = this->start(buffer, fi.suffix());
     }
     if (lsp != nullptr) {
         if (refresh) {
             lsp->refreshFile(buffer);
         } else {
-            this->lspsPerFile.insert(buffer->getFilename(), lsp);
+            this->lspsPerFile.insert(buffer->getId(), lsp);
             // TODO(remy): sends the message to the LSP server to open this file
             lsp->openFile(buffer);
         }
@@ -128,9 +130,7 @@ bool LSPManager::manageBuffer(Buffer* buffer) {
     return false;
 }
 
-void LSPManager::reload(Buffer *buffer) {
-    Q_ASSERT(buffer != nullptr);
-
+void LSPManager::reload(Buffer* buffer) {
     if (this->cleanTimer != nullptr) {
         this->cleanTimer->stop();
     }
@@ -144,14 +144,12 @@ void LSPManager::reload(Buffer *buffer) {
     this->manageBuffer(buffer);
 }
 
-LSP* LSPManager::getLSP(Buffer* buffer) {
-    Q_ASSERT(buffer != nullptr);
-
-    if (!this->lspsPerFile.contains(buffer->getFilename())) {
+LSP* LSPManager::getLSP(const QString& id) {
+    if (!this->lspsPerFile.contains(id)) {
         return nullptr;
     }
 
-    return this->lspsPerFile.value(buffer->getFilename(), nullptr);
+    return this->lspsPerFile.value(id, nullptr);
 }
 
 void LSPManager::setExecutedAction(int reqId, int action, Buffer* buffer) {

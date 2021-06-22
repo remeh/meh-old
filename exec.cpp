@@ -39,11 +39,10 @@ void Exec::onFinished() {
         return;
     }
 
-    Buffer* buffer = new Buffer(this->data);
-    buffer->setType(BUFFER_TYPE_COMMAND);
-    buffer->setName(this->command);
-    this->window->getEditor()->setCurrentBuffer(buffer);
-    this->window->getEditor()->goToLine(0);
+    Editor* editor = this->window->newEditor(this->command, this->data);
+    // XXX(remy): set type
+    editor->getBuffer()->setType(BUFFER_TYPE_COMMAND);
+    editor->goToLine(0);
 
     // we've finished, clean-up
     this->data.clear();

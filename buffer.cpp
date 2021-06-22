@@ -6,18 +6,23 @@
 
 #include "buffer.h"
 #include "editor.h"
+#include "window.h"
 
 #include "qdebug.h"
 
-Buffer::Buffer() :
+Buffer::Buffer(Editor* editor, QString name) :
+    editor(editor),
     modified(false),
     filename(""),
+    name(name),
     alreadyReadFromDisk(false),
     bufferType(BUFFER_TYPE_UNKNOWN) {
 }
 
-Buffer::Buffer(QString filename) :
+Buffer::Buffer(Editor* editor, QString name, QString filename) :
+    editor(editor),
     modified(false),
+    name(name),
     alreadyReadFromDisk(false),
     bufferType(BUFFER_TYPE_FILE) {
     // resolve the absolute path of this
@@ -25,9 +30,11 @@ Buffer::Buffer(QString filename) :
     this->filename = info.absoluteFilePath();
 }
 
-Buffer::Buffer(QByteArray data) :
+Buffer::Buffer(Editor* editor, QString name, QByteArray data) :
+    editor(editor),
     modified(false),
     filename(""),
+    name(name),
     alreadyReadFromDisk(false),
     bufferType(BUFFER_TYPE_UNKNOWN) {
     this->data = data;
@@ -112,24 +119,26 @@ QString Buffer::getId() {
 
 // TODO(remy): while saving the buffer into a file, it should turns the buffer
 // into a BUFFER_TYPE_FILE.
-void Buffer::save(Editor* editor) {
-    Q_ASSERT(editor != NULL);
+void Buffer::save(Window* window) {
+    Q_ASSERT(this->editor != nullptr);
+
     QFile file(filename);
+
     file.open(QIODevice::Truncate | QIODevice::ReadWrite);
-    if (editor->getCurrentBuffer() == this) {
-        file.write(editor->toPlainText().toUtf8());
+    if (this->editor->getBuffer() == this) {
+        file.write(this->editor->toPlainText().toUtf8());
     } else {
         file.write(this->data);
     }
     file.close();
 
-    if (this->postProcess(editor)) {
+    if (this->postProcess()) {
         this->alreadyReadFromDisk = false;
-        if (editor->getCurrentBuffer() == this) {
+        if (this->editor->getBuffer() == this) {
             // store some cursor / scroll positions
-            QTextCursor cursor = editor->textCursor();
+            QTextCursor cursor = this->editor->textCursor();
             int position = cursor.position();
-            QScrollBar* vscroll = editor->verticalScrollBar();
+            QScrollBar* vscroll = this->editor->verticalScrollBar();
             int value = vscroll->value();
 
             // reset the content by re-reading the text
@@ -146,7 +155,7 @@ void Buffer::save(Editor* editor) {
             cursor.setPosition(position);
             editor->setTextCursor(cursor);
             vscroll->setValue(value);
-            editor->ensureCursorVisible();
+            this->editor->ensureCursorVisible();
         } else {
             // refresh the data of this buffer
             this->read();
@@ -161,7 +170,7 @@ bool Buffer::isGitTempFile() {
     return filename.endsWith(".git/COMMIT_EDITMSG") || filename.endsWith(".git/MERGE_MSG");
 }
 
-bool Buffer::postProcess(Editor*) {
+bool Buffer::postProcess() {
     if (this->filename.endsWith(".go")) {
         QProcess process;
         process.start("gofmt", QStringList() << "-l" << "-w" << this->filename);
@@ -185,19 +194,20 @@ bool Buffer::postProcess(Editor*) {
     return false;
 }
 
-void Buffer::refreshData(Editor* editor) {
-    Q_ASSERT(editor != NULL);
-    // store the last data from the document in the buffer
-    this->data = editor->document()->toPlainText().toUtf8();
+void Buffer::refreshData(Window* window) {
+    Q_ASSERT(window != NULL);
+    Q_ASSERT(window->getEditor(this->getId()) != NULL);
+    // store the last data from the currently displayed document in the buffer
+    this->data = window->getEditor(this->getId())->document()->toPlainText().toUtf8();
 }
 
-void Buffer::onLeave(Editor* editor) {
-    Q_ASSERT(editor != NULL);
+void Buffer::onLeave() {
+    Q_ASSERT(this->editor != nullptr);
 
     // store the last data from the document in the buffer
-    this->data = editor->document()->toPlainText().toUtf8();
+    this->data = this->editor->document()->toPlainText().toUtf8();
 
-    QScrollBar* vscroll = editor->verticalScrollBar();
+    QScrollBar* vscroll = this->editor->verticalScrollBar();
 
     // store last cursor position in settings
     QSettings settings("mehteor", "meh");
@@ -205,18 +215,18 @@ void Buffer::onLeave(Editor* editor) {
     settings.setValue("buffer/" + this->filename + "/vscroll", vscroll->value());
 }
 
-void Buffer::onClose(Editor* editor) {
-    Q_ASSERT(editor != NULL);
-    editor->removeOpenedState(this->filename);
+void Buffer::onClose() {
+    Q_ASSERT(this->editor != nullptr);
+    this->editor->removeOpenedState(this->filename);
 }
 
-void Buffer::onEnter(Editor* editor) {
-    Q_ASSERT(editor != NULL);
+void Buffer::onEnter() {
+    Q_ASSERT(this->editor != nullptr);
 
     // TODO(remy): check whether the file has changed on disk? compare timestamp?
 
     // restore the text in the editor
-    editor->setPlainText(this->read());
+    this->editor->setPlainText(this->read());
 
     // restore last cursor position, but do not do that for git messages
     if (this->isGitTempFile()) {
@@ -225,16 +235,16 @@ void Buffer::onEnter(Editor* editor) {
 
     QSettings settings("mehteor", "meh");
 
-    QTextCursor cursor = editor->textCursor();
+    QTextCursor cursor = this->editor->textCursor();
     auto pos = settings.value("buffer/" + this->filename + "/cursor", 0).toInt();
-    if (pos > editor->document()->characterCount()) {
-        cursor.setPosition(editor->document()->characterCount() - 1);
+    if (pos > this->editor->document()->characterCount()) {
+        cursor.setPosition(this->editor->document()->characterCount() - 1);
     } else {
         cursor.setPosition(pos);
     }
-    editor->setTextCursor(cursor);
+    this->editor->setTextCursor(cursor);
 
-    QScrollBar* vscroll = editor->verticalScrollBar();
+    QScrollBar* vscroll = this->editor->verticalScrollBar();
     vscroll->setValue(settings.value("buffer/" + this->filename + "/vscroll", 0).toInt());
-    editor->ensureCursorVisible();
+    this->editor->ensureCursorVisible();
 }

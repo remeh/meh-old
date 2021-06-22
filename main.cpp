@@ -1,7 +1,10 @@
 #include <QApplication>
+#include <QByteArray>
 #include <QFile>
+#include <QLocalSocket>
 #include <QObject>
 #include <QStringList>
+#include <QStyleFactory>
 #include <QThread>
 
 #include <stdio.h>
@@ -16,18 +19,44 @@ int main(int argv, char **args)
 {
     QApplication app(argv, args);
     app.setCursorFlashTime(0);
+    app.setWheelScrollLines(5);
+    app.setStyle(QStyleFactory::create("Fusion"));
     QCoreApplication::setOrganizationName("mehteor");
 
     QCoreApplication::setOrganizationDomain("remy.io");
     QCoreApplication::setApplicationName("meh");
+    QStringList arguments = QCoreApplication::arguments();
 
-    Window window;
+    if (!arguments.empty() && QFile::exists("/tmp/meh.sock") &&
+         arguments.size() >= 2 && arguments.at(1) != "-n") {
+        QLocalSocket socket;
+        socket.connectToServer("/tmp/meh.sock");
+        arguments.removeFirst();
+        if (arguments.empty()) {
+            arguments.append("/tmp/meh-notes");
+        }
+        for (int i = 0; i < arguments.size(); i++) {
+            QFileInfo fi(arguments.at(i));
+            arguments[i] = fi.absoluteFilePath();
+        }
+        QString data = "open " + arguments.join("###");
+        socket.write(data.toLatin1());
+        socket.flush();
+        socket.close();
+        return 0;
+    }
+
+    if (arguments.size() >= 2 && arguments.at(1) == "-n") {
+        arguments.remove(1);
+    }
+
+	qDebug() << "Creating a new instance.";
+
+    Window window(&app);
     window.setWindowTitle(QObject::tr("meh - no file"));
     window.resize(800, 700);
     window.setWindowIcon(QIcon(":res/icon.png"));
     window.show();
-
-    QStringList arguments = QCoreApplication::arguments();
 
     // special case of reading from stdin
     if (arguments.size() > 1 && arguments.at(1) == "-") {
@@ -42,9 +71,7 @@ int main(int argv, char **args)
         content += in.readAll();
         in.close();
 
-        Buffer* buffer = new Buffer(content);
-        buffer->setName("stdin");
-        window.getEditor()->setCurrentBuffer(buffer);
+        window.newEditor("stdin", content);
     } else if (arguments.size() > 0) {
         for (int i = arguments.size() - 1; i > 0; i--) {
             if (arguments.at(i).startsWith("+")) {
@@ -56,7 +83,7 @@ int main(int argv, char **args)
                 continue;
             }
 
-            window.getEditor()->selectOrCreateBuffer(arguments.at(i));
+            window.newEditor(arguments.at(i), arguments.at(i));
         }
 
         // special cases about the last one
@@ -76,6 +103,8 @@ int main(int argv, char **args)
                 window.openListFiles();
             }
         }
+    } else {
+        window.newEditor("notes", QString("/tmp/meh-notes"));
     }
 
     return app.exec();

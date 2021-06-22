@@ -53,16 +53,19 @@ void Command::show() {
 }
 
 bool Command::warningModifiedBuffers() {
-	QStringList modifiedBuffers = this->window->getEditor()->modifiedBuffers();
-	if (modifiedBuffers.size() > 0) {
-		QString msg = "Some opened buffers have not been saved:\n\n";
-		for (int i = 0; i < modifiedBuffers.size(); i++) {
-			msg += modifiedBuffers.at(i) + "\n";
-		}
-		QMessageBox::warning(this->window, "Unsaved buffers", msg);
-		return true;
-	}
-	return false;
+    return false;
+
+    // XXX(remy): reimplement me
+//	QStringList modifiedBuffers = this->window->getEditor()->modifiedBuffers();
+//	if (modifiedBuffers.size() > 0) {
+//		QString msg = "Some opened buffers have not been saved:\n\n";
+//		for (int i = 0; i < modifiedBuffers.size(); i++) {
+//			msg += modifiedBuffers.at(i) + "\n";
+//		}
+//		QMessageBox::warning(this->window, "Unsaved buffers", msg);
+//		return true;
+//	}
+//	return false;
 }
 
 void Command::execute(QString text) {
@@ -92,15 +95,20 @@ void Command::execute(QString text) {
 
     if (command == ":cd") {
         list.removeFirst();
+        QString bd;
         if (list.size() == 0) {
-            return;
-        }
-        QString path = list.join(" ").trimmed();
-        QString bd = this->window->getBaseDir();
-        if (path.startsWith("/")) {
-            bd = path;
+            // go to current file directory
+            if (this->window->getEditor() == nullptr) { return; }
+            QFileInfo fi(this->window->getEditor()->getBuffer()->getFilename());
+            bd = fi.absolutePath();
         } else {
-            bd += path;
+            QString path = list.join(" ").trimmed();
+            bd = this->window->getBaseDir();
+            if (path.startsWith("/")) {
+                bd = path;
+            } else {
+                bd += path;
+            }
         }
         QDir d(bd);
         if (!d.exists()) {
@@ -132,7 +140,7 @@ void Command::execute(QString text) {
         if (list.size() > 1) {
             // TODO(remy):  save to another file
         }
-        this->window->getEditor()->save();
+        this->window->save();
 		if (this->warningModifiedBuffers()) {
 			return;
 		}
@@ -144,7 +152,7 @@ void Command::execute(QString text) {
         if (list.size() > 1) {
             // TODO(remy):  save to another file
         }
-        this->window->getEditor()->saveAll();
+        this->window->saveAll();
         QCoreApplication::quit();
         return;
     }
@@ -153,7 +161,7 @@ void Command::execute(QString text) {
     // --------------
 
     if (command == ":gblame") {
-        Buffer* buffer = this->window->getEditor()->getCurrentBuffer();
+        Buffer* buffer = this->window->getEditor()->getBuffer();
         if (buffer == nullptr) {
             return;
         }
@@ -167,7 +175,7 @@ void Command::execute(QString text) {
         QString checksum;
         if (list.size() > 1) {
             checksum = list[1];
-        } else if (this->window->getEditor()->getCurrentBuffer() != nullptr) {
+        } else if (this->window->getEditor()->getBuffer() != nullptr) {
             checksum = this->window->getEditor()->getWordUnderCursor();
         } else {
             this->window->getStatusBar()->setMessage("no checksum provided");
@@ -222,55 +230,60 @@ void Command::execute(QString text) {
     // lsp
     // ----------------------
 
-    Buffer* currentBuffer = this->window->getEditor()->getCurrentBuffer();
-    LSP* lsp = this->window->getEditor()->lspManager->getLSP(currentBuffer);
+    Buffer* currentBuffer = this->window->getEditor()->getBuffer();
+    LSP* lsp = this->window->getLSPManager()->getLSP(currentBuffer->getId());
     int reqId = QRandomGenerator::global()->generate();
     if (reqId < 0) { reqId *= -1; }
 
     if (command == ":def") {
         if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->definition(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        this->window->getEditor()->lspManager->setExecutedAction(reqId, LSP_ACTION_DEFINITION, currentBuffer);
+        this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_DEFINITION, currentBuffer);
     }
 
     if (command == ":dec") {
         if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->declaration(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        this->window->getEditor()->lspManager->setExecutedAction(reqId, LSP_ACTION_DECLARATION, currentBuffer);
+        this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_DECLARATION, currentBuffer);
     }
 
     if (command == ":sig") {
         if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->signatureHelp(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        this->window->getEditor()->lspManager->setExecutedAction(reqId, LSP_ACTION_SIGNATURE_HELP, currentBuffer);
+        this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_SIGNATURE_HELP, currentBuffer);
     }
 
     if (command == ":i" || command == ":info") {
         if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->hover(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        this->window->getEditor()->lspManager->setExecutedAction(reqId, LSP_ACTION_HOVER, currentBuffer);
+        this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_HOVER, currentBuffer);
     }
 
     if (command == ":ref") {
         if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->references(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        this->window->getEditor()->lspManager->setExecutedAction(reqId, LSP_ACTION_REFERENCES, currentBuffer);
+        this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_REFERENCES, currentBuffer);
     }
 
     if (command == ":com") {
         if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         lsp->completion(reqId, currentBuffer->getFilename(), this->window->getEditor()->currentLineNumber(), this->window->getEditor()->currentColumn());
-        this->window->getEditor()->lspManager->setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
+        this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
     }
 
     if (command == ":err")  {
         if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
-        this->window->getEditor()->showLSPDiagnosticsOfLine(this->window->getEditor()->currentLineNumber());
+        Editor* editor = this->window->getEditor();
+        if (editor == nullptr) {
+            qDebug() << "error: command: `:err` window->getEditor() == nullptr";
+            return;
+        }
+        this->window->showLSPDiagnosticsOfLine(editor->getId(), editor->currentLineNumber());
         return;
     }
 
     if (command == ":rlsp" || command == ":reloadlsp") {
-        this->window->getEditor()->lspManager->reload(currentBuffer);
+        this->window->getLSPManager()->reload(currentBuffer);
         this->window->getStatusBar()->setLspRunning(false);
     }
 
@@ -278,36 +291,30 @@ void Command::execute(QString text) {
     // ----------------------
 
     if (command == ":bd") {
-        if (this->window->getEditor()->getCurrentBuffer() == nullptr) {
-            return;
-        }
-        if (this->window->getEditor()->getCurrentBuffer()->modified) {
-            QMessageBox::warning(this->window, "Unsaved buffer", "The buffer you want to close has modifications.");
-            return;
-        }
-        this->window->getEditor()->closeCurrentBuffer();
+        this->window->closeCurrentEditor();
         return;
     }
 
     // close every unmodified buffers
-    if (command == ":bu") {
-        QMap<QString, Buffer*>& buffers = this->window->getEditor()->getBuffers();
-        QList<QString> keys = buffers.keys();
-        for (int i = 0; i < keys.size(); i++) {
-            Buffer* buffer = buffers[keys.at(i)];
-            if (!buffer->modified) {
-                this->window->getEditor()->deleteBuffer(buffer);
-                buffers.remove(keys.at(i));
-           }
-        }
-        return;
-    }
+    // XXX(remy): reimplement me
+//    if (command == ":bu") {
+//        QMap<QString, Buffer*>& buffers = this->window->getEditor()->getBuffers();
+//        QList<QString> keys = buffers.keys();
+//        for (int i = 0; i < keys.size(); i++) {
+//            Buffer* buffer = buffers[keys.at(i)];
+//            if (!buffer->modified) {
+//                this->window->getEditor()->deleteBuffer(buffer);
+//                buffers.remove(keys.at(i));
+//           }
+//        }
+//        return;
+//    }
 
     if (command == ":bd!") {
-        if (this->window->getEditor()->getCurrentBuffer() == nullptr) {
+        if (this->window->getEditor()->getBuffer() == nullptr) {
             return;
         }
-        this->window->getEditor()->closeCurrentBuffer();
+        this->window->closeCurrentEditor();
         return;
     }
 
@@ -380,7 +387,7 @@ void Command::execute(QString text) {
             terms = this->window->getEditor()->getWordUnderCursor();
         }
         this->window->getEditor()->highlightText(terms);
-        this->window->getEditor()->saveCheckpoint();
+        this->window->saveCheckpoint();
         this->window->getEditor()->goToOccurrence(terms, false);
         this->window->getEditor()->centerCursor();
         return;
@@ -401,7 +408,7 @@ void Command::execute(QString text) {
         }
 
         if (command.startsWith(":rgf")) {
-            this->window->openGrep(search, this->window->getEditor()->getCurrentBuffer()->getFilename());
+            this->window->openGrep(search, this->window->getEditor()->getBuffer()->getFilename());
         } else {
             this->window->openGrep(search);
         }
@@ -417,30 +424,31 @@ void Command::execute(QString text) {
     if (command == ":e" && list.size() > 1) {
         for (int i = 1; i < list.size(); i++) {
             const QString& file = list[i];
-            this->openFile(file);
+            this->window->newEditor(file, file);
         }
         return;
     }
 
     // reload
 
-    if (command == ":reload") {
-        Buffer* buffer = this->window->getEditor()->getCurrentBuffer();
-        if (buffer == nullptr) {
-            return;
-        }
-        if (!this->window->areYouSure("Are you sure to reload this file? Last changes may be lost.")) {
-            return;
-        }
-
-        int position = this->window->getEditor()->textCursor().position();
-        this->window->getEditor()->setPlainText(buffer->reload());
-        QTextCursor cursor = this->window->getEditor()->textCursor();
-        cursor.setPosition(position);
-        this->window->getEditor()->setTextCursor(cursor);
-        this->window->getEditor()->centerCursor();
-        return;
-    }
+    // XXX(remy): reimplement me
+//    if (command == ":reload") {
+//        Buffer* buffer = this->window->getEditor()->getBuffer();
+//        if (buffer == nullptr) {
+//            return;
+//        }
+//        if (!this->window->areYouSure("Are you sure to reload this file? Last changes may be lost.")) {
+//            return;
+//        }
+//
+//        int position = this->window->getEditor()->textCursor().position();
+//        this->window->getEditor()->setPlainText(buffer->reload());
+//        QTextCursor cursor = this->window->getEditor()->textCursor();
+//        cursor.setPosition(position);
+//        this->window->getEditor()->setTextCursor(cursor);
+//        this->window->getEditor()->centerCursor();
+//        return;
+//    }
 
     // save
 
@@ -448,27 +456,10 @@ void Command::execute(QString text) {
         if (list.size() > 1) {
             // TODO(remy): save to another file
         }
-        this->window->getEditor()->save();
+        this->window->save();
     }
 
     if (command == ":wa") {
-        this->window->getEditor()->saveAll();
+        this->window->saveAll();
     }
-}
-
-void Command::openFile(const QString& filename) {
-    Editor* editor = this->window->getEditor();
-    if (editor == nullptr) {
-        // TODO(remy): display a warning
-        return;
-    }
-
-    // if current buffer, don't do anything
-    if (editor->getCurrentBuffer() != nullptr &&
-        editor->getCurrentBuffer()->getFilename() == filename) {
-        return;
-    }
-
-    // this will automatically creates a buffer if needed.
-    editor->selectOrCreateBuffer(filename);
 }

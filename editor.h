@@ -4,6 +4,7 @@
 #include <QColor>
 #include <QFocusEvent>
 #include <QFont>
+#include <QIcon>
 #include <QLabel>
 #include <QList>
 #include <QListWidget>
@@ -31,13 +32,6 @@
 class Window;
 class LineNumberArea;
 
-class Checkpoint {
-    public:
-        Checkpoint(const QString& filename, int position) : filename(filename), position(position) {}
-        QString filename;
-        int position;
-};
-
 class Editor : public QPlainTextEdit
 {
     Q_OBJECT
@@ -46,40 +40,23 @@ public:
     Editor(Window* window);
     ~Editor();
 
-    // buffer manipulation
-    // -------------------
+    Window* getWindow() { return this->window; }
 
-    // setCurrentBuffer sets the editor to use the given buffer.
-    void setCurrentBuffer(Buffer* buffer);
+    // buffer
+    // ------
 
-    // getCurrentBuffer retuns the currently used buffer.
-    Buffer* getCurrentBuffer() { return this->currentBuffer; }
+    // the buffer this editor has been created for
+    Buffer* buffer;
+    Buffer* getBuffer() { return this->buffer; }
+    void setBuffer(Buffer* buffer);
 
-    // selectOrCreateBuffer uses an already opened buffer and set it as the active one,
-    // if this buffer doesn't exist (file not already loaded) it creates it.
-    void selectOrCreateBuffer(const QString& filename);
-
-    // closeCurrentBuffer closes the current buffer.
-    void closeCurrentBuffer();
-
-    // deleteBuffer closes the given buffer and deletes the memory allocated to it.
-    // Don't use buffer anymore after a call to closeBuffer.
-    void deleteBuffer(Buffer* buffer);
-
-    // hasBuffer returns true if a buffer has already been loaded.
-    bool hasBuffer(const QString& filename);
-
-    // save saves the current buffer.
+    // saves the currently opened buffer
     void save();
 
-    // saveAll saves all the loaded buffers.
-    void saveAll();
-
-    // modifiedBuffers returns a list of the loaded and modified buffers that
-    // would need to be stored on disk.
-    QStringList modifiedBuffers();
-
-    QMap<QString, Buffer*>& getBuffers() { return this->buffers; }
+    QString getId() {
+        Q_ASSERT(this->buffer != nullptr);
+        return this->buffer->getId();
+    }
 
     // mode
     // ----
@@ -120,12 +97,6 @@ public:
     int currentLineNumber();
     int currentColumn();
 
-    // saveCheckpoint stores the current filename/cursor position information has a checkpoint.
-    void saveCheckpoint();
-
-    // lastCheckpoint pops the last checkpoint and goes into this file / position.
-    void lastCheckpoint();
-
     // text manipulation
     // -----------------
 
@@ -151,6 +122,10 @@ public:
     // highlightText highlights the given text in the editor.
     void highlightText(QString text);
 
+    // getOneLine returns the given line in the given file.
+    // It returns the last line of the file if line doesn't exist.
+    const QString getOneLine(const QString filename, int line);
+
     // open state of buffers
     // ---------------------
 
@@ -163,7 +138,6 @@ public:
     // LSP
     // -------------
 
-    // XXX(remy):
     // autocomplete is a basic auto-complete with words available in the opened
     // buffers. It is trying to complete the current word if one has been started.
     void autocomplete();
@@ -174,26 +148,13 @@ public:
 
     void applyAutocomplete(const QString& base, const QString& word);
 
-    // showLSPDiagnosticsOfLine shows the diagnostics for this line (of the current buffer)
-    // in the statusbar.
-    void showLSPDiagnosticsOfLine(int line);
-
-    // lspInterpretMessages is called when data has been received from the LSP server
-    // and that the editor needs to interpret them. Note that it can interpret several
-    // messages in on call (if the LSP server has sent several messages in one output)
-    void lspInterpretMessages(const QByteArray& data);
-
-    // lspInterpret is called by the LSP server to let the Editor interpret
-    // one JSON message.
-    void lspInterpret(QJsonDocument json);
-
-    LSPManager* lspManager;
-
     // widget related
     // --------------
 
     // getFont returns the font used by the editor.
     static QFont getFont();
+
+    QIcon getIcon();
 
     // called by the window when it is resized.
     void onWindowResized(QResizeEvent*);
@@ -206,6 +167,11 @@ public:
 
     // lineNumberAtY returns which line number is at the Y value.
     int lineNumberAtY(int y);
+
+    // tab index in the window
+
+    void setTabIndex(int idx) { this->tabIndex = idx; }
+    int getTabIndex() { return this->tabIndex; }
 
 protected:
     void keyPressEvent(QKeyEvent*) override;
@@ -258,9 +224,9 @@ private:
     // the given char in the current line. The distance is from the current cursor position.
     int findPreviousOneInCurrentLine(QChar c);
 
-    // currentBufferExtension returns the extension of the current file.
+    // bufferExtension returns the extension of the current file.
     // Returns an empty string if the buffer has no extension.
-    QString currentBufferExtension();
+    QString bufferExtension();
 
     // leaderModeSelectSubMode sets the subMode we should switch in depending
     // of the current buffer.
@@ -278,13 +244,6 @@ private:
     // getStatusBar is a convenient method returns the Window's StatusBar instance.
     StatusBar* getStatusBar();
 
-    // checkpoints stored.
-    QList<Checkpoint> checkpoints;
-
-    // getOneLine returns the given line in the given file.
-    // It returns the last line of the file if line doesn't exist.
-    const QString getOneLine(const QString filename, int line);
-
     // ----------------------
 
     TasksPlugin *tasksPlugin;
@@ -299,24 +258,14 @@ private:
     Window* window;
     Syntax* syntax;
 
-    // currentBuffer is the currently visible buffer. Note that it is not part
-    // of the buffers map.
-    Buffer* currentBuffer;
-
-    // buffers is the currently loaded buffers. Note that it doesn't contain
-    // the currentBuffer. It is the owner of the buffers.
-    // The key is the ID of the buffer, could be a filename but it could also be
-    // just a simple name for buffers not written on disk.
-    QMap<QString, Buffer*> buffers;
-
-    // bufferPos can be used to know the order of usage of the buffers.
-    QVector<QString> buffersPos;
-
     // mode is the currently used mode. See mode.h
     int mode;
 
     // subMode is the currently used mode. See mode.h
     int subMode;
+
+    // tabIndex is the position of the editor in the list of tab
+    int tabIndex;
 
     // eightCharsX is the X position where the eighty chars line must be drawn.
     int eightyCharsX;

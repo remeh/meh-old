@@ -35,33 +35,27 @@ void Git::onFinished() {
             {
                 QString str = this->data;
                 str = str.replace(QRegularExpression("\\)\\s*\n"), ")\n");
-                Buffer* buffer = new Buffer(str.toUtf8());
-                buffer->setType(BUFFER_TYPE_GIT_BLAME);
-                buffer->setName(this->bufferName);
-                this->window->getEditor()->setCurrentBuffer(buffer);
-                this->window->getEditor()->goToLine(lineNumber);
+                Editor* editor = this->window->newEditor(this->bufferName, str.toUtf8());
+                editor->getBuffer()->setType(BUFFER_TYPE_GIT_BLAME);
+                editor->goToLine(lineNumber);
             }
             break;
         case GIT_SHOW:
             {
                 QString str = this->data;
                 str = str.replace(QRegularExpression("\n\\s*\n"), "\n\n");
-                Buffer* buffer = new Buffer(str.toUtf8());
-                buffer->setType(BUFFER_TYPE_GIT_SHOW);
-                buffer->setName(this->bufferName);
-                this->window->getEditor()->setCurrentBuffer(buffer);
-                this->window->getEditor()->goToLine(0);
+                Editor* editor = this->window->newEditor(this->bufferName, str.toUtf8());
+                editor->getBuffer()->setType(BUFFER_TYPE_GIT_SHOW);
+                editor->goToLine(0);
             }
             break;
         case GIT_DIFF:
             {
                 QString str = this->data;
                 str = str.replace(QRegularExpression("\n\\s*\n"), "\n\n");
-                Buffer* buffer = new Buffer(str.toUtf8());
-                buffer->setType(BUFFER_TYPE_GIT_DIFF);
-                buffer->setName(this->bufferName);
-                this->window->getEditor()->setCurrentBuffer(buffer);
-                this->window->getEditor()->goToLine(0);
+                Editor* editor = this->window->newEditor(this->bufferName, str.toUtf8());
+                editor->getBuffer()->setType(BUFFER_TYPE_GIT_DIFF);
+                editor->goToLine(0);
             }
             break;
     }
@@ -77,6 +71,8 @@ void Git::blame(const Buffer* buffer) {
         this->window->getStatusBar()->setMessage("Git blame called on a null buffer.");
         return;
     }
+
+    // TODO(remy): runGit(QStringList args, int command) command
 
     const QString& filename = buffer->getFilename();
     this->data.clear(); // clear the data read from the process before starting the blame

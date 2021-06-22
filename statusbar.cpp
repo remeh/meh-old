@@ -1,6 +1,6 @@
 #include <QSizePolicy>
 
-#include "buffer.h"
+#include "editor.h"
 #include "statusbar.h"
 #include "window.h"
 
@@ -73,17 +73,17 @@ void StatusBar::setMode(const QString& newMode) {
     }
 }
 
-void StatusBar::setBuffer(Buffer* buffer) {
-    if (this->filename == nullptr || buffer == nullptr) {
+void StatusBar::setEditor(Editor* editor) {
+    if (this->filename == nullptr || editor == nullptr) {
         return;
     }
 
-    switch (buffer->getType()) {
+    switch (editor->getBuffer()->getType()) {
         case BUFFER_TYPE_GIT_BLAME:
-            this->filename->setText("GIT BLAME - " + buffer->getName());
+            this->filename->setText("GIT BLAME - " + editor->getBuffer()->getName());
             break;
         default:
-            this->filename->setText(buffer->getFilename());
+            this->filename->setText(editor->getBuffer()->getFilename());
     }
 }
 

@@ -18,7 +18,7 @@ ReferencesWidget::ReferencesWidget(Window* window) :
     columns << "File" << "Line #" << "Line";
     this->tree->setHeaderLabels(columns);
 
-    this->setFont(window->getEditor()->getFont());
+    this->setFont(Editor::getFont());
     this->setFocusPolicy(Qt::StrongFocus);
 
     this->layout = new QGridLayout();
@@ -81,10 +81,14 @@ void ReferencesWidget::keyPressEvent(QKeyEvent* event) {
                 if (currentItem == nullptr) {
                     return;
                 }
-                QString file = currentItem->text(0);
+                QString filename = currentItem->text(0);
                 QString lineNumber = currentItem->text(1);
-                this->window->getEditor()->saveCheckpoint();
-                this->window->getEditor()->selectOrCreateBuffer(file);
+                this->window->saveCheckpoint();
+                QString filepath = currentItem->data(REF_WIDGET_DATA_ID, Qt::UserRole).toString();
+                if (filepath.size() == 0) {
+                    qDebug() << "error: currentItem->data(REF_WIDGET_DATA_ID, Qt::UserRole)) is empty";
+                }
+                this->window->setCurrentEditor(filepath);
                 this->window->getEditor()->goToLine(lineNumber.toInt());
                 this->window->getEditor()->setFocus();
                 return;
@@ -149,12 +153,15 @@ void ReferencesWidget::setLabelText(QString text) {
     }
 }
 
-void ReferencesWidget::insert(const QString& file, const QString& lineNumber, const QString& text) {
-    QStringList parts; parts << file << lineNumber << text;
-    if (data.contains(file)) {
-        new QTreeWidgetItem(this->data[file], parts);
+void ReferencesWidget::insert(const QString& filepath, const QString& lineNumber, const QString& text) {
+    QFileInfo info(filepath);
+    QStringList parts; parts << info.fileName() << lineNumber << text;
+    if (data.contains(filepath)) {
+        QTreeWidgetItem* item = new QTreeWidgetItem(this->data[filepath], parts);
+        item->setData(REF_WIDGET_DATA_ID, Qt::UserRole, filepath);
     } else {
         QTreeWidgetItem* item = new QTreeWidgetItem(this->tree, parts);
-        this->data[file] = item;
+        item->setData(REF_WIDGET_DATA_ID, Qt::UserRole, filepath);
+        this->data[filepath] = item;
     }
 }

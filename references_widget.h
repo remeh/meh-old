@@ -11,6 +11,8 @@
 #include <QTreeWidgetItem>
 #include <QWidget>
 
+#define REF_WIDGET_DATA_ID    0 << 2 // full filepath
+
 class Window;
 
 class ReferencesWidget : public QWidget {

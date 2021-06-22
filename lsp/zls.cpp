@@ -25,7 +25,7 @@ void LSPZLS::readStandardOutput() {
         return;
     }
     QByteArray data = this->lspServer.readAll();
-    this->window->getEditor()->lspInterpretMessages(data);
+    this->window->lspInterpretMessages(data);
 }
 
 // --------------------------
@@ -36,20 +36,26 @@ bool LSPZLS::start() {
     return this->serverSpawned;
 }
 
-void LSPZLS::initialize() {
+void LSPZLS::initialize(Buffer* buffer) {
+    Q_ASSERT(buffer != nullptr);
+
     const QString& initialize = this->writer.initialize(this->baseDir);
     const QString& initialized = this->writer.initialized();
     this->lspServer.write(initialize.toUtf8());
-    this->window->getEditor()->lspManager->setExecutedAction(1, LSP_ACTION_INIT, this->window->getEditor()->getCurrentBuffer());
+    this->window->getLSPManager()->setExecutedAction(1, LSP_ACTION_INIT, buffer);
     this->lspServer.write(initialized.toUtf8());
 }
 
 void LSPZLS::openFile(Buffer* buffer) {
+    Q_ASSERT(buffer != nullptr);
+
     const QString& msg = this->writer.openFile(buffer, buffer->getFilename(), this->language);
     this->lspServer.write(msg.toUtf8());
 }
 
 void LSPZLS::refreshFile(Buffer* buffer) {
+    Q_ASSERT(buffer != nullptr);
+
     const QString& msg = this->writer.refreshFile(buffer, buffer->getFilename());
     this->lspServer.write(msg.toUtf8());
 }
