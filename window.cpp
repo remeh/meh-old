@@ -414,6 +414,7 @@ Editor* Window::setCurrentEditor(QString id) {
         this->tabs->setCurrentIndex(tabIndex);
         Editor* editor = this->getEditor();
         this->statusBar->setEditor(editor);
+        editor->update();
         return editor;
     }
 
