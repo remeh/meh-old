@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QLocalServer>
+#include <QPaintEvent>
 #include <QResizeEvent>
 #include <QString>
 #include <QTabWidget>
@@ -173,6 +174,7 @@ public:
     void lspInterpret(QJsonDocument json);
 
 protected:
+    void paintEvent(QPaintEvent* event);
 
 private slots:
     void resizeEvent(QResizeEvent*);

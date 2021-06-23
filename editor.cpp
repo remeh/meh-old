@@ -770,9 +770,6 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         } else {
             this->window->focusGrep();
         }
-
-        // redraw
-        this->update();
     }
 
 
