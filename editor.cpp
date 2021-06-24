@@ -146,7 +146,9 @@ QFont Editor::getFont() {
 }
 
 void Editor::onWindowResized(QResizeEvent* event) {
-    QPlainTextEdit::resizeEvent(event);
+    if (event != nullptr) {
+        QPlainTextEdit::resizeEvent(event);
+    }
 
     QRect cr = this->contentsRect();
     this->lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
@@ -1132,6 +1134,11 @@ void Editor::onUpdateLineNumberArea(const QRect &rect, int dy) {
     if (rect.contains(viewport()->rect())) {
         this->onUpdateLineNumberAreaWidth(0);
     }
+}
+
+void Editor::update() {
+    // FIXME(remy): trick to have the line area number redrawn
+    this->onWindowResized(nullptr);
 }
 
 void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {

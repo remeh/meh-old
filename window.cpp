@@ -5,6 +5,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
+#include <QThread>
 #include <QMessageBox>
 
 #include "command.h"
@@ -118,7 +119,6 @@ Window::~Window() {
 }
 
 void Window::onNewSocketCommand() {
-    qDebug() << "received a command";
     QLocalSocket* socket = this->commandServer.nextPendingConnection();
     if (socket == nullptr) {
         return;
@@ -129,6 +129,7 @@ void Window::onNewSocketCommand() {
 
     if (this->app) {
         this->app->alert(this, 10000);
+        this->activateWindow();
     }
 
     if (data.startsWith("open ")) {
@@ -205,6 +206,11 @@ void Window::openReplace() {
 
 void Window::closeReplace() {
     this->replace->hide();
+}
+
+void Window::paintEvent(QPaintEvent* event) {
+    // repaint the editor and its line number area
+    this->getEditor()->update();
 }
 
 void Window::openCompleter(const QString& base, const QList<CompleterEntry> entries) {
@@ -413,7 +419,10 @@ Editor* Window::setCurrentEditor(QString id) {
     if (tabIndex >= 0) {
         this->tabs->setCurrentIndex(tabIndex);
         Editor* editor = this->getEditor();
+        this->setWindowTitle(QString("meh - ") + this->tabs->tabText(this->tabs->currentIndex()).trimmed());
         this->statusBar->setEditor(editor);
+        editor->update();
+        editor->setFocus();
         return editor;
     }
 

@@ -172,6 +172,10 @@ public:
 
     void setTabIndex(int idx) { this->tabIndex = idx; }
     int getTabIndex() { return this->tabIndex; }
+    QWidget* lineNumberArea;
+
+public slots:
+    void update();
 
 protected:
     void keyPressEvent(QKeyEvent*) override;
@@ -253,7 +257,6 @@ private:
     QTimer* selectionTimer;
     QTimer* lspRefreshTimer;
     QListWidget* currentCompleter;
-    QWidget* lineNumberArea;
 
     Window* window;
     Syntax* syntax;
