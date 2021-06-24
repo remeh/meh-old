@@ -57,7 +57,6 @@ int main(int argv, char **args)
     Window window(&app);
     window.setWindowTitle(QObject::tr("meh - no file"));
     window.resize(800, 700);
-    window.setWindowIcon(QIcon(":res/icon.png"));
     window.show();
 
     // special case of reading from stdin

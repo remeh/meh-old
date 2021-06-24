@@ -24,6 +24,8 @@ public:
     Syntax(Editor *editor, QTextDocument *parent = 0);
     bool setSelection(const QString& text);
 
+    static QList<HighlightingRule> getSharedRules();
+
 protected:
     void highlightBlock(const QString &text) override;
 

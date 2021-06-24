@@ -9,20 +9,31 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
 {
     HighlightingRule rule;
 
+    selectionFormat.setUnderlineColor(QColor::fromRgb(153,215,0));
+    selectionFormat.setFontUnderline(true);
+    selectionFormat.setUnderlineStyle(QTextCharFormat::SingleUnderline);
+
+    // specific syntax rules
+
     if (editor->getBuffer()->getFilename().endsWith(".tasks")) {
         for (HighlightingRule rule : TasksPlugin::getSyntaxRules()) {
+            highlightingRules.append(rule);
+        }
+        for (HighlightingRule rule : getSharedRules()) {
             highlightingRules.append(rule);
         }
         return;
     }
 
+    // code syntax rules
+
     keywordFormat.setFontWeight(QFont::Bold);
-    keywordFormat.setForeground(QColor::fromRgb(46,126,184));
+    keywordFormat.setForeground(QColor::fromRgb(46,126,184)); // blue
     const QString keywordPatterns[] = {
         QStringLiteral("\\bchar\\b"), QStringLiteral("\\bclass\\b"), QStringLiteral("\\bconst\\b"),
         QStringLiteral("\\bdouble\\b"), QStringLiteral("\\benum\\b"), QStringLiteral("\\bexplicit\\b"),
-        QStringLiteral("\\bfriend\\b"), QStringLiteral("\\binline\\b"), QStringLiteral("\\bint\\b"),
-        QStringLiteral("\\blong\\b"), QStringLiteral("\\bnamespace\\b"), QStringLiteral("\\boperator\\b"),
+        QStringLiteral("\\bfriend\\b"), QStringLiteral("\\binline\\b"), QStringLiteral("\\bu?int(\\d){0,3}\\b"),
+        QStringLiteral("\\bu?long(\\d){0,3}\\b"), QStringLiteral("\\bnamespace\\b"), QStringLiteral("\\boperator\\b"),
         QStringLiteral("\\bprivate\\b"), QStringLiteral("\\bprotected\\b"), QStringLiteral("\\bpublic\\b"),
         QStringLiteral("\\bslots\\b"), QStringLiteral("\\bstatic\\b"), QStringLiteral("struct\\b"),
         QStringLiteral("\\bif\\b"), QStringLiteral("\\belse\\b"), QStringLiteral("const\\b"),
@@ -40,47 +51,17 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
         highlightingRules.append(rule);
     }
 
-    selectionFormat.setUnderlineColor(QColor::fromRgb(153,215,0));
-    selectionFormat.setFontUnderline(true);
-    selectionFormat.setUnderlineStyle(QTextCharFormat::SingleUnderline);
-
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::gray);
     rule.pattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
     rule.format = classFormat;
     highlightingRules.append(rule);
 
-    quotationFormat.setForeground(Qt::gray);
-    quotationFormat.setFontItalic(true);
-    rule.pattern = QRegularExpression(QStringLiteral("\"(.*?)\""));
-    rule.format = quotationFormat;
-    highlightingRules.append(rule);
-    rule.pattern = QRegularExpression(QStringLiteral("'(.*?)'"));
-    highlightingRules.append(rule);
-    rule.pattern = QRegularExpression(QStringLiteral("`(.*?)`"));
-    highlightingRules.append(rule);
 
     // TODO(remy): add the same for instanciation in Go / Zig
     functionFormat.setForeground(QColor::fromRgb(160, 160, 170));
     rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
     rule.format = functionFormat;
-    highlightingRules.append(rule);
-
-    singleLineCommentFormat.setForeground(QColor::fromRgb(98,98,98));
-    rule.pattern = QRegularExpression(QStringLiteral("(^|\\s)//[^\n]*"));
-    rule.format = singleLineCommentFormat;
-    highlightingRules.append(rule);
-
-    markdownTitleFormat.setFontWeight(QFont::Bold);
-//    markdownTitleFormat.setForeground(QColor::fromRgb(153,215,0)); // green
-    markdownTitleFormat.setForeground(Qt::gray);
-    rule.pattern = QRegularExpression(QStringLiteral("^\\s*#+[^\n]*"));
-    rule.format = markdownTitleFormat;
-    highlightingRules.append(rule);
-
-    todoFixmeNoteFormat.setForeground(QColor::fromRgb(250, 50, 50));
-    rule.pattern = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME|XXX)"));
-    rule.format = todoFixmeNoteFormat;
     highlightingRules.append(rule);
 
     trailingWhiteSpaces.setBackground(Qt::red);
@@ -111,6 +92,48 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
     rule.pattern = QRegularExpression(QStringLiteral("^\\-.*"));
     rule.format = diffOut;
     highlightingRules.append(rule);
+
+    for (HighlightingRule rule : getSharedRules()) {
+        highlightingRules.append(rule);
+    }
+}
+
+QList<HighlightingRule> Syntax::getSharedRules() {
+    QList<HighlightingRule> rv;
+
+    HighlightingRule rule;
+    QTextCharFormat format;
+
+    format.setForeground(Qt::gray);
+    format.setFontItalic(true);
+    rule.pattern = QRegularExpression(QStringLiteral("\"(.*?)\""));
+    rule.format = format;
+    rv.append(rule);
+    rule.pattern = QRegularExpression(QStringLiteral("'(.*?)'"));
+    rv.append(rule);
+    rule.pattern = QRegularExpression(QStringLiteral("`(.*?)`"));
+    rv.append(rule);
+
+    format = QTextCharFormat();
+    format.setFontWeight(QFont::Bold);
+    format.setForeground(Qt::gray);
+    rule.pattern = QRegularExpression(QStringLiteral("^\\s*#+[^\n]*"));
+    rule.format = format;
+    rv.append(rule);
+
+    format = QTextCharFormat();
+    format.setForeground(QColor::fromRgb(250, 50, 50));
+    rule.pattern = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME|XXX)"));
+    rule.format = format;
+    rv.append(rule);
+
+    format = QTextCharFormat();
+    format.setForeground(QColor::fromRgb(98,98,98));
+    rule.pattern = QRegularExpression(QStringLiteral("(^|\\s)//[^\n]*"));
+    rule.format = format;
+    rv.append(rule);
+
+    return rv;
 }
 
 void Syntax::highlightBlock(const QString &text)

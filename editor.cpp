@@ -133,7 +133,7 @@ QFont Editor::getFont() {
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
     #ifdef Q_OS_MAC
-    font.setPointSize(16);
+    font.setPointSize(15);
     #else
     font.setPointSize(11);
     #endif
@@ -1181,7 +1181,9 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
             } else {
                 painter.setPen(QColor::fromRgb(50, 50, 50));
             }
-            painter.drawText(0, top, lineNumberArea->width()-7, fontMetrics().height(), Qt::AlignRight, number);
+
+            painter.setFont(Editor::getFont());
+            painter.drawText(0, top, lineNumberArea->width()-2, fontMetrics().height(), Qt::AlignCenter, number);
         }
 
         block = block.next();
