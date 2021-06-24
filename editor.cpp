@@ -229,6 +229,7 @@ void Editor::setBuffer(Buffer* buffer) {
 
     buffer->onEnter();
     this->document()->setModified(buffer->modified);
+    this->window->getLSPManager()->manageBuffer(buffer);
 
     connect(this, &QPlainTextEdit::modificationChanged, this, &Editor::onChange);
     connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
