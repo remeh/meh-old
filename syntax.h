@@ -8,24 +8,28 @@
 #include <QTextDocument>
 #include <QVector>
 
+class Editor;
+
+struct HighlightingRule
+{
+    QRegularExpression pattern;
+    QTextCharFormat format;
+};
+
 class Syntax : public QSyntaxHighlighter
 {
     Q_OBJECT
 
 public:
-    Syntax(QTextDocument *parent = 0);
+    Syntax(Editor *editor, QTextDocument *parent = 0);
     bool setSelection(const QString& text);
-//void rehighlightAround(QTextBlock currentBlock);
 
 protected:
     void highlightBlock(const QString &text) override;
 
 private:
-    struct HighlightingRule
-    {
-        QRegularExpression pattern;
-        QTextCharFormat format;
-    };
+    Editor* editor;
+
     QVector<HighlightingRule> highlightingRules;
 
     QString selection;

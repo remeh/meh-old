@@ -7,6 +7,25 @@ TasksPlugin::TasksPlugin(Window* window) :
     Q_ASSERT(window != nullptr);
 }
 
+QList<HighlightingRule> TasksPlugin::getSyntaxRules() {
+    QList<HighlightingRule> rv;
+
+    HighlightingRule rule;
+    QTextCharFormat tasksDone, tasksWontDo;
+
+    tasksDone.setForeground(QColor::fromRgb(153,215,0));
+    rule.pattern = QRegularExpression(QStringLiteral("\\[v\\] .*"));
+    rule.format = tasksDone;
+    rv.append(rule);
+
+    tasksWontDo.setForeground(Qt::red);
+    rule.pattern = QRegularExpression(QStringLiteral("\\[x\\] .*"));
+    rule.format = tasksWontDo;
+    rv.append(rule);
+
+    return rv;
+}
+
 void TasksPlugin::keyPressEvent(QKeyEvent* event, bool ctrl, bool shift) {
     Q_ASSERT(event != nullptr);
 

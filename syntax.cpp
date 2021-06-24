@@ -1,13 +1,23 @@
 #include <QTextBlock>
 
+#include "editor.h"
+#include "tasks.h"
 #include "syntax.h"
 
-Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
+Syntax::Syntax(Editor* editor, QTextDocument *parent) :
+  QSyntaxHighlighter(parent), editor(editor)
 {
     HighlightingRule rule;
 
+    if (editor->getBuffer()->getFilename().endsWith(".tasks")) {
+        for (HighlightingRule rule : TasksPlugin::getSyntaxRules()) {
+            highlightingRules.append(rule);
+        }
+        return;
+    }
+
     keywordFormat.setFontWeight(QFont::Bold);
-    keywordFormat.setForeground(Qt::gray);
+    keywordFormat.setForeground(QColor::fromRgb(46,126,184));
     const QString keywordPatterns[] = {
         QStringLiteral("\\bchar\\b"), QStringLiteral("\\bclass\\b"), QStringLiteral("\\bconst\\b"),
         QStringLiteral("\\bdouble\\b"), QStringLiteral("\\benum\\b"), QStringLiteral("\\bexplicit\\b"),
@@ -17,7 +27,7 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
         QStringLiteral("\\bslots\\b"), QStringLiteral("\\bstatic\\b"), QStringLiteral("struct\\b"),
         QStringLiteral("\\bif\\b"), QStringLiteral("\\belse\\b"), QStringLiteral("const\\b"),
         QStringLiteral("\\bvar\\b"), QStringLiteral("\\breturn\\b"), QStringLiteral("\\bnil\\b"),
-        QStringLiteral("\\bvoid\\b"), QStringLiteral("\\bvolatile\\b"), QStringLiteral("\\bbool\\b"),
+        QStringLiteral("\\bvoid\\b"), QStringLiteral("\\bstring\\b"), QStringLiteral("\\bbool\\b"),
         QStringLiteral("func\\b"), QStringLiteral("\\bselect\\b"), QStringLiteral("\\brange\\b"),
         QStringLiteral("\\bfor\\b"), QStringLiteral("\\bswitch\\b"), QStringLiteral("\\bcase\\b"),
         QStringLiteral("\\btrue\\b"), QStringLiteral("\\bfalse\\b"), QStringLiteral("\\btype\\b"),
@@ -51,7 +61,7 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     highlightingRules.append(rule);
 
     // TODO(remy): add the same for instanciation in Go / Zig
-    functionFormat.setForeground(Qt::gray);
+    functionFormat.setForeground(QColor::fromRgb(160, 160, 170));
     rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
     rule.format = functionFormat;
     highlightingRules.append(rule);
@@ -100,22 +110,6 @@ Syntax::Syntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     highlightingRules.append(rule);
     rule.pattern = QRegularExpression(QStringLiteral("^\\-.*"));
     rule.format = diffOut;
-    highlightingRules.append(rule);
-
-    // tasks
-    // -----
-
-    // TODO(remy): should be in the plugin and only runned on .tasks files
-    QTextCharFormat tasksDone, tasksWontDo;
-
-    tasksDone.setForeground(QColor::fromRgb(153,215,0));
-    rule.pattern = QRegularExpression(QStringLiteral("\\[v\\] .*"));
-    rule.format = tasksDone;
-    highlightingRules.append(rule);
-
-    tasksWontDo.setForeground(Qt::red);
-    rule.pattern = QRegularExpression(QStringLiteral("\\[x\\] .*"));
-    rule.format = tasksWontDo;
     highlightingRules.append(rule);
 }
 

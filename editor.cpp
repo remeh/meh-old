@@ -71,11 +71,6 @@ Editor::Editor(Window* window) :
     p.setColor(QPalette::HighlightedText, QColor::fromRgb(240, 240, 240));
     this->setPalette(p);
 
-    // syntax highlighting
-    // ----------------------
-
-    this->syntax = new Syntax(this->document());
-
     // selection timer
     // ----------------------
 
@@ -192,7 +187,7 @@ void Editor::onTriggerSelectionHighlight() {
 }
 
 void Editor::highlightText(QString text) {
-    if (this->syntax->setSelection(text)) {
+    if (this->syntax && this->syntax->setSelection(text)) {
         this->syntax->rehighlight();
     }
 }
@@ -235,7 +230,9 @@ void Editor::setBuffer(Buffer* buffer) {
 
     connect(this, &QPlainTextEdit::modificationChanged, this, &Editor::onChange);
     connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
+
     this->buffer = buffer;
+    this->syntax = new Syntax(this, this->document());
 }
 
 QIcon Editor::getIcon() {
@@ -1184,7 +1181,7 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
             } else {
                 painter.setPen(QColor::fromRgb(50, 50, 50));
             }
-            painter.drawText(0, top, lineNumberArea->width()-2, fontMetrics().height(), Qt::AlignRight, number);
+            painter.drawText(0, top, lineNumberArea->width()-7, fontMetrics().height(), Qt::AlignRight, number);
         }
 
         block = block.next();
@@ -1204,7 +1201,7 @@ int Editor::lineNumberAreaWidth() {
 
     if (digits < 5) { digits = 5; }
 
-    int space = 3 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
+    int space = 5 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
     return space;
 }
 
