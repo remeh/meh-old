@@ -245,7 +245,7 @@ QIcon Editor::getIcon() {
         #ifdef Q_OS_MAC
         painter.setFont(QFont(font().family(), 240));
         #else
-        painter.setFont(QFont(font().family(), 200));
+        painter.setFont(QFont(font().family(), 190));
         #endif
         painter.drawText(QRect(60, 75, 390, 245), Qt::AlignCenter, this->bufferExtension());
         return QIcon(pixmap);
