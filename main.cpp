@@ -31,21 +31,29 @@ int main(int argv, char **args)
     if (!arguments.empty() && QFile::exists("/tmp/meh.sock") &&
          arguments.size() >= 2 && arguments.at(1) != "-n" &&
          !Git::isGitTempFile(arguments.at(1))) {
+
         QLocalSocket socket;
         socket.connectToServer("/tmp/meh.sock");
-        arguments.removeFirst();
-        if (arguments.empty()) {
-            arguments.append("/tmp/meh-notes");
+
+        if (socket.state() != QLocalSocket::ConnectedState) {
+            qDebug() << "An error happened while connecting to /tmp/meh.sock" <<
+                socket.errorString();
+            qDebug() << "Will create a new instance instead.";
+        } else {
+            arguments.removeFirst();
+            if (arguments.empty()) {
+                arguments.append("/tmp/meh-notes");
+            }
+            for (int i = 0; i < arguments.size(); i++) {
+                QFileInfo fi(arguments.at(i));
+                arguments[i] = fi.absoluteFilePath();
+            }
+            QString data = "open " + arguments.join("###");
+            socket.write(data.toLatin1());
+            socket.flush();
+            socket.close();
+            return 0;
         }
-        for (int i = 0; i < arguments.size(); i++) {
-            QFileInfo fi(arguments.at(i));
-            arguments[i] = fi.absoluteFilePath();
-        }
-        QString data = "open " + arguments.join("###");
-        socket.write(data.toLatin1());
-        socket.flush();
-        socket.close();
-        return 0;
     }
 
     if (arguments.size() >= 2 && arguments.at(1) == "-n") {
