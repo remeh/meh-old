@@ -9,26 +9,52 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
 {
     HighlightingRule rule;
 
+    QList<QString> languages{
+        ".go", ".java", ".py", ".rs", ".rb", ".zig", ".c", ".cpp", ".h", ".hpp",
+        ".scala"
+    };
+
+
     selectionFormat.setUnderlineColor(QColor::fromRgb(153,215,0));
     selectionFormat.setFontUnderline(true);
     selectionFormat.setUnderlineStyle(QTextCharFormat::SingleUnderline);
 
     // specific syntax rules
 
-    if (editor->getBuffer()->getFilename().endsWith(".tasks")) {
+    QString filename = editor->getBuffer()->getFilename();
+
+    if (filename.endsWith(".tasks")) {
         for (HighlightingRule rule : TasksPlugin::getSyntaxRules()) {
             highlightingRules.append(rule);
         }
-        for (HighlightingRule rule : getSharedRules()) {
-            highlightingRules.append(rule);
-        }
-        return;
     }
+
+    // if it looks like source code
+
+    for (QString language : languages) {
+        if (filename.endsWith(language)) {
+            for (HighlightingRule rule : getCodeRules()) {
+                highlightingRules.append(rule);
+            }
+        }
+    }
+
+    // rules shared with everything
+
+    for (HighlightingRule rule : getSharedRules()) {
+        highlightingRules.append(rule);
+    }
+}
+
+QList<HighlightingRule> Syntax::getCodeRules() {
+    QList<HighlightingRule> rv;
+    HighlightingRule rule;
+    QTextCharFormat format;
 
     // code syntax rules
 
-    keywordFormat.setFontWeight(QFont::Bold);
-    keywordFormat.setForeground(QColor::fromRgb(46,126,184)); // blue
+    format.setFontWeight(QFont::Bold);
+    format.setForeground(QColor::fromRgb(46,126,184)); // blue
     const QString keywordPatterns[] = {
         QStringLiteral("\\bchar\\b"), QStringLiteral("\\bclass\\b"), QStringLiteral("\\bconst\\b"),
         QStringLiteral("\\bdouble\\b"), QStringLiteral("\\benum\\b"), QStringLiteral("\\bexplicit\\b"),
@@ -47,27 +73,29 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
     };
     for (const QString &pattern : keywordPatterns) {
         rule.pattern = QRegularExpression(pattern);
-        rule.format = keywordFormat;
-        highlightingRules.append(rule);
+        rule.format = format;
+        rv.append(rule);
     }
 
-    classFormat.setFontWeight(QFont::Bold);
-    classFormat.setForeground(Qt::gray);
+    format = QTextCharFormat();
+    format.setFontWeight(QFont::Bold);
+    format.setForeground(Qt::gray);
     rule.pattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
-    rule.format = classFormat;
-    highlightingRules.append(rule);
-
+    rule.format = format;
+    rv.append(rule);
 
     // TODO(remy): add the same for instanciation in Go / Zig
-    functionFormat.setForeground(QColor::fromRgb(160, 160, 170));
+    format = QTextCharFormat();
+    format.setForeground(QColor::fromRgb(160, 160, 170));
     rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
-    rule.format = functionFormat;
-    highlightingRules.append(rule);
+    rule.format = format;
+    rv.append(rule);
 
-    trailingWhiteSpaces.setBackground(Qt::red);
+    format = QTextCharFormat();
+    format.setBackground(Qt::red);
     rule.pattern = QRegularExpression(QStringLiteral("( |\t)+$"));
-    rule.format = trailingWhiteSpaces;
-    highlightingRules.append(rule);
+    rule.format = format;
+    rv.append(rule);
 
     // diff markups
     // ------------
@@ -78,24 +106,22 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
     diffOut.setForeground(QColor::fromRgb(250,50,50));
     rule.pattern = QRegularExpression(QStringLiteral("^<<<<<<< .*"));
     rule.format = diffIn;
-    highlightingRules.append(rule);
+    rv.append(rule);
     rule.pattern = QRegularExpression(QStringLiteral("^=======$"));
     rule.format = diffSeparator;
-    highlightingRules.append(rule);
+    rv.append(rule);
     rule.pattern = QRegularExpression(QStringLiteral("^>>>>>>> .*"));
     rule.format = diffOut;
-    highlightingRules.append(rule);
+    rv.append(rule);
 
     rule.pattern = QRegularExpression(QStringLiteral("^\\+.*"));
     rule.format = diffIn;
-    highlightingRules.append(rule);
+    rv.append(rule);
     rule.pattern = QRegularExpression(QStringLiteral("^\\-.*"));
     rule.format = diffOut;
-    highlightingRules.append(rule);
+    rv.append(rule);
 
-    for (HighlightingRule rule : getSharedRules()) {
-        highlightingRules.append(rule);
-    }
+    return rv;
 }
 
 QList<HighlightingRule> Syntax::getSharedRules() {

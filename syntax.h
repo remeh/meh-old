@@ -25,6 +25,7 @@ public:
     bool setSelection(const QString& text);
 
     static QList<HighlightingRule> getSharedRules();
+    static QList<HighlightingRule> getCodeRules();
 
 protected:
     void highlightBlock(const QString &text) override;
@@ -33,17 +34,8 @@ private:
     Editor* editor;
 
     QVector<HighlightingRule> highlightingRules;
+    QTextCharFormat selectionFormat;
 
     QString selection;
     QRegularExpression selectionRx;
-
-    QTextCharFormat keywordFormat;
-    QTextCharFormat classFormat;
-    QTextCharFormat singleLineCommentFormat;
-    QTextCharFormat quotationFormat;
-    QTextCharFormat functionFormat;
-    QTextCharFormat todoFixmeNoteFormat;
-    QTextCharFormat selectionFormat;
-    QTextCharFormat markdownTitleFormat;
-    QTextCharFormat trailingWhiteSpaces;
 };

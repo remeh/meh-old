@@ -201,14 +201,19 @@ void Command::execute(QString text) {
     if (command == ":d") {
         QDateTime now = QDateTime::currentDateTime();
         QString v = now.toString("yyyy-MM-dd");
-        this->window->getEditor()->textCursor().insertText(" " + v);
+        QTextCursor cursor = this->window->getEditor()->textCursor();
+        cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
+        cursor.insertText(" " + v);
+        this->window->getEditor()->setTextCursor(cursor);
         return;
     }
 
     if (command == ":dt") {
         QDateTime now = QDateTime::currentDateTime();
         QString v = now.toString("yyyy-MM-dd hh:mm:ss");
-        this->window->getEditor()->textCursor().insertText(" " + v);
+        QTextCursor cursor = this->window->getEditor()->textCursor();
+        cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
+        cursor.insertText(" " + v);
         return;
     }
 
