@@ -11,16 +11,29 @@ QList<HighlightingRule> TasksPlugin::getSyntaxRules() {
     QList<HighlightingRule> rv;
 
     HighlightingRule rule;
-    QTextCharFormat tasksDone, tasksWontDo;
+    QTextCharFormat format;
 
-    tasksDone.setForeground(QColor::fromRgb(153,215,0));
+    format.setForeground(QColor::fromRgb(153,215,0));
     rule.pattern = QRegularExpression(QStringLiteral("\\[v\\] .*"));
-    rule.format = tasksDone;
+    rule.format = format;
     rv.append(rule);
 
-    tasksWontDo.setForeground(Qt::red);
+    format = QTextCharFormat();
+    format.setForeground(Qt::red);
     rule.pattern = QRegularExpression(QStringLiteral("\\[x\\] .*"));
-    rule.format = tasksWontDo;
+    rule.format = format;
+    rv.append(rule);
+
+    format.setFontWeight(QFont::Bold);
+    format.setForeground(Syntax::getMainColor());
+    rule.pattern = QRegularExpression(QStringLiteral("^\\s*##+[^\n]*"));
+    rule.format = format;
+    rv.append(rule);
+
+    format = QTextCharFormat();
+    format.setForeground(Qt::gray);
+    rule.pattern = QRegularExpression(QStringLiteral("\\s*\\* .*"));
+    rule.format = format;
     rv.append(rule);
 
     return rv;
