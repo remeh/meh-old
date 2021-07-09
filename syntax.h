@@ -27,6 +27,8 @@ public:
     static QList<HighlightingRule> getSharedRules();
     static QList<HighlightingRule> getCodeRules();
 
+    static QColor getMainColor();
+
 protected:
     void highlightBlock(const QString &text) override;
 
@@ -38,4 +40,5 @@ private:
 
     QString selection;
     QRegularExpression selectionRx;
+
 };

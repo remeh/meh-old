@@ -4,30 +4,29 @@
 #include "tasks.h"
 #include "syntax.h"
 
+QColor Syntax::getMainColor() {
+    return QColor::fromRgb(46,126,184); // blue
+}
+
 Syntax::Syntax(Editor* editor, QTextDocument *parent) :
   QSyntaxHighlighter(parent), editor(editor)
 {
-    HighlightingRule rule;
-
     QList<QString> languages{
         ".go", ".java", ".py", ".rs", ".rb", ".zig", ".c", ".cpp", ".h", ".hpp",
         ".scala"
     };
 
-
     selectionFormat.setUnderlineColor(QColor::fromRgb(153,215,0));
     selectionFormat.setFontUnderline(true);
     selectionFormat.setUnderlineStyle(QTextCharFormat::SingleUnderline);
 
-    // specific syntax rules
+    // rules shared with everything
+
+    for (HighlightingRule rule : getSharedRules()) {
+        highlightingRules.append(rule);
+    }
 
     QString filename = editor->getBuffer()->getFilename();
-
-    if (filename.endsWith(".tasks")) {
-        for (HighlightingRule rule : TasksPlugin::getSyntaxRules()) {
-            highlightingRules.append(rule);
-        }
-    }
 
     // if it looks like source code
 
@@ -39,11 +38,25 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
         }
     }
 
-    // rules shared with everything
+    // specific syntax rules
 
-    for (HighlightingRule rule : getSharedRules()) {
+    if (filename.endsWith(".tasks")) {
+        for (HighlightingRule rule : TasksPlugin::getSyntaxRules()) {
+            highlightingRules.append(rule);
+        }
+    }
+
+    if (filename.endsWith(".md")) {
+        HighlightingRule rule;
+        QTextCharFormat format;
+
+        format.setFontWeight(QFont::Bold);
+        format.setForeground(Syntax::getMainColor());
+        rule.pattern = QRegularExpression(QStringLiteral("^\\s*#+[^\n]*"));
+        rule.format = format;
         highlightingRules.append(rule);
     }
+
 }
 
 QList<HighlightingRule> Syntax::getCodeRules() {
@@ -54,7 +67,7 @@ QList<HighlightingRule> Syntax::getCodeRules() {
     // code syntax rules
 
     format.setFontWeight(QFont::Bold);
-    format.setForeground(QColor::fromRgb(46,126,184)); // blue
+    format.setForeground(Syntax::getMainColor());
     const QString keywordPatterns[] = {
         QStringLiteral("\\bchar\\b"), QStringLiteral("\\bclass\\b"), QStringLiteral("\\bconst\\b"),
         QStringLiteral("\\bdouble\\b"), QStringLiteral("\\benum\\b"), QStringLiteral("\\bexplicit\\b"),
