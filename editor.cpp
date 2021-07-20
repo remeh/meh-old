@@ -176,7 +176,7 @@ void Editor::onTriggerSelectionHighlight() {
     QTextCursor cursor = this->textCursor();
     QString text = cursor.selectedText();
     if (text.size() == 0) {
-        text = this->getWordUnderCursor();
+        text = "\\b" + this->getWordUnderCursor() + "\\b";
         // do not automatically highlight small words
         if (text.size() > 0 && text.size() <= 3) {
             return;
