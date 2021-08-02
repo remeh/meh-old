@@ -4,7 +4,7 @@
 
 ## Features
 
-    * C++/Qt5, tested on Linux and macOS (will most likely work on Windows as well)
+    * C++/Qt6, tested on Linux and macOS (will most likely work on Windows as well)
     * Vim-like movements: `h`, `j`, `k`, `l`, `f`, `F`, `o`, `O`, `a`, `A`, `I`, `g`, `G`, ...
     * Insert, normal, replace, command, visual and visual-line mode are implemented (`i`, `Esc`, `r`, `R`, `:`, `v` and `V`)
     * Open multiple files
@@ -12,10 +12,12 @@
         * Ctrl-P to use the file opener
         * Ctrl-Shift-P to use the file opener with opened buffers
         * `:e <filepath>`
+    * Single instance mode to open new files in existing instance
     * LSP client for C++ (clangd), Go (gopls) and Zig (zls):
         * Go to definition with the `:def` command
         * Auto-completion with `Ctrl-Enter`
         * Display references to a variable / method / ... with `:ref` command
+        * Get error of the current line with `err` or clicking on the red highlighted line number
         * Get functions/methods signatures and documentation with `:sig`
         * `:i` or `:info` to get infos on what's under the cursor
     * File opener
@@ -43,6 +45,7 @@
     * Simple syntax highlighting (regexp based)
     * Execute a command and display the output in a buffer (with `:exec <command> <args>` or `:!<command> <args>`)
     * Highlight the selection / word under the cursor
+    * Commands history
     * Remember cursor position in previously opened files
     * Current-line visual emphasizing
     * 80 and 120 chars vertical lines indicator
@@ -67,8 +70,6 @@
 ## Roadmap
 
     * After having started `:gblame`, enter should load the file in the commit under the cursor
-    * Syntax highlighting per file extension
-    * May implement the file opener with FZF if this one annoys me, but so far I'm happy with it
 
 ## License
 
