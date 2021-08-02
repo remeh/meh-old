@@ -2,6 +2,8 @@
 
 `meh` is remeh's personal code editor.
 
+![Screenshot](https://raw.githubusercontent.com/remeh/meh/master/res/screenshot.png)
+
 ## Features
 
     * C++/Qt6, tested on Linux and macOS (will most likely work on Windows as well)
