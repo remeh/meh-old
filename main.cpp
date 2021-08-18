@@ -46,7 +46,7 @@ int main(int argv, char **args)
             }
             for (int i = 0; i < arguments.size(); i++) {
                 QFileInfo fi(arguments.at(i));
-                arguments[i] = fi.absoluteFilePath();
+                arguments[i] = fi.canonicalFilePath();
             }
             QString data = "open " + arguments.join("###");
             socket.write(data.toLatin1());
@@ -108,7 +108,7 @@ int main(int argv, char **args)
             // set it as the base work dir.
             QFileInfo fi(arguments.last());
             if (fi.isDir()) {
-                window.setBaseDir(fi.absoluteFilePath());
+                window.setBaseDir(fi.canonicalFilePath());
                 window.openListFiles();
             }
         }

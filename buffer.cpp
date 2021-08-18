@@ -28,7 +28,7 @@ Buffer::Buffer(Editor* editor, QString name, QString filename) :
     bufferType(BUFFER_TYPE_FILE) {
     // resolve the absolute path of this
     QFileInfo info(filename);
-    this->filename = info.absoluteFilePath();
+    this->filename = info.canonicalFilePath();
 }
 
 Buffer::Buffer(Editor* editor, QString name, QByteArray data) :

@@ -49,7 +49,7 @@ Window::Window(QApplication* app, QWidget* parent) :
     // ----------------------
 
     QFileInfo dir(".");
-    this->setBaseDir(dir.absoluteFilePath());
+    this->setBaseDir(dir.canonicalFilePath());
 
     // references widget displayed at the bottom of the editor
     // ----------------------
@@ -257,7 +257,7 @@ void Window::setCommand(const QString& text) {
 
 void Window::setBaseDir(const QString& dir) {
     QFileInfo info(dir);
-    this->baseDir = info.absoluteFilePath();
+    this->baseDir = info.canonicalFilePath();
     if (!this->baseDir.endsWith("/")) {
         this->baseDir += "/";
     }
@@ -415,6 +415,7 @@ Editor* Window::setCurrentEditor(QString id) {
         this->previousEditorId = currentEditor->getId();
     }
 
+    qDebug() << "received:" << id;
     int tabIndex = this->getEditorTabIndex(id);
     if (tabIndex >= 0) {
         this->tabs->setCurrentIndex(tabIndex);
@@ -585,7 +586,7 @@ void Window::lspInterpret(QJsonDocument json) {
                 }
 
                 auto diags = json["params"]["diagnostics"].toArray();
-                const QString& uri = QFileInfo(json["params"]["uri"].toString().replace("file://", "")).absoluteFilePath();
+                const QString& uri = QFileInfo(json["params"]["uri"].toString().replace("file://", "")).canonicalFilePath();
 
                 this->lspManager->clearDiagnostics(uri);
 

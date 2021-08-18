@@ -297,7 +297,13 @@ void FilesLookup::refreshList() {
     }
     it = this->filteredFiles.begin();
     while (it != this->filteredFiles.end()) {
-        QString fullPath = this->base + *it;
+        QString fullPath = *it;
+        if (!(it->startsWith("/"))) {
+            fullPath = this->base + *it;
+        }
+        QFileInfo fi(fullPath);
+        fullPath = fi.canonicalFilePath();
+
         QIcon icon = QIcon(":/res/plus.png");
         if (this->window->hasBuffer(fullPath)) {
             icon = QIcon(":/res/edit.png");

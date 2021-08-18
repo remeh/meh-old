@@ -260,7 +260,7 @@ bool Editor::alreadyOpened(const QString& filename) {
 
     QSettings settings("mehteor", "meh");
     QFileInfo f(filename);
-    int pid = settings.value("buffer/"+f.absoluteFilePath()+"/opened", 0).toInt();
+    int pid = settings.value("buffer/"+f.canonicalFilePath()+"/opened", 0).toInt();
     return pid != 0 && pid != QCoreApplication::applicationPid();
 }
 
@@ -275,14 +275,14 @@ bool Editor::storeOpenedState(const QString& filename) {
 
     QSettings settings("mehteor", "meh");
     QFileInfo f(filename);
-    settings.setValue("buffer/"+f.absoluteFilePath()+"/opened", QCoreApplication::applicationPid());
+    settings.setValue("buffer/"+f.canonicalFilePath()+"/opened", QCoreApplication::applicationPid());
     return true;
 }
 
 void Editor::removeOpenedState(const QString& filename) {
     QSettings settings("mehteor", "meh");
     QFileInfo f(filename);
-    settings.remove("buffer/"+f.absoluteFilePath()+"/opened");
+    settings.remove("buffer/"+f.canonicalFilePath()+"/opened");
 }
 
 void Editor::cleanOnlyWhiteSpacesLine() {

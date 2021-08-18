@@ -100,7 +100,7 @@ void Command::execute(QString text) {
             // go to current file directory
             if (this->window->getEditor() == nullptr) { return; }
             QFileInfo fi(this->window->getEditor()->getBuffer()->getFilename());
-            bd = fi.absolutePath();
+            bd = fi.canonicalPath();
         } else {
             QString path = list.join(" ").trimmed();
             bd = this->window->getBaseDir();
@@ -112,10 +112,10 @@ void Command::execute(QString text) {
         }
         QDir d(bd);
         if (!d.exists()) {
-            this->window->getStatusBar()->setMessage("Can't set base dir to: " + d.absolutePath() + "\nIt doesn't exist");
+            this->window->getStatusBar()->setMessage("Can't set base dir to: " + d.canonicalPath() + "\nIt doesn't exist");
             return;
         }
-        this->window->setBaseDir(d.absolutePath());
+        this->window->setBaseDir(d.canonicalPath());
         this->window->getStatusBar()->setMessage("Base dir set to: " + this->window->getBaseDir());
         return;
     }

@@ -105,7 +105,7 @@ void Grep::grep(const QString& string, const QString& baseDir, const QString& ta
     // create and init the process
     this->process = new QProcess(this);
     QFileInfo baseDirInfo(baseDir);
-    this->process->setWorkingDirectory(baseDirInfo.absoluteFilePath());
+    this->process->setWorkingDirectory(baseDirInfo.canonicalFilePath());
 
     // target
     QString t = target;

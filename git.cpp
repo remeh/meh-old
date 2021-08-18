@@ -81,7 +81,7 @@ void Git::blame(const Buffer* buffer) {
     this->process = new QProcess(this);
     QFileInfo fi(filename);
 
-    this->process->setWorkingDirectory(fi.absolutePath());
+    this->process->setWorkingDirectory(fi.canonicalPath());
 
     // run git blame <filename>
     QStringList args; args << "blame" << fi.fileName();
@@ -104,7 +104,7 @@ void Git::show(const QString& workDir, const QString& checksum) {
     // create and init the process
     this->process = new QProcess(this);
     QFileInfo fi(workDir);
-    this->process->setWorkingDirectory(fi.absolutePath());
+    this->process->setWorkingDirectory(fi.canonicalPath());
 
     // run git show <checksum>
     QStringList args; args << "show" << checksum;
@@ -127,7 +127,7 @@ void Git::diff(const QString& workDir, bool staged) {
     // create and init the process
     this->process = new QProcess(this);
     QFileInfo fi(workDir);
-    this->process->setWorkingDirectory(fi.absolutePath());
+    this->process->setWorkingDirectory(fi.canonicalPath());
 
     QStringList args; args << "diff";
     if (staged) {

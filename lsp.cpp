@@ -79,7 +79,7 @@ QString LSPWriter::initialize(const QString& baseDir) {
         {"textDocument", textDocument}
     };
     QJsonObject params {
-        {"rootUri", "file://" + fi.absoluteFilePath()},
+        {"rootUri", "file://" + fi.canonicalFilePath()},
         {"processId", QCoreApplication::applicationPid()},
         {"capabilities", capabilities},
     };
