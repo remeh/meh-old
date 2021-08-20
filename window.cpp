@@ -415,7 +415,6 @@ Editor* Window::setCurrentEditor(QString id) {
         this->previousEditorId = currentEditor->getId();
     }
 
-    qDebug() << "received:" << id;
     int tabIndex = this->getEditorTabIndex(id);
     if (tabIndex >= 0) {
         this->tabs->setCurrentIndex(tabIndex);

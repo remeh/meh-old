@@ -434,6 +434,11 @@ void Command::execute(QString text) {
         return;
     }
 
+    if (command == ":notes") {
+        this->window->setCurrentEditor("/tmp/meh-notes");
+        return;
+    }
+
     // reload
 
     // XXX(remy): reimplement me
