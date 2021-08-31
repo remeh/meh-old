@@ -67,8 +67,11 @@ int main(int argv, char **args)
     window.resize(800, 700);
     window.show();
 
+	// remove the binary name
+    arguments.takeFirst();
+
     // special case of reading from stdin
-    if (arguments.size() > 1 && arguments.at(1) == "-") {
+    if (arguments.size() > 0 && arguments.at(0) == "-") {
 
         QByteArray content;
 
@@ -82,11 +85,13 @@ int main(int argv, char **args)
 
         window.newEditor("stdin", content);
     } else if (arguments.size() > 0) {
-        for (int i = arguments.size() - 1; i > 0; i--) {
+        for (int i = arguments.size() - 1; i >= 0; i--) {
+			// ignore if this is a position
             if (arguments.at(i).startsWith("+")) {
                 continue;
             }
 
+            // ignore if this is a directory
             QFileInfo fi(arguments.at(i));
             if (fi.isDir()) {
                 continue;
@@ -102,7 +107,7 @@ int main(int argv, char **args)
             if (ok) {
                 window.getEditor()->goToLine(lineNumber);
             }
-        } else if (arguments.size() > 1) {
+        } else {
             // the last one is not a +###
             // checks whether it is a directory, if it is, we want to
             // set it as the base work dir.

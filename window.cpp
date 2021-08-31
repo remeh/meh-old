@@ -209,6 +209,9 @@ void Window::closeReplace() {
 }
 
 void Window::paintEvent(QPaintEvent* event) {
+    if (this->getEditor() == nullptr) {
+        return;
+    }
     // repaint the editor and its line number area
     this->getEditor()->update();
 }
