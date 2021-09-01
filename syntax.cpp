@@ -57,6 +57,10 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
         highlightingRules.append(rule);
     }
 
+    // rules to overriding all others (TODO and comments color for example)
+    for (HighlightingRule rule : getOverrideRules()) {
+        highlightingRules.append(rule);
+    }
 }
 
 QList<HighlightingRule> Syntax::getCodeRules() {
@@ -82,6 +86,7 @@ QList<HighlightingRule> Syntax::getCodeRules() {
         QStringLiteral("\\bfor\\b"), QStringLiteral("\\bswitch\\b"), QStringLiteral("\\bcase\\b"),
         QStringLiteral("\\btrue\\b"), QStringLiteral("\\bfalse\\b"), QStringLiteral("\\btype\\b"),
         QStringLiteral("\\bwhile\\b"), QStringLiteral("\\bdelete\\b"), QStringLiteral("\\bnew\\b"),
+        QStringLiteral("\\bdef\\b"), QStringLiteral("\\bend\\b"), // ruby
         QStringLiteral("package\\b"), QStringLiteral("import\\b")
     };
     for (const QString &pattern : keywordPatterns) {
@@ -153,6 +158,14 @@ QList<HighlightingRule> Syntax::getSharedRules() {
     rule.pattern = QRegularExpression(QStringLiteral("`(.*?)`"));
     rv.append(rule);
 
+    return rv;
+}
+
+QList<HighlightingRule> Syntax::getOverrideRules() {
+    QList<HighlightingRule> rv;
+    HighlightingRule rule;
+    QTextCharFormat format;
+
     format = QTextCharFormat();
     format.setFontWeight(QFont::Bold);
     format.setForeground(Qt::gray);
@@ -161,14 +174,14 @@ QList<HighlightingRule> Syntax::getSharedRules() {
     rv.append(rule);
 
     format = QTextCharFormat();
-    format.setForeground(QColor::fromRgb(250, 50, 50));
-    rule.pattern = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME|XXX)"));
+    format.setForeground(QColor::fromRgb(98,98,98));
+    rule.pattern = QRegularExpression(QStringLiteral("(^|\\s)//[^\n]*"));
     rule.format = format;
     rv.append(rule);
 
     format = QTextCharFormat();
-    format.setForeground(QColor::fromRgb(98,98,98));
-    rule.pattern = QRegularExpression(QStringLiteral("(^|\\s)//[^\n]*"));
+    format.setForeground(QColor::fromRgb(250, 50, 50));
+    rule.pattern = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME|XXX)"));
     rule.format = format;
     rv.append(rule);
 

@@ -26,6 +26,7 @@ public:
 
     static QList<HighlightingRule> getSharedRules();
     static QList<HighlightingRule> getCodeRules();
+    static QList<HighlightingRule> getOverrideRules();
 
     static QColor getMainColor();
 
