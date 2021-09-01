@@ -38,6 +38,11 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
         }
     }
 
+    // rules to overriding all others (TODO and comments color for example)
+    for (HighlightingRule rule : getOverrideRules()) {
+        highlightingRules.append(rule);
+    }
+
     // specific syntax rules
 
     if (filename.endsWith(".tasks")) {
@@ -54,11 +59,6 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
         format.setForeground(Syntax::getMainColor());
         rule.pattern = QRegularExpression(QStringLiteral("^\\s*#+[^\n]*"));
         rule.format = format;
-        highlightingRules.append(rule);
-    }
-
-    // rules to overriding all others (TODO and comments color for example)
-    for (HighlightingRule rule : getOverrideRules()) {
         highlightingRules.append(rule);
     }
 }
