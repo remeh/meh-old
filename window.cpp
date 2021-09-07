@@ -81,8 +81,8 @@ Window::Window(QApplication* app, QWidget* parent) :
     this->tabs->setMovable(true);
 
     this->layout = new QGridLayout();
-    this->layout->setContentsMargins(0, 0, 0, 0);
-    this->layout->setVerticalSpacing(1);
+    this->layout->setContentsMargins(3, 2, 3, 2);
+    this->layout->setVerticalSpacing(3);
     this->layout->addWidget(this->tabs);
     this->layout->addWidget(this->command);
     this->layout->addWidget(this->filesLookup);
