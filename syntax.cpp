@@ -16,7 +16,8 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
         ".scala"
     };
 
-    selectionFormat.setUnderlineColor(QColor::fromRgb(153,215,0));
+    selectionFormat.setForeground(QColor::fromRgb(129,179,234));
+    selectionFormat.setUnderlineColor(QColor::fromRgb(129,179,234));
     selectionFormat.setFontUnderline(true);
     selectionFormat.setUnderlineStyle(QTextCharFormat::SingleUnderline);
 
