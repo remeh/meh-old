@@ -71,7 +71,6 @@ QList<HighlightingRule> Syntax::getCodeRules() {
 
     // code syntax rules
 
-    format.setFontWeight(QFont::Bold);
     format.setForeground(Syntax::getMainColor());
     const QString keywordPatterns[] = {
         QStringLiteral("\\bchar\\b"), QStringLiteral("\\bclass\\b"), QStringLiteral("\\bconst\\b"),
@@ -97,7 +96,6 @@ QList<HighlightingRule> Syntax::getCodeRules() {
     }
 
     format = QTextCharFormat();
-    format.setFontWeight(QFont::Bold);
     format.setForeground(Qt::gray);
     rule.pattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
     rule.format = format;
@@ -168,7 +166,6 @@ QList<HighlightingRule> Syntax::getOverrideRules() {
     QTextCharFormat format;
 
     format = QTextCharFormat();
-    format.setFontWeight(QFont::Bold);
     format.setForeground(Qt::gray);
     rule.pattern = QRegularExpression(QStringLiteral("^\\s*#+[^\n]*"));
     rule.format = format;
