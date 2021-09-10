@@ -5,6 +5,8 @@
 #include <QRandomGenerator>
 #include <QSettings>
 
+#include "qdebug.h"
+
 #include "command.h"
 #include "exec.h"
 #include "lsp.h"
@@ -24,6 +26,9 @@ void Command::keyPressEvent(QKeyEvent* event) {
         case Qt::Key_Escape:
             this->clear();
             this->window->closeCommand();
+            if (this->window->getEditor()) {
+                this->window->getEditor()->highlightText("");
+            }
             return;
         case Qt::Key_Up:
             {
@@ -44,6 +49,13 @@ void Command::keyPressEvent(QKeyEvent* event) {
     }
 
     QLineEdit::keyPressEvent(event);
+
+    // highlight search
+    if (this->text().size() > 0 && this->text()[0] == '/') {
+        if (this->window->getEditor()) {
+            this->window->getEditor()->highlightText(this->text().mid(1));
+        }
+    }
 }
 
 void Command::show() {
