@@ -129,13 +129,13 @@ Editor::~Editor() {
 
 QFont Editor::getFont() {
     QFont font;
-    font.setFamily("Inconsolata");
+    font.setFamilies(QStringList() << "Source Code Pro" << "Inconsolata");
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
     #ifdef Q_OS_MAC
     font.setPointSize(15);
     #else
-    font.setPointSize(11);
+    font.setPointSize(10.5);
     #endif
     return font;
 }
