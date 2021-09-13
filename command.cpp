@@ -53,7 +53,7 @@ void Command::keyPressEvent(QKeyEvent* event) {
     // highlight search
     if (this->text().size() > 0 && this->text()[0] == '/') {
         if (this->window->getEditor()) {
-            this->window->getEditor()->highlightText(this->text().mid(1));
+            this->window->getEditor()->highlightText(QString("(?i)") + this->text().mid(1));
         }
     }
 }
