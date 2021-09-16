@@ -293,12 +293,18 @@ Editor* Window::newEditor(QString name, QByteArray content) {
 Editor* Window::newEditor(QString name, QString filename) {
     // XXX(remy): do not open the same file multiple times
 
+    QFileInfo fi(filename);
+    if (fi.isDir()) {
+        this->setBaseDir(fi.canonicalFilePath());
+        this->openListFiles();
+        return nullptr;
+    }
+
     // we want to create a new Editor with this buffer.
     Editor* editor = new Editor(this);
     Buffer* buffer = new Buffer(editor, name, filename);
     editor->setBuffer(buffer);
 
-    QFileInfo fi(filename);
     QString label;
     QString dirName = fi.dir().dirName();
     if (dirName != ".") {
