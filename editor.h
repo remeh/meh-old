@@ -94,6 +94,10 @@ public:
     void left();
     void right();
 
+    // at the start of the line, move onto the first char instead of being in
+    // the indentation
+    void moveToFirstWord(QTextCursor* cursor);
+
     int currentLineNumber();
     int currentColumn();
 

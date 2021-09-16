@@ -129,14 +129,15 @@ Editor::~Editor() {
 
 QFont Editor::getFont() {
     QFont font;
-    font.setFamilies(QStringList() << "Source Code Pro" << "Inconsolata");
-    font.setStyleHint(QFont::Monospace);
-    font.setFixedPitch(true);
     #ifdef Q_OS_MAC
+    font.setFamily("Inconsolata");
     font.setPointSize(15);
     #else
+    font.setFamilies(QStringList() << "Source Code Pro" << "Inconsolata");
     font.setPointSize(10.5);
     #endif
+    font.setStyleHint(QFont::Monospace);
+    font.setFixedPitch(true);
     return font;
 }
 
@@ -474,6 +475,19 @@ void Editor::left() {
     }
 }
 
+void Editor::moveToFirstWord(QTextCursor* cursor) {
+    if (cursor == nullptr) {
+        return;
+    }
+    QChar c = this->document()->characterAt(cursor->position());
+    int watchdog = 1000;
+    while (c.isSpace() && !cursor->atBlockEnd() && watchdog > 0) {
+        cursor->movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
+        c = this->document()->characterAt(cursor->position());
+        watchdog--;
+    }
+}
+
 void Editor::deleteCurrentLine() {
     QTextCursor cursor = this->textCursor();
     cursor.movePosition(QTextCursor::StartOfBlock);
@@ -623,16 +637,24 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         switch (event->key()) {
             case Qt::Key_U:
                 {
-                    QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageUp, Qt::NoModifier);
-                    QPlainTextEdit::keyPressEvent(&pageEvent);
+                    QTextCursor cursor = this->textCursor();
+                    cursor.beginEditBlock();
+                    cursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor, 20);
+                    this->moveToFirstWord(&cursor);
+                    cursor.endEditBlock();
                     this->selectionTimer->stop(); // we don't want to refresh the highlight
+                    this->setTextCursor(cursor);
                 }
                 return;
             case Qt::Key_D:
                 {
-                    QKeyEvent pageEvent(QEvent::KeyPress, Qt::Key_PageDown, Qt::NoModifier);
-                    QPlainTextEdit::keyPressEvent(&pageEvent);
+                    QTextCursor cursor = this->textCursor();
+                    cursor.beginEditBlock();
+                    cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, 20);
+                    this->moveToFirstWord(&cursor);
+                    cursor.endEditBlock();
                     this->selectionTimer->stop(); // we don't want to refresh the highlight
+                    this->setTextCursor(cursor);
                 }
                 return;
             case Qt::Key_Return:
