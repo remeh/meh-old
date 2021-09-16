@@ -193,6 +193,12 @@ void Editor::highlightText(QString text) {
     }
 }
 
+void Editor::setSearchText(QString text) {
+    if (this->syntax && this->syntax->setSearchText(text)) {
+        this->syntax->rehighlight();
+    }
+}
+
 void Editor::onChange(bool changed) {
     if (this->buffer != nullptr && changed) {
         this->buffer->modified = changed;
@@ -778,12 +784,13 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         return;
     }
 
-    // close extra widgets
+    // close extra stuff
     if (event->key() == Qt::Key_Escape) {
         this->window->closeList();
         this->window->closeCompleter();
         this->window->closeReplace();
         this->window->getStatusBar()->hideMessage();
+        this->setSearchText("");
 
         if (!this->hasFocus()) {
             this->window->closeGrep();

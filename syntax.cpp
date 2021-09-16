@@ -21,6 +21,9 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
     selectionFormat.setFontUnderline(true);
     selectionFormat.setUnderlineStyle(QTextCharFormat::SingleUnderline);
 
+    searchTextFormat.setForeground(Qt::white);
+    searchTextFormat.setBackground(QColor::fromRgb(129,179,234));
+
     // rules shared with everything
 
     for (HighlightingRule rule : getSharedRules()) {
@@ -203,6 +206,14 @@ void Syntax::highlightBlock(const QString &text)
             setFormat(match.capturedStart(), match.capturedLength(), selectionFormat);
         }
     }
+
+    if (this->searchText.size() > 0 && this->searchTextRx.isValid()) {
+        QRegularExpressionMatchIterator matchIterator = searchTextRx.globalMatch(text);
+        while (matchIterator.hasNext()) {
+            QRegularExpressionMatch match = matchIterator.next();
+            setFormat(match.capturedStart(), match.capturedLength(), searchTextFormat);
+        }
+    }
 }
 
 bool Syntax::setSelection(const QString& text) {
@@ -218,6 +229,16 @@ bool Syntax::setSelection(const QString& text) {
     return true;
 }
 
+bool Syntax::setSearchText(const QString& text) {
+    if (this->searchText == text) {
+        return false;
+    }
+    if (text.size() > 0) {
+        this->searchTextRx = QRegularExpression("(" + text + ")");
+    }
+    this->searchText = text;
+    return true;
+}
 // void Syntax::rehighlightAround(QTextBlock currentBlock) {
 //     QVector<QTextBlock> blocks;
 //

@@ -23,6 +23,7 @@ class Syntax : public QSyntaxHighlighter
 public:
     Syntax(Editor *editor, QTextDocument *parent = 0);
     bool setSelection(const QString& text);
+    bool setSearchText(const QString& text);
 
     static QList<HighlightingRule> getSharedRules();
     static QList<HighlightingRule> getCodeRules();
@@ -37,9 +38,12 @@ private:
     Editor* editor;
 
     QVector<HighlightingRule> highlightingRules;
-    QTextCharFormat selectionFormat;
 
     QString selection;
     QRegularExpression selectionRx;
+    QTextCharFormat selectionFormat;
 
+    QString searchText;
+    QRegularExpression searchTextRx;
+    QTextCharFormat searchTextFormat;
 };

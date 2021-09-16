@@ -53,7 +53,7 @@ void Command::keyPressEvent(QKeyEvent* event) {
     // highlight search
     if (this->text().size() > 0 && this->text()[0] == '/') {
         if (this->window->getEditor()) {
-            this->window->getEditor()->highlightText(QString("(?i)") + this->text().mid(1));
+            this->window->getEditor()->setSearchText(QString("(?i)") + this->text().mid(1));
         }
     }
 }
@@ -403,7 +403,7 @@ void Command::execute(QString text) {
         } else {
             terms = this->window->getEditor()->getWordUnderCursor();
         }
-        this->window->getEditor()->highlightText(terms);
+        this->window->getEditor()->setSearchText(terms);
         this->window->saveCheckpoint();
         this->window->getEditor()->goToOccurrence(terms, false);
         this->window->getEditor()->centerCursor();

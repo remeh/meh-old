@@ -126,6 +126,10 @@ public:
     // highlightText highlights the given text in the editor.
     void highlightText(QString text);
 
+    // setSearchText sets the pattern to highlight because
+    // of a search
+    void setSearchText(QString text);
+
     // getOneLine returns the given line in the given file.
     // It returns the last line of the file if line doesn't exist.
     const QString getOneLine(const QString filename, int line);
