@@ -130,6 +130,7 @@ void Window::onNewSocketCommand() {
     if (this->app) {
         this->app->alert(this, 10000);
         this->activateWindow();
+        this->raise();
     }
 
     if (data.startsWith("open ")) {
