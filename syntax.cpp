@@ -191,6 +191,8 @@ QList<HighlightingRule> Syntax::getOverrideRules() {
 
 void Syntax::highlightBlock(const QString &text)
 {
+//    highlightBlock2(text);
+
     for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
         while (matchIterator.hasNext()) {
@@ -214,6 +216,108 @@ void Syntax::highlightBlock(const QString &text)
             setFormat(match.capturedStart(), match.capturedLength(), searchTextFormat);
         }
     }
+}
+
+void Syntax::processWord(const QString& word, int wordStart, bool startOfLine, bool endOfLine, bool inQuote) {
+    if (word == " ") {
+        // TODO(remy): we want to display it red if endOfLine == true
+        return;
+    }
+
+    if (word.size() <= 2) {
+        return;
+    }
+
+    qDebug() << "process word: " << word << endOfLine;
+
+}
+void Syntax::processLine(const QString& line) {
+    qDebug() << "process line: " << line;
+}
+void Syntax::processQuote(const QString& text, int start) {
+    qDebug() << "process quote: " << text;
+}
+
+void Syntax::highlightBlock2(const QString &text) {
+    // FIXME(remy): highlightStateReset();
+    QString lineBuffer = "";
+    QString wordBuffer = "";
+    QString quoteBuffer = "";
+    QChar isInQuote = '0'; // FIXME(remy): we want to ignore quote chars if previous char is '\'
+    bool startOfLine = true;
+    bool endOfLine = false;
+    int quoteStart = 0;
+    int wordStart = 0;
+
+    for (int i = 0; i < text.size(); i++) {
+        QChar c = text[i];
+        wordStart++;
+        lineBuffer.append(c); // TODO(remy): un-necessary since everything's in `line`?
+
+        if (isInQuote != '0') {
+            quoteStart++;
+
+            if (c == isInQuote) {
+                processWord(wordBuffer, wordStart, startOfLine, false, true);
+                processQuote(quoteBuffer, quoteStart);
+                quoteBuffer.clear();
+                wordBuffer.clear();
+                continue;
+            }
+
+            quoteBuffer += c;
+        }
+
+        // we are entering a quote, store which char has been used to open it
+        if (c == '\"' || c == '\'' || c == '`') {
+            quoteStart = i;
+            isInQuote = c;
+            quoteBuffer.clear();
+            continue;
+        }
+
+        // end of word
+        if (c.isSpace() || c.isPunct()) {
+            if (wordBuffer.size() > 0) {
+                processWord(wordBuffer, wordStart, startOfLine, false, false);
+                wordBuffer.clear();
+                startOfLine = false;
+                continue;
+            }
+        }
+
+        wordBuffer.append(c);
+    }
+
+    // end of line
+    if (wordBuffer.size() > 0) {
+        processWord(wordBuffer, wordStart, false, true, isInQuote != '0');
+        wordBuffer.clear();
+    }
+
+    if (lineBuffer.size() > 0) {
+        processLine(lineBuffer);
+        lineBuffer.clear();
+    }
+
+    // FIXME(remy): highlightStateReset();
+    quoteBuffer = '0';
+    wordBuffer.clear();
+    lineBuffer.clear();
+    quoteBuffer.clear();
+    startOfLine = true;
+    endOfLine = false;
+    wordStart = 0;
+
+    // contains word
+    // for contains rules: we will want to go through the text, every time we encounter
+    // a space, we will consider the last word buffered and see if we have to colorize it
+
+    // start with
+    // for instance for markdown titles, git syntax, the tasks syntax or comments
+    // will color the whole line
+
+    // selection and search will probably still be regexp based
 }
 
 bool Syntax::setSelection(const QString& text) {

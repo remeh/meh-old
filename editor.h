@@ -27,6 +27,7 @@
 #include "references_widget.h"
 #include "statusbar.h"
 #include "syntax.h"
+#include "syntax_highlighter.h"
 #include "tasks.h"
 
 class Window;
@@ -267,7 +268,8 @@ private:
     QListWidget* currentCompleter;
 
     Window* window;
-    Syntax* syntax;
+    SyntaxHighlighter* syntax;
+//    Syntax* syntax;
 
     // mode is the currently used mode. See mode.h
     int mode;

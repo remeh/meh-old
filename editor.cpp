@@ -37,6 +37,7 @@
 #include "mode.h"
 #include "references_widget.h"
 #include "syntax.h"
+#include "syntax_highlighter.h"
 #include "tasks.h"
 #include "window.h"
 
@@ -239,7 +240,8 @@ void Editor::setBuffer(Buffer* buffer) {
     connect(this->document(), &QTextDocument::contentsChange, this, &Editor::onContentsChange);
 
     this->buffer = buffer;
-    this->syntax = new Syntax(this, this->document());
+    this->syntax = new SyntaxHighlighter(this, this->document());
+//    this->syntax = new Syntax(this, this->document());
 }
 
 QIcon Editor::getIcon() {
