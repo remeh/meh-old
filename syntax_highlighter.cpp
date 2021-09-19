@@ -270,7 +270,7 @@ QVector<PluginRule> SyntaxHighlighter::setMarkdownRules() {
     PluginRule rule;
     QTextCharFormat format;
     format.setFontWeight(QFont::Bold);
-    format.setForeground(Syntax::getMainColor());
+    format.setForeground(SyntaxHighlighter::getMainColor());
     rule.pattern = QRegularExpression(QStringLiteral("^\\s*#+[^\n]*"));
     rule.format = format;
     rv.append(rule);

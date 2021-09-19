@@ -38,7 +38,6 @@ set(SOURCES
     replace.cpp
     statusbar.cpp
     submode.cpp
-    syntax.cpp
     syntax_highlighter.cpp
     tasks.cpp
     visual.cpp

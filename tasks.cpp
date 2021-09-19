@@ -25,7 +25,7 @@ QList<PluginRule> TasksPlugin::getSyntaxRules() {
     rv.append(rule);
 
     format.setFontWeight(QFont::Bold);
-    format.setForeground(Syntax::getMainColor());
+    format.setForeground(SyntaxHighlighter::getMainColor());
     rule.pattern = QRegularExpression(QStringLiteral("^\\s*##+[^\n]*"));
     rule.format = format;
     rv.append(rule);

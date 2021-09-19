@@ -26,7 +26,6 @@
 #include "mode.h"
 #include "references_widget.h"
 #include "statusbar.h"
-#include "syntax.h"
 #include "syntax_highlighter.h"
 #include "tasks.h"
 
@@ -269,7 +268,6 @@ private:
 
     Window* window;
     SyntaxHighlighter* syntax;
-//    Syntax* syntax;
 
     // mode is the currently used mode. See mode.h
     int mode;
