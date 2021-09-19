@@ -11,6 +11,12 @@ QColor SyntaxHighlighter::getMainColor() {
 SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
   QSyntaxHighlighter(parent), editor(editor)
 {
+    if (editor == nullptr) {
+        return;
+    }
+
+    this->filename = editor->getBuffer()->getFilename();
+
     QList<QString> languages{
         ".go", ".java", ".py", ".rs", ".rb", ".zig", ".c", ".cpp", ".h", ".hpp",
         ".scala"
@@ -34,7 +40,17 @@ SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
     todoFormat.setForeground(QColor::fromRgb(250, 50, 50));
     whitespaceEolFormat.setBackground(QColor::fromRgb(250, 50, 50));
 
-    setCodeRules();
+    for (QString language : languages) {
+        if (filename.endsWith(language)) {
+            setCodeRules();
+        }
+    }
+
+    if (filename.endsWith(".tasks")) {
+        for (PluginRule rule : TasksPlugin::getSyntaxRules()) {
+            pluginRules.append(rule);
+        }
+    }
 }
 
 void SyntaxHighlighter::setCodeRules() {
@@ -61,6 +77,7 @@ void SyntaxHighlighter::setCodeRules() {
         "def", "end", "until", // ruby
         "package", "import", "#include"
     };
+
     for (const QString &pattern : keywordPatterns) {
         rule.word = pattern;
         rule.format = format;
@@ -80,7 +97,6 @@ void SyntaxHighlighter::processRegexp(const QString& text, QRegularExpression rx
 
 void SyntaxHighlighter::processWord(const QString& word, int wordStart, bool endOfLine, bool inQuote) {
     if (word == " ") {
-        // TODO(remy): we want to display it red if endOfLine == true
         return;
     }
 
@@ -96,6 +112,12 @@ void SyntaxHighlighter::processWord(const QString& word, int wordStart, bool end
 }
 
 void SyntaxHighlighter::processLine(const QString& line) {
+    if (pluginRules.size() > 0) {
+        for (PluginRule rule : pluginRules) {
+            processRegexp(line, rule.pattern, rule.format);
+        }
+    }
+
     if (this->selection.size() > 0) {
         processRegexp(line, this->selectionRx, this->selectionFormat);
     }

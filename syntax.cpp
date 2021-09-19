@@ -49,11 +49,11 @@ Syntax::Syntax(Editor* editor, QTextDocument *parent) :
 
     // specific syntax rules
 
-    if (filename.endsWith(".tasks")) {
-        for (HighlightingRule rule : TasksPlugin::getSyntaxRules()) {
-            highlightingRules.append(rule);
-        }
-    }
+//    if (filename.endsWith(".tasks")) {
+//        for (HighlightingRule rule : TasksPlugin::getSyntaxRules()) {
+//            highlightingRules.append(rule);
+//        }
+//    }
 
     if (filename.endsWith(".md")) {
         HighlightingRule rule;

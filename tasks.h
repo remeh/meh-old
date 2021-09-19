@@ -6,7 +6,7 @@
 #include <QWidget>
 
 class Window;
-struct HighlightingRule;
+struct PluginRule;
 
 // TasksPlugin is the basic definition of a TaskPlugin.
 class TasksPlugin : public QWidget {
@@ -16,7 +16,7 @@ public:
     TasksPlugin(Window* window);
     void keyPressEvent(QKeyEvent* event, bool ctrl, bool shift);
 
-    static QList<HighlightingRule> getSyntaxRules();
+    static QList<PluginRule> getSyntaxRules();
 
 private:
     Window* window;

@@ -7,10 +7,10 @@ TasksPlugin::TasksPlugin(Window* window) :
     Q_ASSERT(window != nullptr);
 }
 
-QList<HighlightingRule> TasksPlugin::getSyntaxRules() {
-    QList<HighlightingRule> rv;
+QList<PluginRule> TasksPlugin::getSyntaxRules() {
+    QList<PluginRule> rv;
 
-    HighlightingRule rule;
+    PluginRule rule;
     QTextCharFormat format;
 
     format.setForeground(QColor::fromRgb(153,215,0));

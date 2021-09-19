@@ -16,6 +16,12 @@ struct SyntaxRule
     QTextCharFormat format;
 };
 
+struct PluginRule
+{
+    QRegularExpression pattern;
+    QTextCharFormat format;
+};
+
 class SyntaxHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
@@ -32,8 +38,10 @@ protected:
 
 private:
     Editor* editor;
+    QString filename;
 
     QVector<SyntaxRule> simpleWordEqualityRules;
+    QVector<PluginRule> pluginRules;
 
     QString selection;
     QRegularExpression selectionRx;
