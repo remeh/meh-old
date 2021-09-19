@@ -62,6 +62,7 @@ private:
     QTextCharFormat functionCallFormat;
 
     void setCodeRules();
+    QVector<PluginRule> setMarkdownRules();
 
     void processWord(const QString& word, int wordStart, bool endOfLine, bool inQuote);
     void processLine(const QString& line);

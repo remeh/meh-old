@@ -51,6 +51,12 @@ SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
             pluginRules.append(rule);
         }
     }
+
+    if (filename.endsWith(".md")) {
+        for (PluginRule rule : setMarkdownRules()) {
+            pluginRules.append(rule);
+        }
+    }
 }
 
 void SyntaxHighlighter::setCodeRules() {
@@ -158,11 +164,10 @@ void SyntaxHighlighter::processFunctionCall(const QString& text, int start, bool
 }
 
 void SyntaxHighlighter::highlightBlock(const QString &text) {
-    // FIXME(remy): highlightStateReset();
     QString wordBuffer = "";
     QString quoteBuffer = "";
     QChar charBeforeWord = '0';
-    QChar isInQuote = '0'; // FIXME(remy): we want to ignore quote chars if previous char is '\'
+    QChar isInQuote = '0';
     QChar pc = '0';
     bool endOfLine = false;
     int quoteStart = 0;
@@ -228,7 +233,6 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
 
     processLine(text);
 
-    // FIXME(remy): highlightStateReset();
     quoteBuffer = '0';
     wordBuffer.clear();
     quoteBuffer.clear();
@@ -258,4 +262,18 @@ bool SyntaxHighlighter::setSearchText(const QString& text) {
     }
     this->searchText = text;
     return true;
+}
+
+QVector<PluginRule> SyntaxHighlighter::setMarkdownRules() {
+    QVector<PluginRule> rv;
+
+    PluginRule rule;
+    QTextCharFormat format;
+    format.setFontWeight(QFont::Bold);
+    format.setForeground(Syntax::getMainColor());
+    rule.pattern = QRegularExpression(QStringLiteral("^\\s*#+[^\n]*"));
+    rule.format = format;
+    rv.append(rule);
+
+    return rv;
 }
