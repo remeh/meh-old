@@ -16,6 +16,9 @@ SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
         ".scala"
     };
 
+    todoRx = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME|XXX)"));
+    whitespaceEolRx = QRegularExpression(QStringLiteral("( |\t)+$"));
+
     selectionFormat.setForeground(QColor::fromRgb(129,179,234));
     selectionFormat.setUnderlineColor(QColor::fromRgb(129,179,234));
     selectionFormat.setFontUnderline(true);
@@ -28,6 +31,9 @@ SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
     functionCallFormat.setForeground(Qt::lightGray);
     quoteFormat.setForeground(Qt::gray);
     quoteFormat.setFontItalic(true);
+    todoFormat.setForeground(QColor::fromRgb(250, 50, 50));
+    whitespaceEolFormat.setBackground(QColor::fromRgb(250, 50, 50));
+
     setCodeRules();
 }
 
@@ -62,7 +68,17 @@ void SyntaxHighlighter::setCodeRules() {
     }
 }
 
-void SyntaxHighlighter::processWord(const QString& word, int wordStart, bool startOfLine, bool endOfLine, bool inQuote) {
+void SyntaxHighlighter::processRegexp(const QString& text, QRegularExpression rx, QTextCharFormat format) {
+    if (text.size() > 0 && rx.isValid()) {
+        QRegularExpressionMatchIterator matchIterator = rx.globalMatch(text);
+        while (matchIterator.hasNext()) {
+            QRegularExpressionMatch match = matchIterator.next();
+            setFormat(match.capturedStart(), match.capturedLength(), format);
+        }
+    }
+}
+
+void SyntaxHighlighter::processWord(const QString& word, int wordStart, bool endOfLine, bool inQuote) {
     if (word == " ") {
         // TODO(remy): we want to display it red if endOfLine == true
         return;
@@ -80,21 +96,14 @@ void SyntaxHighlighter::processWord(const QString& word, int wordStart, bool sta
 }
 
 void SyntaxHighlighter::processLine(const QString& line) {
-    if (this->selection.size() > 0 && this->selectionRx.isValid()) {
-        QRegularExpressionMatchIterator matchIterator = selectionRx.globalMatch(line);
-        while (matchIterator.hasNext()) {
-            QRegularExpressionMatch match = matchIterator.next();
-            setFormat(match.capturedStart(), match.capturedLength(), selectionFormat);
-        }
+    if (this->selection.size() > 0) {
+        processRegexp(line, this->selectionRx, this->selectionFormat);
+    }
+    if (this->searchText.size() > 0) {
+        processRegexp(line, this->searchTextRx, this->searchTextFormat);
     }
 
-    if (this->searchText.size() > 0 && this->searchTextRx.isValid()) {
-        QRegularExpressionMatchIterator matchIterator = searchTextRx.globalMatch(line);
-        while (matchIterator.hasNext()) {
-            QRegularExpressionMatch match = matchIterator.next();
-            setFormat(match.capturedStart(), match.capturedLength(), searchTextFormat);
-        }
-    }
+    processRegexp(line, this->whitespaceEolRx, this->whitespaceEolFormat);
 }
 
 void SyntaxHighlighter::processQuote(const QString& text, int start) {
@@ -110,42 +119,47 @@ void SyntaxHighlighter::processComment(const QString& comment, int start) {
         return;
     }
 
-    // TODO(remy): FIXME/TODO/NOTE/XXX support
-
     setFormat(start, comment.size(), commentFormat);
+    processRegexp(comment, todoRx, todoFormat);
 }
 
-void SyntaxHighlighter::processFunctionCall(const QString& text, int start) {
+void SyntaxHighlighter::processFunctionCall(const QString& text, int start, bool endOfLine) {
     if (text == "") {
         return;
     }
 
-    setFormat(start, text.size(), functionCallFormat);
+    int size = text.size();
+    if (endOfLine) {
+        size += 1;
+    }
+    setFormat(start, size, functionCallFormat);
 }
 
 void SyntaxHighlighter::highlightBlock(const QString &text) {
     // FIXME(remy): highlightStateReset();
     QString wordBuffer = "";
     QString quoteBuffer = "";
+    QChar charBeforeWord = '0';
     QChar isInQuote = '0'; // FIXME(remy): we want to ignore quote chars if previous char is '\'
     QChar pc = '0';
-    bool startOfLine = true;
     bool endOfLine = false;
     int quoteStart = 0;
     int wordStart = 0;
 
     for (int i = 0; i < text.size(); i++) {
+        if (i > 0) { pc = text[i-1]; }
         QChar c = text[i];
 
         if ((c == '/' && pc == '/') || (c == ' ' && pc == '#')) {
             // entering comment
-            QString comment = text.right(text.size() - wordStart);
-            processComment(comment, wordStart);
+            QString comment = text.right(text.size());
+            processComment(comment, i-1);
+            wordBuffer.clear();
             break;
         }
 
         if (isInQuote != '0') {
-            if (c == isInQuote) {
+            if (c == isInQuote && pc != '\\') {
                 processQuote(quoteBuffer, quoteStart);
                 isInQuote = '0';
                 wordStart = i+1;
@@ -158,7 +172,7 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
         }
 
         // we are entering a quote, store which char has been used to open it
-        if (isInQuote == '0' && (c == '\"' || c == '\'' || c == '`')) {
+        if (isInQuote == '0' && pc != '\\' && (c == '\"' || c == '\'' || c == '`')) {
             quoteStart = i+1;
             isInQuote = c;
             quoteBuffer.clear();
@@ -166,26 +180,27 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
         }
 
         // end of word
-        if (c.isSpace() || c.isPunct()) {
+        if (c.isSpace() || c.isPunct() || i == text.size()-1) {
             if (wordBuffer.size() > 0) {
-                if (c == '(') {
-                    processFunctionCall(wordBuffer, wordStart);
+                bool endOfLine = (i == text.size()-1);
+                if (c == '(' || charBeforeWord == '.') {
+                    processFunctionCall(wordBuffer, wordStart, endOfLine);
                 } else {
-                    processWord(wordBuffer, wordStart, startOfLine, false, false);
-                } 
-                wordStart = i+1;
-                wordBuffer.clear();
-                startOfLine = false;
-                continue;
+                    processWord(wordBuffer, wordStart, endOfLine, false);
+                }
             }
+            wordBuffer.clear();
+            wordStart = i+1;
+            charBeforeWord = c;
+            continue;
         }
+
         wordBuffer.append(c);
-        pc = c;
     }
 
     // end of line
     if (wordBuffer.size() > 0) {
-        processWord(wordBuffer, wordStart, false, true, isInQuote != '0');
+        processWord(wordBuffer, wordStart, true, isInQuote != '0');
         wordBuffer.clear();
     }
 
@@ -195,7 +210,6 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
     quoteBuffer = '0';
     wordBuffer.clear();
     quoteBuffer.clear();
-    startOfLine = true;
     endOfLine = false;
     wordStart = 0;
 }

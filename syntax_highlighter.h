@@ -43,15 +43,22 @@ private:
     QRegularExpression searchTextRx;
     QTextCharFormat searchTextFormat;
 
+    QRegularExpression todoRx;
+    QTextCharFormat todoFormat;
+
+    QRegularExpression whitespaceEolRx;
+    QTextCharFormat whitespaceEolFormat;
+
     QTextCharFormat commentFormat;
     QTextCharFormat quoteFormat;
     QTextCharFormat functionCallFormat;
 
     void setCodeRules();
 
-    void processWord(const QString& word, int wordStart, bool startOfLine, bool endOfLine, bool inQuote);
+    void processWord(const QString& word, int wordStart, bool endOfLine, bool inQuote);
     void processLine(const QString& line);
     void processQuote(const QString& text, int start);
     void processComment(const QString& text, int start);
-    void processFunctionCall(const QString& text, int start);
+    void processFunctionCall(const QString& text, int start, bool endOfLine);
+    void processRegexp(const QString& text, QRegularExpression rx, QTextCharFormat format);
 };
