@@ -8,6 +8,7 @@
 #include "window.h"
 #include "lsp/clangd.h"
 #include "lsp/gopls.h"
+#include "lsp/solargraph.h"
 #include "lsp/zls.h"
 
 #include "qdebug.h"
@@ -76,6 +77,17 @@ LSP* LSPManager::start(Buffer* buffer, const QString& language) {
         lsp->initialize(buffer);
         this->lsps.append(lsp);
         return lsp;
+    } else if (language == "rb" || language == "ruby") {
+        LSP* lsp = new LSPSolargraph(window, window->getBaseDir());
+        if (!lsp->start()) {
+            qWarning() << "Can't start lsp server.";
+            // TODO(remy): warning here
+            delete lsp;
+            return nullptr;
+        }
+        lsp->initialize(buffer);
+        this->lsps.append(lsp);
+        return lsp;
     } else if (language == "zig") {
         LSP* lsp = new LSPZLS(window, window->getBaseDir());
         if (!lsp->start()) {
@@ -122,7 +134,6 @@ bool LSPManager::manageBuffer(Buffer* buffer) {
             lsp->refreshFile(buffer);
         } else {
             this->lspsPerFile.insert(buffer->getId(), lsp);
-            // TODO(remy): sends the message to the LSP server to open this file
             lsp->openFile(buffer);
         }
         return true;
