@@ -180,6 +180,7 @@ private slots:
     void resizeEvent(QResizeEvent*);
     void closeEvent(QCloseEvent*);
     void onCloseTab(int);
+    void onChangeTab(int);
     void onNewSocketCommand();
 
 private:

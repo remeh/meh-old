@@ -105,6 +105,7 @@ Window::Window(QApplication* app, QString instanceSocket, QWidget* parent) :
     commandServer.listen(instanceSocket);
 
     connect(this->tabs, &QTabWidget::tabCloseRequested, this, &Window::onCloseTab);
+    connect(this->tabs, &QTabWidget::currentChanged, this, &Window::onChangeTab);
     connect(&this->commandServer, &QLocalServer::newConnection, this, &Window::onNewSocketCommand);
 }
 
@@ -172,6 +173,13 @@ void Window::onCloseTab(int index) {
     Editor* editor = this->getEditor(index);
     if (editor != nullptr) {
         this->closeEditor(editor->getId());
+    }
+}
+
+void Window::onChangeTab(int index) {
+    Editor* editor = this->getEditor(index);
+    if (editor != nullptr) {
+        this->setCurrentEditor(editor->getId());
     }
 }
 
