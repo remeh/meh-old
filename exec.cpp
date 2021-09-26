@@ -17,17 +17,14 @@ void Exec::onResults() {
     }
 }
 
-void Exec::onErrorOccurred() {
-    if (this->process) {
-        delete this->process;
-        this->process = nullptr;
-    }
+void Exec::onErrorOccurred(QProcess::ProcessError error) {
+    this->process->deleteLater();
 
-    this->window->getStatusBar()->setMessage("An error occurred while running: " + this->command);
+    this->window->getStatusBar()->setMessage("An error occurred while running: '" + this->command + "':\n" + QVariant::fromValue(error).toString());
     this->window->getStatusBar()->showMessage();
 }
 
-void Exec::onFinished() {
+void Exec::onFinished(int exitCode, QProcess::ExitStatus exitStatus) {
     if (this->process) {
         delete this->process;
         this->process = nullptr;
@@ -54,6 +51,7 @@ void Exec::start(const QString& baseDir, QStringList args) {
     this->command = args.join(" ");
 
     this->process = new QProcess(this);
+
     this->process->setWorkingDirectory(baseDir);
     this->process->setProcessChannelMode(QProcess::MergedChannels); // read both stdout and stderr
 

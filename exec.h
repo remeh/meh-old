@@ -18,9 +18,9 @@ public:
     void start(const QString& baseDir, QStringList args);
 
 public slots:
-    void onErrorOccurred();
+    void onErrorOccurred(QProcess::ProcessError error);
     void onResults();
-    void onFinished();
+    void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
     QByteArray data;
