@@ -19,8 +19,9 @@
 #include "statusbar.h"
 #include "window.h"
 
-Window::Window(QApplication* app, QWidget* parent) :
+Window::Window(QApplication* app, QString instanceSocket, QWidget* parent) :
     app(app),
+    instanceSocket(instanceSocket),
     QWidget(parent),
     commandServer(this) {
     // widgets
@@ -101,7 +102,7 @@ Window::Window(QApplication* app, QWidget* parent) :
     // command server
     // --------------
 
-    commandServer.listen("/tmp/meh.sock");
+    commandServer.listen(instanceSocket);
 
     connect(this->tabs, &QTabWidget::tabCloseRequested, this, &Window::onCloseTab);
     connect(&this->commandServer, &QLocalServer::newConnection, this, &Window::onNewSocketCommand);
@@ -111,6 +112,7 @@ Window::~Window() {
     // XXX(remy): do I have to delete all editors myself since they are owned
     // by the QTabWidget?
 
+    commandServer.close();
     delete this->tabs;
     delete this->grep;
     delete this->git;
@@ -279,8 +281,6 @@ void Window::resizeEvent(QResizeEvent* event) {
 // XXX(remy): merge newEditor methods
 
 Editor* Window::newEditor(QString name, QByteArray content) {
-    // XXX(remy): do not open the same file multiple times
-
     // we want to create a new Editor with this buffer.
     Editor* editor = new Editor(this);
     Buffer* buffer = new Buffer(editor, name, content);
@@ -292,8 +292,6 @@ Editor* Window::newEditor(QString name, QByteArray content) {
 }
 
 Editor* Window::newEditor(QString name, QString filename) {
-    // XXX(remy): do not open the same file multiple times
-
     QFileInfo fi(filename);
     if (fi.isDir()) {
         this->setBaseDir(fi.canonicalFilePath());

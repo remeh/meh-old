@@ -28,15 +28,23 @@ int main(int argv, char **args)
     QCoreApplication::setApplicationName("meh");
     QStringList arguments = QCoreApplication::arguments();
 
-    if (!arguments.empty() && QFile::exists("/tmp/meh.sock") &&
+    QString instanceFile = "";
+    if (!arguments.empty() && arguments.at(1).startsWith("-n")) {
+        instanceFile = arguments.at(1).right(-2);
+        arguments.removeFirst();
+    }
+    instanceFile = QString("/tmp/meh") + instanceFile + ".sock";
+    qDebug() << instanceFile;
+
+    if (!arguments.empty() && QFile::exists(instanceFile) &&
          arguments.size() >= 2 && arguments.at(1) != "-n" &&
          !Git::isGitTempFile(arguments.at(1))) {
 
         QLocalSocket socket;
-        socket.connectToServer("/tmp/meh.sock");
+        socket.connectToServer(instanceFile);
 
         if (socket.state() != QLocalSocket::ConnectedState) {
-            qDebug() << "An error happened while connecting to /tmp/meh.sock" <<
+            qDebug() << "An error happened while connecting to " << instanceFile <<
                 socket.errorString();
             qDebug() << "Will create a new instance instead.";
         } else {
@@ -62,7 +70,7 @@ int main(int argv, char **args)
 
 	qDebug() << "Creating a new instance.";
 
-    Window window(&app);
+    Window window(&app, instanceFile);
     window.setWindowTitle(QObject::tr("meh - no file"));
     window.resize(800, 700);
     window.show();

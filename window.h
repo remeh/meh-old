@@ -38,7 +38,7 @@ class Window : public QWidget
 {
     Q_OBJECT
 public:
-    Window(QApplication* app, QWidget* parent = nullptr);
+    Window(QApplication* app, QString instanceSocket, QWidget* parent = nullptr);
     ~Window();
 
     // openCommand opens the command line and focus on it.
@@ -184,6 +184,7 @@ private slots:
 
 private:
     QApplication* app;
+    const QString instanceSocket;
 
     // tabs is containing all editors instances
     QTabWidget* tabs;

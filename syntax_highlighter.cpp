@@ -177,14 +177,15 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
         if (i > 0) { pc = text[i-1]; }
         QChar c = text[i];
 
+        // entering comment
         if ((c == '/' && pc == '/') || (c == ' ' && pc == '#')) {
-            // entering comment
             QString comment = text.right(text.size());
             processComment(comment, i-1);
             wordBuffer.clear();
             break;
         }
 
+        // leaving a quoted text
         if (isInQuote != '0') {
             if (c == isInQuote && pc != '\\') {
                 processQuote(quoteBuffer, quoteStart);
@@ -198,7 +199,7 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
             quoteBuffer += c;
         }
 
-        // we are entering a quote, store which char has been used to open it
+        // we are entering a quoted text, store which char has been used to open it
         if (isInQuote == '0' && pc != '\\' && (c == '\"' || c == '\'' || c == '`')) {
             quoteStart = i+1;
             isInQuote = c;
@@ -207,7 +208,7 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
         }
 
         // end of word
-        if (c.isSpace() || c.isPunct() || i == text.size()-1) {
+        if (c.isSpace() || (c.isPunct() && c != '_') || i == text.size()-1) {
             if (wordBuffer.size() > 0) {
                 bool endOfLine = (i == text.size()-1);
                 if (c == '(' || charBeforeWord == '.') {
