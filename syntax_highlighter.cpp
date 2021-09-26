@@ -169,7 +169,6 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
     QChar charBeforeWord = '0';
     QChar isInQuote = '0';
     QChar pc = '0';
-    bool endOfLine = false;
     int quoteStart = 0;
     int wordStart = 0;
 
@@ -214,6 +213,10 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
                 if (c == '(' || charBeforeWord == '.') {
                     processFunctionCall(wordBuffer, wordStart, endOfLine);
                 } else {
+                    if (!(c.isSpace() || (c.isPunct() && c != '_'))) {
+                        wordBuffer.append(c);
+                        break;
+                    }
                     processWord(wordBuffer, wordStart, endOfLine, false);
                 }
             }
@@ -237,7 +240,6 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
     quoteBuffer = '0';
     wordBuffer.clear();
     quoteBuffer.clear();
-    endOfLine = false;
     wordStart = 0;
 }
 
