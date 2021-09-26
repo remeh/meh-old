@@ -35,7 +35,6 @@ int main(int argv, char **args)
         arguments.removeFirst();
     }
     instanceFile = QString("/tmp/meh") + instanceFile + ".sock";
-    qDebug() << instanceFile;
 
     if (!arguments.empty() && QFile::exists(instanceFile) &&
          arguments.size() >= 2 && arguments.at(1) != "-n" &&
@@ -73,7 +72,7 @@ int main(int argv, char **args)
         arguments.remove(1);
     }
 
-	qDebug() << "Creating a new instance.";
+	qDebug() << "Creating a new instance:" << instanceFile;
 
     Window window(&app, instanceFile);
     window.setWindowTitle(QObject::tr("meh - no file"));
