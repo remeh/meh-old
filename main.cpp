@@ -39,7 +39,7 @@ int main(int argv, char **args)
 
     if (!arguments.empty() && QFile::exists(instanceFile) &&
          arguments.size() >= 2 && arguments.at(1) != "-n" &&
-         !Git::isGitTempFile(arguments.at(1))) {
+         !Git::isGitTempFile(arguments.at(1)) && arguments.at(1) != "-") {
 
         QLocalSocket socket;
         socket.connectToServer(instanceFile);
