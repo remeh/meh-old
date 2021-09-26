@@ -28,7 +28,13 @@ Buffer::Buffer(Editor* editor, QString name, QString filename) :
     bufferType(BUFFER_TYPE_FILE) {
     // resolve the absolute path of this
     QFileInfo info(filename);
-    this->filename = info.canonicalFilePath();
+    // happens when the file does not exist
+    if (info.canonicalFilePath() == "") {
+        // we believe the filename to be canonical
+        this->filename = filename;
+    } else {
+        this->filename = info.canonicalFilePath();
+    }
 }
 
 Buffer::Buffer(Editor* editor, QString name, QByteArray data) :

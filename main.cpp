@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QByteArray>
+#include <QDir>
 #include <QFile>
 #include <QLocalSocket>
 #include <QObject>
@@ -54,7 +55,11 @@ int main(int argv, char **args)
             }
             for (int i = 0; i < arguments.size(); i++) {
                 QFileInfo fi(arguments.at(i));
-                arguments[i] = fi.canonicalFilePath();
+                if (fi.exists()) {
+                  arguments[i] = fi.canonicalFilePath();
+                } else {
+                  arguments[i] = QDir::currentPath() + "/" + arguments.at(i);
+                }
             }
             QString data = "open " + arguments.join("###");
             socket.write(data.toLatin1());
