@@ -65,7 +65,7 @@ Editor::Editor(Window* window) :
     // basic theming
     // ----------------------
 
-    this->setStyleSheet("color: #e7e7e7; background-color: #262626;");
+    this->setStyleSheet("color: #c0c0c0; background-color: #262626;");
     QPalette p = this->palette();
     p.setColor(QPalette::Highlight, QColor::fromRgb(70, 70, 70));
     p.setColor(QPalette::HighlightedText, QColor::fromRgb(240, 240, 240));

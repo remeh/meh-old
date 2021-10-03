@@ -33,8 +33,8 @@ SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
     searchTextFormat.setForeground(Qt::white);
     searchTextFormat.setBackground(QColor::fromRgb(129,179,234));
 
-    commentFormat.setForeground(Qt::gray);
-    functionCallFormat.setForeground(Qt::lightGray);
+    commentFormat.setForeground(Qt::darkGray);
+    functionCallFormat.setForeground(Qt::white);
     quoteFormat.setForeground(Qt::gray);
     quoteFormat.setFontItalic(true);
     todoFormat.setForeground(QColor::fromRgb(250, 50, 50));
