@@ -577,27 +577,27 @@ void Editor::mousePressEvent(QMouseEvent* event) {
         }
     }
     if (event->button() == Qt::MiddleButton) {
-        // XXX(remy): reimplement me
         qDebug() << "Editor::mousePressEvent" << "MiddleButton";
-//        if (this->currentBuffer == nullptr) {
-//            return;
-//        }
-//
-//        // position the cursor, this way, `currentLineNumber` and `currentColumn`
-//        // will return the correct value.
-//        QPlainTextEdit::mousePressEvent(event);
-//
-//        LSP* lsp = this->lspManager->getLSP(this->currentBuffer);
-//        if (lsp == nullptr) {
-//            this->window->getStatusBar()->setMessage("No LSP server running."); return;
-//            return;
-//        }
-//        int reqId = QRandomGenerator::global()->generate();
-//        lsp->definition(reqId, this->currentBuffer->getFilename(),
-//                        this->currentLineNumber(),
-//                        this->currentColumn());
-//        this->lspManager->setExecutedAction(reqId, LSP_ACTION_DEFINITION, this->currentBuffer);
-//        return;
+
+        if (this->buffer == nullptr || this->window == nullptr) {
+            return;
+        }
+
+        // position the cursor, this way, `currentLineNumber` and `currentColumn`
+        // will return the correct value.
+        QPlainTextEdit::mousePressEvent(event);
+
+        LSP* lsp = this->window->getLSPManager()->getLSP(this->getId());
+        if (lsp == nullptr) {
+            this->window->getStatusBar()->setMessage("No LSP server running."); return;
+            return;
+        }
+        int reqId = QRandomGenerator::global()->generate();
+        lsp->definition(reqId, this->buffer->getFilename(),
+                        this->currentLineNumber(),
+                        this->currentColumn());
+        this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_DEFINITION, this->buffer);
+        return;
     }
     if (event->button() == Qt::ForwardButton) {
         if (this->mode == MODE_NORMAL) {
@@ -607,6 +607,7 @@ void Editor::mousePressEvent(QMouseEvent* event) {
         }
         return;
     }
+
     if (event->button() == Qt::BackButton) {
         // XXX(remy): reimplement me
          qDebug() << "Editor::mousePressEvent" << "BackButton";
