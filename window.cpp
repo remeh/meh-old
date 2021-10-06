@@ -170,6 +170,7 @@ bool Window::areYouSure(const QString& message) {
 }
 
 void Window::onCloseTab(int index) {
+    if (index < 0) { return; }
     Editor* editor = this->getEditor(index);
     if (editor != nullptr) {
         this->closeEditor(editor->getId());
@@ -177,6 +178,7 @@ void Window::onCloseTab(int index) {
 }
 
 void Window::onChangeTab(int index) {
+    if (index < 0) { return; }
     Editor* editor = this->getEditor(index);
     if (editor != nullptr) {
         this->setCurrentEditor(editor->getId());
@@ -432,7 +434,6 @@ int Window::getEditorTabIndex(const QString& id) {
 }
 
 Editor* Window::setCurrentEditor(QString id) {
-
     int tabIndex = this->getEditorTabIndex(id);
     if (tabIndex >= 0) {
         this->tabs->setCurrentIndex(tabIndex);
@@ -446,7 +447,6 @@ Editor* Window::setCurrentEditor(QString id) {
         if (currentEditor != nullptr && this->previousEditorId != currentEditor->getId()) {
             this->previousEditorId = QString(currentEditor->getId());
         }
-
         return editor;
     }
 
@@ -477,7 +477,7 @@ void Window::closeEditor(const QString& id) {
 
     if (editor->getBuffer()->modified) {
             QMessageBox msgBox;
-            msgBox.setWindowTitle("Unsaved bffer");
+            msgBox.setWindowTitle("Unsaved buffer");
             msgBox.setText("The buffer you want to close has modifications. Close anyway?");
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
             msgBox.setDefaultButton(QMessageBox::Cancel);
@@ -489,7 +489,7 @@ void Window::closeEditor(const QString& id) {
     int tabIdx = this->getEditorTabIndex(id);
 
     this->tabs->removeTab(tabIdx);
-    delete editor; // since we use removeTab, it's not done by the QTabWidget
+    editor->deleteLater(); // since we use removeTab, it's not done by the QTabWidget
 
     if (this->checkpoints.size() > 0) {
         this->lastCheckpoint();
