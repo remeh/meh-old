@@ -1,4 +1,4 @@
-# macOS build: CMAKE_PREFIX_PATH=/usr/local/Cellar/qt/6.0.2 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
+# macOS build: CMAKE_PREFIX_PATH=/usr/local/Cellar/qt/6.1.3 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
 
 cmake_minimum_required(VERSION 3.1.0)
 

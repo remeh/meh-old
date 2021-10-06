@@ -46,6 +46,9 @@ StatusBar::StatusBar(Window* window) :
     this->message->setReadOnly(true);
     this->message->setFocusPolicy(Qt::NoFocus);
     this->message->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    this->message->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    this->message->setStyleSheet("color: #e7e7e7; background-color: #262626;");
+    this->message->setFont(Editor::getFont());
     this->message->setMaximumHeight(150);
     this->vlayout->setContentsMargins(5, 0, 5, 0);
     this->vlayout->addWidget(this->message);

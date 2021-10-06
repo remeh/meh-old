@@ -295,7 +295,11 @@ Editor* Window::newEditor(QString name, QByteArray content) {
     editor->setBuffer(buffer);
     int tabIdx = this->tabs->addTab(editor, editor->getId());
     this->tabs->setCurrentIndex(tabIdx);
-    this->setCurrentEditor(editor->getId());
+
+    if (this->getEditor() != nullptr && this->getEditor()->getId() != editor->getId()) {
+        this->setCurrentEditor(editor->getId());
+    }
+
     return editor;
 }
 
@@ -324,7 +328,9 @@ Editor* Window::newEditor(QString name, QString filename) {
     label.append("   ");
 
     int tabIdx = this->tabs->addTab(editor, editor->getIcon(), label);
-    this->setCurrentEditor(editor->getId());
+    if (this->getEditor() != nullptr && this->getEditor()->getId() != editor->getId()) {
+        this->setCurrentEditor(editor->getId());
+    }
     return editor;
 }
 
@@ -426,10 +432,6 @@ int Window::getEditorTabIndex(const QString& id) {
 }
 
 Editor* Window::setCurrentEditor(QString id) {
-    Editor* currentEditor = this->getEditor();
-    if (currentEditor != nullptr) {
-        this->previousEditorId = currentEditor->getId();
-    }
 
     int tabIndex = this->getEditorTabIndex(id);
     if (tabIndex >= 0) {
@@ -439,6 +441,12 @@ Editor* Window::setCurrentEditor(QString id) {
         this->statusBar->setEditor(editor);
         editor->update();
         editor->setFocus();
+
+        Editor* currentEditor = this->getEditor();
+        if (currentEditor != nullptr && this->previousEditorId != currentEditor->getId()) {
+            this->previousEditorId = QString(currentEditor->getId());
+        }
+
         return editor;
     }
 

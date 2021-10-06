@@ -577,8 +577,6 @@ void Editor::mousePressEvent(QMouseEvent* event) {
         }
     }
     if (event->button() == Qt::MiddleButton) {
-        qDebug() << "Editor::mousePressEvent" << "MiddleButton";
-
         if (this->buffer == nullptr || this->window == nullptr) {
             return;
         }
