@@ -722,10 +722,6 @@ void Window::lspInterpret(QJsonDocument json) {
                     }
 
                     const QString targetLine = this->getEditor()->getOneLine(file, line);
-
-                    if (file.startsWith(this->getBaseDir())) {
-                        file = file.remove(0, this->getBaseDir().size());
-                    }
                     this->getRefWidget()->insert(file, QString::number(line), targetLine);
                 }
                 this->getRefWidget()->fitContent();
