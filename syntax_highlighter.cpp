@@ -178,13 +178,10 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
 
         // entering comment
         if ((c == '/' && pc == '/') || (c == ' ' && pc == '#')) {
-            // don't consider comments something not starting with a space
-            if (i < text.size() - 1 && text[i+1] == ' ') {
-                QString comment = text.right(text.size());
-                processComment(comment, i-1);
-                wordBuffer.clear();
-                break;
-            }
+            QString comment = text.right(text.size());
+            processComment(comment, i-1);
+            wordBuffer.clear();
+            break;
         }
 
         // leaving a quoted text
