@@ -96,6 +96,7 @@ void ReferencesWidget::keyPressEvent(QKeyEvent* event) {
                 }
                 this->window->setCurrentEditor(filepath);
                 this->window->getEditor()->goToLine(lineNumber.toInt());
+                this->window->getRefWidget()->setDisabled(true);
                 this->window->getEditor()->setFocus();
                 return;
             }

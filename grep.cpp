@@ -21,6 +21,7 @@ void Grep::show() {
 }
 
 void Grep::focus() {
+    this->window->getRefWidget()->setDisabled(false);
     this->window->getRefWidget()->setFocus();
 }
 
