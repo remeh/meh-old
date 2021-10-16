@@ -19,6 +19,7 @@ void Completer::setItems(const QString& base, const QList<CompleterEntry> entrie
     }
     this->base = base;
     this->fitContent();
+    this->setCurrentItem(this->topLevelItem(0));
 }
 
 void Completer::keyPressEvent(QKeyEvent* event) {
@@ -27,6 +28,7 @@ void Completer::keyPressEvent(QKeyEvent* event) {
     #else
         bool ctrl = event->modifiers() & Qt::ControlModifier;
     #endif
+
 
     switch (event->key()) {
         case Qt::Key_Escape:
