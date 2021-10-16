@@ -435,6 +435,7 @@ int Window::getEditorTabIndex(const QString& id) {
 
 Editor* Window::setCurrentEditor(QString id) {
     int tabIndex = this->getEditorTabIndex(id);
+    Editor* currentEditor = this->getEditor();
     if (tabIndex >= 0) {
         this->tabs->setCurrentIndex(tabIndex);
         Editor* editor = this->getEditor();
@@ -443,7 +444,6 @@ Editor* Window::setCurrentEditor(QString id) {
         editor->update();
         editor->setFocus();
 
-        Editor* currentEditor = this->getEditor();
         if (currentEditor != nullptr && this->previousEditorId != currentEditor->getId()) {
             this->previousEditorId = QString(currentEditor->getId());
         }
