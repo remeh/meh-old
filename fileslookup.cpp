@@ -322,4 +322,13 @@ void FilesLookup::refreshList() {
         item->setText(*it);
         ++it;
     }
+
+    // now, select the first entry which is not ..
+    if (this->list->count() == 1) {
+        this->list->item(0)->setSelected(true);
+        this->list->setCurrentRow(0);
+    } else if (this->list->count() > 1) {
+        this->list->item(1)->setSelected(true);
+        this->list->setCurrentRow(1);
+    }
 }
