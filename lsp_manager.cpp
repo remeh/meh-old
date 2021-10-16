@@ -7,9 +7,7 @@
 #include "statusbar.h"
 #include "window.h"
 #include "lsp/clangd.h"
-#include "lsp/gopls.h"
-#include "lsp/solargraph.h"
-#include "lsp/zls.h"
+#include "lsp/generic.h"
 
 #include "qdebug.h"
 
@@ -58,7 +56,8 @@ LSP* LSPManager::start(Buffer* buffer, const QString& language) {
     Q_ASSERT(buffer != nullptr);
 
     if (language == "go") {
-         LSP* lsp = new LSPGopls(window, window->getBaseDir());
+         LSP* lsp = new LSPGeneric(window, window->getBaseDir(), "go", "gopls", QStringList());
+
          if (!lsp->start()) {
              // TODO(remy): warning here
              delete lsp;
@@ -78,7 +77,7 @@ LSP* LSPManager::start(Buffer* buffer, const QString& language) {
         this->lsps.append(lsp);
         return lsp;
     } else if (language == "rb" || language == "ruby") {
-        LSP* lsp = new LSPSolargraph(window, window->getBaseDir());
+        LSP* lsp = new LSPGeneric(window, window->getBaseDir(), "ruby", "solargraph", QStringList() << "stdio");
         if (!lsp->start()) {
             qWarning() << "Can't start lsp server.";
             // TODO(remy): warning here
@@ -89,7 +88,7 @@ LSP* LSPManager::start(Buffer* buffer, const QString& language) {
         this->lsps.append(lsp);
         return lsp;
     } else if (language == "zig") {
-        LSP* lsp = new LSPZLS(window, window->getBaseDir());
+        LSP* lsp = new LSPGeneric(window, window->getBaseDir(), "zig", "zls", QStringList());
         if (!lsp->start()) {
             // TODO(remy): warning here
             delete lsp;

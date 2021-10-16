@@ -1,5 +1,6 @@
 #include <QList>
 #include <QString>
+#include <QStringList>
 
 #include "../buffer.h"
 
@@ -8,11 +9,11 @@ class LSP;
 class LSPWriter;
 class Window;
 
-class LSPZLS : public LSP
+class LSPGeneric : public LSP
 {
 public:
-    LSPZLS(Window* window, const QString& baseDir);
-    ~LSPZLS() override;
+    LSPGeneric(Window* window, const QString& baseDir, const QString& language, const QString& command, QStringList args);
+    ~LSPGeneric() override;
     void readStandardOutput() override;
 
     // protocol
@@ -30,5 +31,8 @@ public:
 
 private:
     QString baseDir;
+    QString command;
+    QString language;
+    QStringList args;
     LSPWriter writer;
 };

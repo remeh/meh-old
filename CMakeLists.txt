@@ -31,9 +31,7 @@ set(SOURCES
     lsp.cpp
     lsp_manager.cpp
     lsp/clangd.cpp
-    lsp/gopls.cpp
-    lsp/solargraph.cpp
-    lsp/zls.cpp
+    lsp/generic.cpp
     normal.cpp
     references_widget.cpp
     replace.cpp

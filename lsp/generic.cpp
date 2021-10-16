@@ -7,20 +7,22 @@
 #include "../completer.h"
 #include "../lsp.h"
 #include "../window.h"
-#include "zls.h"
+#include "generic.h"
 
-LSPZLS::LSPZLS(Window* window, const QString& baseDir) : LSP(window) {
+LSPGeneric::LSPGeneric(Window* window, const QString& baseDir, const QString& language, const QString& command, QStringList args) : LSP(window) {
     this->serverSpawned = false;
-    this->language = "zig";
+    this->language = language;
     this->baseDir = baseDir;
+    this->command = command;
+    this->args = args;
 }
 
-LSPZLS::~LSPZLS() {
+LSPGeneric::~LSPGeneric() {
     this->lspServer.kill();
     this->lspServer.waitForFinished(1000);
 }
 
-void LSPZLS::readStandardOutput() {
+void LSPGeneric::readStandardOutput() {
     if (this->window == nullptr) {
         return;
     }
@@ -30,13 +32,13 @@ void LSPZLS::readStandardOutput() {
 
 // --------------------------
 
-bool LSPZLS::start() {
-    this->lspServer.start("zls", QStringList());
+bool LSPGeneric::start() {
+    this->lspServer.start(this->command, this->args);
     this->serverSpawned = this->lspServer.waitForStarted(5000);
     return this->serverSpawned;
 }
 
-void LSPZLS::initialize(Buffer* buffer) {
+void LSPGeneric::initialize(Buffer* buffer) {
     Q_ASSERT(buffer != nullptr);
 
     const QString& initialize = this->writer.initialize(this->baseDir);
@@ -46,51 +48,51 @@ void LSPZLS::initialize(Buffer* buffer) {
     this->lspServer.write(initialized.toUtf8());
 }
 
-void LSPZLS::openFile(Buffer* buffer) {
+void LSPGeneric::openFile(Buffer* buffer) {
     Q_ASSERT(buffer != nullptr);
 
     const QString& msg = this->writer.openFile(buffer, buffer->getFilename(), this->language);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPZLS::refreshFile(Buffer* buffer) {
+void LSPGeneric::refreshFile(Buffer* buffer) {
     Q_ASSERT(buffer != nullptr);
 
     const QString& msg = this->writer.refreshFile(buffer, buffer->getFilename());
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPZLS::definition(int reqId, const QString& filename, int line, int column) {
+void LSPGeneric::definition(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.definition(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPZLS::declaration(int reqId, const QString& filename, int line, int column) {
+void LSPGeneric::declaration(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.declaration(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPZLS::hover(int reqId, const QString& filename, int line, int column) {
+void LSPGeneric::hover(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.hover(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPZLS::signatureHelp(int reqId, const QString& filename, int line, int column) {
+void LSPGeneric::signatureHelp(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.signatureHelp(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPZLS::references(int reqId, const QString& filename, int line, int column) {
+void LSPGeneric::references(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.references(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-void LSPZLS::completion(int reqId, const QString& filename, int line, int column) {
+void LSPGeneric::completion(int reqId, const QString& filename, int line, int column) {
     const QString& msg = this->writer.completion(reqId, filename, line, column);
     this->lspServer.write(msg.toUtf8());
 }
 
-QList<CompleterEntry> LSPZLS::getEntries(const QJsonDocument& json) {
+QList<CompleterEntry> LSPGeneric::getEntries(const QJsonDocument& json) {
     QList<CompleterEntry> list;
 
     if (json["result"].isNull() || json["result"]["items"].isNull()) {

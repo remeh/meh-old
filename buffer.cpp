@@ -253,5 +253,5 @@ void Buffer::onEnter() {
 
     QScrollBar* vscroll = this->editor->verticalScrollBar();
     vscroll->setValue(settings.value("buffer/" + this->filename + "/vscroll", 0).toInt());
-    this->editor->ensureCursorVisible();
+    this->editor->centerCursor();
 }

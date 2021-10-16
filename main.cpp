@@ -29,6 +29,9 @@ int main(int argv, char **args)
     QCoreApplication::setApplicationName("meh");
     QStringList arguments = QCoreApplication::arguments();
 
+    // -n flag: to use a different instance than /tmp/meh.sock
+    // --------------
+
     QString instanceFile = "";
     if (!arguments.empty() && arguments.size() > 1 &&
         arguments.at(1).startsWith("-n")) {
@@ -36,6 +39,10 @@ int main(int argv, char **args)
         arguments.removeFirst();
     }
     instanceFile = QString("/tmp/meh") + instanceFile + ".sock";
+
+    // if there is an existing instance, send it the command to open a file
+    // instead of creating a new window
+    // ---------------
 
     if (!arguments.empty() && QFile::exists(instanceFile) &&
          arguments.size() >= 2 && arguments.at(1) != "-n" &&
