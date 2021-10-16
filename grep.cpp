@@ -111,7 +111,8 @@ void Grep::grep(const QString& string, const QString& baseDir, const QString& ta
     // target
     QString t = target;
     if (t.size() == 0) { t = "."; }
-    QStringList list; list << "--with-filename" << "--line-number" << string << t;
+    QStringList list;
+    list << "-u" << "--with-filename" << "--line-number" << string << t;
 
     // run ripgrep
     this->process->start("rg", list);
