@@ -30,7 +30,8 @@ int main(int argv, char **args)
     QStringList arguments = QCoreApplication::arguments();
 
     QString instanceFile = "";
-    if (!arguments.empty() && arguments.at(1).startsWith("-n")) {
+    if (!arguments.empty() && arguments.size() > 1 &&
+        arguments.at(1).startsWith("-n")) {
         instanceFile = arguments.at(1).right(-2);
         arguments.removeFirst();
     }
