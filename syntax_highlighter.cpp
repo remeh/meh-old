@@ -80,7 +80,7 @@ void SyntaxHighlighter::setCodeRules() {
         "for", "switch", "case", "break",
         "true", "false", "type",
         "while", "delete", "new",
-        "def", "end", "until", // ruby
+        "def", "end", "until", "unless", // ruby
         "package", "import", "#include"
     };
 

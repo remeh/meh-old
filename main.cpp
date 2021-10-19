@@ -38,6 +38,7 @@ int main(int argv, char **args)
         instanceFile = arguments.at(1).right(-2);
         arguments.removeFirst();
     }
+
     instanceFile = QString("/tmp/meh") + instanceFile + ".sock";
 
     // if there is an existing instance, send it the command to open a file

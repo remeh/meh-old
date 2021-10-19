@@ -8,87 +8,64 @@
 #include "../lsp.h"
 #include "../window.h"
 #include "clangd.h"
+#include "generic.h"
 
 LSPClangd::LSPClangd(Window* window, const QString& baseDir) : LSP(window) {
-    this->serverSpawned = false;
-    this->language = "cpp";
-    this->baseDir = baseDir;
+    this->generic = new LSPGeneric(window, baseDir, "cpp", "clangd", QStringList());
 }
 
 LSPClangd::~LSPClangd() {
-    this->lspServer.kill();
-    this->lspServer.waitForFinished(1000);
+    delete this->generic;
 }
 
 void LSPClangd::readStandardOutput() {
-    if (this->window == nullptr) {
-        return;
-    }
-    QByteArray data = this->lspServer.readAll();
-    this->window->lspInterpretMessages(data);
+    this->generic->readStandardOutput();
 }
 
 // --------------------------
 
 bool LSPClangd::start() {
-    this->lspServer.start("clangd", QStringList());
-    this->serverSpawned = this->lspServer.waitForStarted(5000);
-    return this->serverSpawned;
+    return this->generic->start();
 }
 
 void LSPClangd::initialize(Buffer* buffer) {
-    Q_ASSERT(buffer != nullptr);
-
-    const QString& initialize = this->writer.initialize(this->baseDir);
-    const QString& initialized = this->writer.initialized();
-    this->lspServer.write(initialize.toUtf8());
-    this->window->getLSPManager()->setExecutedAction(1, LSP_ACTION_INIT, buffer);
-    this->lspServer.write(initialized.toUtf8());
+    this->generic->initialize(buffer);
 }
 
 void LSPClangd::openFile(Buffer* buffer) {
-    Q_ASSERT(buffer != nullptr);
-
-
-    const QString& msg = this->writer.openFile(buffer, buffer->getFilename(), this->language);
-    this->lspServer.write(msg.toUtf8());
+    this->generic->openFile(buffer);
 }
 
 void LSPClangd::refreshFile(Buffer* buffer) {
-    Q_ASSERT(buffer != nullptr);
-
-    const QString& msg = this->writer.refreshFile(buffer, buffer->getFilename());
-    this->lspServer.write(msg.toUtf8());
+    this->generic->refreshFile(buffer);
 }
 
 void LSPClangd::definition(int reqId, const QString& filename, int line, int column) {
-    const QString& msg = this->writer.definition(reqId, filename, line, column);
-    this->lspServer.write(msg.toUtf8());
+    this->generic->definition(reqId, filename, line, column);
 }
 
 void LSPClangd::declaration(int reqId, const QString& filename, int line, int column) {
-    const QString& msg = this->writer.declaration(reqId, filename, line, column);
-    this->lspServer.write(msg.toUtf8());
+    this->generic->declaration(reqId, filename, line, column);
 }
 
 void LSPClangd::hover(int reqId, const QString& filename, int line, int column) {
-    const QString& msg = this->writer.hover(reqId, filename, line, column);
-    this->lspServer.write(msg.toUtf8());
+    this->generic->hover(reqId, filename, line, column);
 }
 
 void LSPClangd::signatureHelp(int reqId, const QString& filename, int line, int column) {
-    const QString& msg = this->writer.signatureHelp(reqId, filename, line, column);
-    this->lspServer.write(msg.toUtf8());
+    this->generic->signatureHelp(reqId, filename, line, column);
 }
 
 void LSPClangd::references(int reqId, const QString& filename, int line, int column) {
-    const QString& msg = this->writer.references(reqId, filename, line, column);
-    this->lspServer.write(msg.toUtf8());
+    this->generic->references(reqId, filename, line, column);
 }
 
 void LSPClangd::completion(int reqId, const QString& filename, int line, int column) {
-    const QString& msg = this->writer.completion(reqId, filename, line, column);
-    this->lspServer.write(msg.toUtf8());
+    this->generic->completion(reqId, filename, line, column);
+}
+
+QString LSPClangd::getLanguage() {
+    return this->generic->getLanguage();
 }
 
 QList<CompleterEntry> LSPClangd::getEntries(const QJsonDocument& json) {

@@ -70,14 +70,13 @@ public:
     virtual void references(int reqId, const QString& filename, int line, int column) = 0;
     virtual void completion(int reqId, const QString& filename, int line, int column) = 0;
     virtual QList<CompleterEntry> getEntries(const QJsonDocument& json) = 0;
+    virtual QString getLanguage() = 0;
 
-    const QString& getLanguage() { return this->language; }
 private slots:
     void readyReadStandardOutput();
 protected:
     Window* window;
     QProcess lspServer;
     bool serverSpawned;
-    QString language;
 private:
 };

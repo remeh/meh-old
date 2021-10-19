@@ -28,6 +28,7 @@ public:
     void references(int reqId, const QString& filename, int line, int column) override;
     void completion(int reqId, const QString& filename, int line, int column) override;
     QList<CompleterEntry> getEntries(const QJsonDocument& json) override;
+    QString getLanguage() override { return this->language; };
 
 private:
     QString baseDir;
