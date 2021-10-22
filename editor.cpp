@@ -65,7 +65,7 @@ Editor::Editor(Window* window) :
     // basic theming
     // ----------------------
 
-    this->setStyleSheet("color: #c0c0c0; background-color: #262626;");
+    this->setStyleSheet("color: #c0c0c0; background-color: #1e1e1e;");
     QPalette p = this->palette();
     p.setColor(QPalette::Highlight, QColor::fromRgb(70, 70, 70));
     p.setColor(QPalette::HighlightedText, QColor::fromRgb(240, 240, 240));
@@ -562,6 +562,8 @@ void Editor::paintEvent(QPaintEvent* event) {
 
     QPlainTextEdit::paintEvent(event);
     QPainter painter(this->viewport());
+    painter.setPen(QPen(QColor(255, 255, 255, 14)));
+    painter.drawLine(0, 0, 0, this->viewport()->rect().height());
     painter.setPen(QPen(QColor(255, 255, 255, 8)));
     painter.drawLine(this->eightyCharsX, 0, this->eightyCharsX, this->viewport()->rect().height());
     painter.setPen(QPen(QColor(255, 255, 255, 3)));
@@ -1207,7 +1209,7 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
             } else if (currentLine == blockNumber+1) {
                 painter.setPen(QColor::fromRgb(200, 200, 200));
             } else {
-                painter.setPen(QColor::fromRgb(50, 50, 50));
+                painter.setPen(QColor::fromRgb(80, 80, 80));
             }
 
             painter.setFont(Editor::getFont());

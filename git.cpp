@@ -147,3 +147,15 @@ void Git::diff(const QString& workDir, bool staged) {
 bool Git::isGitTempFile(const QString& filename) {
     return filename.endsWith(".git/COMMIT_EDITMSG") || filename.endsWith(".git/MERGE_MSG");
 }
+
+bool Git::isGitFile(const QString &filename) {
+    if (Git::isGitTempFile(filename)) {
+        return true;
+    }
+
+    if (filename.toLower().contains("git")) {
+        return true;
+    }
+
+    return false;
+}

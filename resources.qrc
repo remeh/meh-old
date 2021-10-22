@@ -7,5 +7,7 @@
         <file>res/icon.png</file>
         <file>res/icon-check.png</file>
         <file>res/icon-empty.png</file>
+        <file>res/close.png</file>
+        <file>res/close-hover.png</file>
     </qresource>
 </RCC>

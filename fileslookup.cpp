@@ -24,6 +24,7 @@ FilesLookup::FilesLookup(Window* window) :
     this->label = new QLabel(this);
     this->list = new QListWidget(this);
     this->list->setSortingEnabled(true);
+    this->list->setFont(Editor::getFont());
 
     this->setFocusPolicy(Qt::StrongFocus);
 
@@ -33,6 +34,8 @@ FilesLookup::FilesLookup(Window* window) :
     this->layout->addWidget(this->label);
     this->layout->addWidget(this->list);
     this->setLayout(layout);
+
+    this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
     connect(this->edit, &QLineEdit::textChanged, this, &FilesLookup::onEditChanged);
     connect(this->list, &QListWidget::itemDoubleClicked, this, &FilesLookup::onItemDoubleClicked);
@@ -71,6 +74,16 @@ void FilesLookup::show() {
     this->list->show();
     this->edit->setFocus();
     this->refreshList();
+
+    QPoint pos = this->window->pos();
+    int winWidth = this->window->size().width();
+    int winHeight = this->window->size().height();
+
+    int popupWidth = winWidth  - winWidth/3;
+    int popupHeight = winHeight / 2;
+    this->move(pos.rx() + winWidth / 2 - (winWidth/3), pos.ry() + 120);
+    this->resize(popupWidth, popupHeight);
+
     QWidget::show();
 }
 

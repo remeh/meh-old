@@ -1,6 +1,7 @@
 #include <QTextBlock>
 
 #include "editor.h"
+#include "git.h"
 #include "tasks.h"
 #include "syntax_highlighter.h"
 
@@ -53,7 +54,13 @@ SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
     }
 
     if (filename.endsWith(".md")) {
-        for (PluginRule rule : setMarkdownRules()) {
+        for (PluginRule rule : markdownRules()) {
+            pluginRules.append(rule);
+        }
+    }
+
+    if (Git::isGitFile(filename)) {
+        for (PluginRule rule : gitRules()) {
             pluginRules.append(rule);
         }
     }
@@ -267,7 +274,7 @@ bool SyntaxHighlighter::setSearchText(const QString& text) {
     return true;
 }
 
-QVector<PluginRule> SyntaxHighlighter::setMarkdownRules() {
+QVector<PluginRule> SyntaxHighlighter::markdownRules() {
     QVector<PluginRule> rv;
 
     PluginRule rule;
@@ -277,6 +284,27 @@ QVector<PluginRule> SyntaxHighlighter::setMarkdownRules() {
     rule.pattern = QRegularExpression(QStringLiteral("^\\s*#+[^\n]*"));
     rule.format = format;
     rv.append(rule);
+
+    return rv;
+}
+
+QVector<PluginRule> SyntaxHighlighter::gitRules() {
+    QVector<PluginRule> rv;
+
+    PluginRule rule;
+    QTextCharFormat format;
+    format.setFontWeight(QFont::Bold);
+    format.setForeground(Qt::green);
+    rule.pattern = QRegularExpression(QStringLiteral("^+"));
+    rule.format = format;
+    format.setFontWeight(QFont::Bold);
+    format.setForeground(Qt::darkGray);
+    format.setFontOverline(true);
+    rule.pattern = QRegularExpression(QStringLiteral("^-"));
+    rule.format = format;
+    rv.append(rule);
+
+    qDebug() << "gitRules";
 
     return rv;
 }

@@ -12,6 +12,7 @@ Grep::Grep(Window* window) :
     Q_ASSERT(window != nullptr);
 
     this->process = nullptr;
+    this->setFont(Editor::getFont());
 }
 
 void Grep::show() {
@@ -112,7 +113,7 @@ void Grep::grep(const QString& string, const QString& baseDir, const QString& ta
     QString t = target;
     if (t.size() == 0) { t = "."; }
     QStringList list;
-    list << "-u" << "--with-filename" << "--line-number" << string << t;
+    list << "--with-filename" << "--line-number" << string << t;
 
     // run ripgrep
     this->process->start("rg", list);

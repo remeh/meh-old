@@ -14,6 +14,7 @@ ReferencesWidget::ReferencesWidget(Window* window) :
 
     this->tree->setSortingEnabled(true);
     this->tree->setColumnCount(3);
+    this->tree->setFont(Editor::getFont());
     QStringList columns;
     columns << "File" << "Line #" << "Line";
     this->tree->setHeaderLabels(columns);

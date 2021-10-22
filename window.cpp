@@ -76,17 +76,53 @@ Window::Window(QApplication* app, QString instanceSocket, QWidget* parent) :
     this->tabs->setDocumentMode(true);
     this->tabs->setTabsClosable(true);
     this->tabs->setUsesScrollButtons(true);
-    this->tabs->setIconSize(QSize(24,24));
-    this->tabs->setElideMode(Qt::ElideNone);
     this->tabs->setFocusPolicy(Qt::NoFocus);
     this->tabs->setMovable(true);
+    this->tabs->setStyleSheet(QString("QTabWidget { \
+} \
+QTabWidget::pane { \
+} \
+QTabWidget QTabBar{ \
+background-color: #262626;  \
+border: 0px;  \
+height: 34px; \
+} \
+QTabWidget QTabBar::tab{  \
+padding: 0px 5px 0px 5px;  \
+height: 34px;  \
+color: #136ba2;  \
+}  \
+QTabWidget QTabBar::tab:selected{  \
+background-color: #1e1e1e;  \
+color: #ffffff;  \
+}  \
+QTabWidget QTabBar::tear{  \
+background-color: #1e1e1e;  \
+color: #262626;  \
+}  \
+QTabWidget QTabBar::tab:!selected{  \
+background-color:#2d2d2d;  \
+color:  #969696;  \
+}  \
+QTabWidget QTabBar::close-button{  \
+image: url(:res/close.png); \
+}  \
+QTabWidget QTabBar::close-button:hover{  \
+image: url(:res/close-hover.png); \
+}  \
+QTabWidget::tab-bar { \
+} \
+QTabWidget QTabBar::tab:hover{  \
+background-color:  #5A5B5C;  \
+color:  #ffffff;  \
+}"));
+    this->tabs->setElideMode(Qt::ElideNone);
 
     this->layout = new QGridLayout();
-    this->layout->setContentsMargins(3, 2, 3, 2);
+    this->layout->setContentsMargins(0, 0, 0, 0);
     this->layout->setVerticalSpacing(3);
     this->layout->addWidget(this->tabs);
     this->layout->addWidget(this->command);
-    this->layout->addWidget(this->filesLookup);
     this->layout->addWidget(this->completer);
     this->layout->addWidget(this->refWidget);
     this->layout->addWidget(this->replace);
@@ -325,11 +361,10 @@ Editor* Window::newEditor(QString name, QString filename) {
     } else {
         label = fi.fileName();
     }
-    // FIXME(remy): use CSS rule?
-    label.prepend("   ");
-    label.append("   ");
 
-    int tabIdx = this->tabs->addTab(editor, editor->getIcon(), label);
+    label = QString("  ") + label;
+
+    int tabIdx = this->tabs->addTab(editor, label);
     if (this->getEditor() != nullptr && this->getEditor()->getId() != editor->getId()) {
         this->setCurrentEditor(editor->getId());
     }

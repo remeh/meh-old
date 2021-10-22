@@ -28,6 +28,7 @@ public:
     void diff(const QString& baseDir, bool staged);
 
     static bool isGitTempFile(const QString& filename);
+    static bool isGitFile(const QString& filename);
 
 public slots:
     void onErrorOccurred();

@@ -24,7 +24,6 @@ int main(int argv, char **args)
     app.setWheelScrollLines(5);
     app.setStyle(QStyleFactory::create("Fusion"));
     QCoreApplication::setOrganizationName("mehteor");
-
     QCoreApplication::setOrganizationDomain("remy.io");
     QCoreApplication::setApplicationName("meh");
     QStringList arguments = QCoreApplication::arguments();
@@ -81,11 +80,11 @@ int main(int argv, char **args)
         arguments.remove(1);
     }
 
-	qDebug() << "Creating a new instance:" << instanceFile;
-
     Window window(&app, instanceFile);
     window.setWindowTitle(QObject::tr("meh - no file"));
     window.resize(800, 700);
+//    window.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMaximizeButtonHint | Qt::WindowTitleHint);
+    window.setStyleSheet("background-color: #262626; color: #efefef;");
     window.show();
 
 	// remove the binary name
