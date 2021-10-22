@@ -11,6 +11,7 @@ Completer::Completer(Window* window) :
     columns << "Completion" << "Infos";
     this->setHeaderLabels(columns);
 
+    this->setFont(Editor::getFont());
     this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 }
 
