@@ -64,13 +64,14 @@ void Command::show() {
     QLineEdit::show();
     QLineEdit::raise();
 
-    QPoint pos = this->window->pos();
+    QPoint wpos = this->window->pos();
+    QRect cursorRect = this->window->getEditor()->cursorRect();
     int winWidth = this->window->size().width();
-    int winHeight = this->window->size().height();
-
     int popupWidth = winWidth  - winWidth/3;
-    this->move(pos.rx() + winWidth / 2 - (winWidth/3), pos.ry() + 120);
-    this->resize(popupWidth, 32);
+    QWidget::show();
+    QWidget::raise();
+    this->resize(600, 32);
+    this->move(wpos.rx() + cursorRect.x() + 50, wpos.ry() + cursorRect.y() + 64);
 }
 
 bool Command::warningModifiedBuffers() {

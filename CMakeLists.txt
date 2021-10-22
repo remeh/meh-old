@@ -26,6 +26,7 @@ set(SOURCES
     fileslookup.cpp
     git.cpp
     grep.cpp
+    info_popup.cpp
     leader.cpp
     line_number_area.cpp
     lsp.cpp

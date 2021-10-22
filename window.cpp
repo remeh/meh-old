@@ -15,6 +15,7 @@
 #include "fileslookup.h"
 #include "git.h"
 #include "grep.h"
+#include "info_popup.h"
 #include "replace.h"
 #include "statusbar.h"
 #include "window.h"
@@ -38,6 +39,9 @@ Window::Window(QApplication* app, QString instanceSocket, QWidget* parent) :
     // ----------------------
     this->statusBar = new StatusBar(this);
     this->statusBar->show();
+
+    this->infoPopup = new InfoPopup(this);
+    this->infoPopup->hide();
 
     // replace
     // ----------------------
@@ -275,6 +279,10 @@ void Window::openCompleter(const QString& base, const QList<CompleterEntry> entr
 
 void Window::closeCompleter() {
     this->completer->hide();
+}
+
+void Window::closeInfoPopup() {
+    this->infoPopup->hide();
 }
 
 void Window::openGrep(const QString& string) {
@@ -712,12 +720,12 @@ void Window::lspInterpret(QJsonDocument json) {
         case LSP_ACTION_HOVER:
             {
                 if (json["result"].isNull() || json["result"]["contents"].isNull()) {
-                    this->getStatusBar()->setMessage("Nothing found.");
+                    this->getInfoPopup()->setMessage("Nothing found.");
                     return;
                 }
 
                 auto contents = json["result"]["contents"].toObject();
-                this->getStatusBar()->setMessage(contents["value"].toString());
+                this->getInfoPopup()->setMessage(contents["value"].toString());
                 return;
             }
         case LSP_ACTION_SIGNATURE_HELP:
@@ -730,10 +738,10 @@ void Window::lspInterpret(QJsonDocument json) {
                         message.append(signature["label"].toString()).append("\n");
                         message.append(signature["documentation"].toString());
                     }
-                    this->getStatusBar()->setMessage(message);
+                    this->getInfoPopup()->setMessage(message);
                     return;
                 }
-                this->getStatusBar()->setMessage("Nothing found.");
+                this->getInfoPopup()->setMessage("Nothing found.");
                 return;
             }
         case LSP_ACTION_REFERENCES:

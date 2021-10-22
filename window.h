@@ -23,6 +23,7 @@ class Editor;
 class Exec;
 class Git;
 class Grep;
+class InfoPopup;
 class ReferencesWidget;
 class ReplaceWidget;
 class StatusBar;
@@ -50,6 +51,8 @@ public:
     void openCompleter(const QString& base, QList<CompleterEntry> entries);
     void closeCompleter();
 
+    void closeInfoPopup();
+
     // setCommand sets the text in the command to the given value.
     void setCommand(const QString& text);
 
@@ -70,6 +73,9 @@ public:
 
     // getStatusBar returns the StatusBar instance.
     StatusBar* getStatusBar() const { return this->statusBar; }
+
+    // getInfoPopup returns the InfoPopup instance.
+    InfoPopup* getInfoPopup() const { return this->infoPopup; }
 
     // setBaseDir sets the base dir on which the FilesLookup
     // should be opened.
@@ -194,6 +200,7 @@ private:
     Command* command;
     FilesLookup* filesLookup;
     Grep* grep;
+    InfoPopup* infoPopup;
     Completer* completer;
     ReferencesWidget *refWidget;
     StatusBar* statusBar;

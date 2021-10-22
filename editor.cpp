@@ -33,6 +33,7 @@
 
 #include "completer.h"
 #include "editor.h"
+#include "info_popup.h"
 #include "line_number_area.h"
 #include "mode.h"
 #include "references_widget.h"
@@ -169,7 +170,15 @@ void Editor::onTriggerLspRefresh() {
     this->lspRefreshTimer->stop();
 }
 
+
 void Editor::onTriggerSelectionHighlight() {
+    if (this->window == nullptr || this->buffer == nullptr) {
+        return;
+    }
+
+    // color
+    // -----
+
     // do not highlight in big files
     if (this->document()->blockCount() > 3000) {
         return;
@@ -185,6 +194,16 @@ void Editor::onTriggerSelectionHighlight() {
     }
     this->highlightText(text);
     this->selectionTimer->stop();
+
+    // lsp info
+    // --------
+
+//    LSP* lsp = this->window->getLSPManager()->getLSP(this->buffer->getId());
+//    if (lsp == nullptr) { return; }
+//    int reqId = QRandomGenerator::global()->generate();
+//    if (reqId < 0) { reqId *= -1; }
+//    lsp->hover(reqId, buffer->getFilename(), currentLineNumber(), currentColumn());
+//    this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_HOVER, this->buffer);
 }
 
 void Editor::highlightText(QString text) {
@@ -208,6 +227,9 @@ void Editor::onChange(bool changed) {
 
 void Editor::onContentsChange(int position, int charsRemoved, int charsAdded) {
     this->lspRefreshTimer->start(500);
+    if (this->window != nullptr) {
+        this->window->getInfoPopup()->hide();
+    }
 }
 
 void Editor::save() {
@@ -788,6 +810,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     // close extra stuff
     if (event->key() == Qt::Key_Escape) {
         this->window->closeList();
+        this->window->closeInfoPopup();
         this->window->closeCompleter();
         this->window->closeReplace();
         this->window->getStatusBar()->hideMessage();
