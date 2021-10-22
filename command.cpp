@@ -17,6 +17,7 @@ Command::Command(Window* window) :
     window(window) {
     Q_ASSERT(window != NULL);
     this->setFont(Editor::getFont());
+    this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 }
 
 void Command::keyPressEvent(QKeyEvent* event) {
@@ -60,8 +61,16 @@ void Command::keyPressEvent(QKeyEvent* event) {
 
 void Command::show() {
     this->historyIdx = 0;
-
     QLineEdit::show();
+    QLineEdit::raise();
+
+    QPoint pos = this->window->pos();
+    int winWidth = this->window->size().width();
+    int winHeight = this->window->size().height();
+
+    int popupWidth = winWidth  - winWidth/3;
+    this->move(pos.rx() + winWidth / 2 - (winWidth/3), pos.ry() + 120);
+    this->resize(popupWidth, 32);
 }
 
 bool Command::warningModifiedBuffers() {

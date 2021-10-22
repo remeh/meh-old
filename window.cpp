@@ -121,7 +121,6 @@ color:  #ffffff;  \
     this->layout->setContentsMargins(0, 0, 0, 0);
     this->layout->setVerticalSpacing(3);
     this->layout->addWidget(this->tabs);
-    this->layout->addWidget(this->command);
     this->layout->addWidget(this->refWidget);
     this->layout->addWidget(this->replace);
     this->layout->addWidget(this->statusBar);
