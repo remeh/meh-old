@@ -10,6 +10,8 @@ Completer::Completer(Window* window) :
     QStringList columns;
     columns << "Completion" << "Infos";
     this->setHeaderLabels(columns);
+
+    this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 }
 
 void Completer::setItems(const QString& base, const QList<CompleterEntry> entries) {
@@ -73,4 +75,15 @@ void Completer::keyPressEvent(QKeyEvent* event) {
 
 void Completer::fitContent() {
     this->resizeColumnToContents(0);
+}
+
+void Completer::show() {
+    QPoint wpos = this->window->pos();
+    QRect cursorRect = this->window->getEditor()->cursorRect();
+    int winWidth = this->window->size().width();
+    int winHeight = this->window->size().height();
+    QWidget::show();
+    QWidget::raise();
+    this->resize(600, 200);
+    this->move(wpos.rx() + cursorRect.x() + 50, wpos.ry() + cursorRect.y() + 64);
 }

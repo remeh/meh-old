@@ -32,7 +32,6 @@ Window::Window(QApplication* app, QString instanceSocket, QWidget* parent) :
     this->filesLookup = new FilesLookup(this);
     this->filesLookup->hide();
     this->completer = new Completer(this);
-    this->completer->setMaximumHeight(100);
     this->completer->hide();
 
     // status bar
@@ -123,7 +122,6 @@ color:  #ffffff;  \
     this->layout->setVerticalSpacing(3);
     this->layout->addWidget(this->tabs);
     this->layout->addWidget(this->command);
-    this->layout->addWidget(this->completer);
     this->layout->addWidget(this->refWidget);
     this->layout->addWidget(this->replace);
     this->layout->addWidget(this->statusBar);
@@ -268,8 +266,6 @@ void Window::paintEvent(QPaintEvent* event) {
 void Window::openCompleter(const QString& base, const QList<CompleterEntry> entries) {
     this->completer->clear();
     this->completer->setItems(base, entries);
-    QPoint p; this->mapToParent(p);
-    this->completer->setGeometry(p.x(), p.y(), 200, 60);
     this->completer->show();
     this->completer->setFocus();
     if (entries.size() > 0) {

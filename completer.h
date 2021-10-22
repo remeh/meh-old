@@ -27,6 +27,7 @@ public:
     Completer(Window* window);
 
     void setItems(const QString& base, const QList<CompleterEntry> list);
+    void show();
 
 protected:
     void keyPressEvent(QKeyEvent*) override;

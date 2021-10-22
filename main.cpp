@@ -83,7 +83,6 @@ int main(int argv, char **args)
     Window window(&app, instanceFile);
     window.setWindowTitle(QObject::tr("meh - no file"));
     window.resize(800, 700);
-//    window.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMaximizeButtonHint | Qt::WindowTitleHint);
     window.setStyleSheet("background-color: #262626; color: #efefef;");
     window.show();
 
