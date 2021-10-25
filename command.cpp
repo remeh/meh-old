@@ -17,7 +17,7 @@ Command::Command(Window* window) :
     window(window) {
     Q_ASSERT(window != NULL);
     this->setFont(Editor::getFont());
-    this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
 }
 
 void Command::keyPressEvent(QKeyEvent* event) {

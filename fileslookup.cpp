@@ -35,7 +35,7 @@ FilesLookup::FilesLookup(Window* window) :
     this->layout->addWidget(this->list);
     this->setLayout(layout);
 
-    this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
 
     connect(this->edit, &QLineEdit::textChanged, this, &FilesLookup::onEditChanged);
     connect(this->list, &QListWidget::itemDoubleClicked, this, &FilesLookup::onItemDoubleClicked);

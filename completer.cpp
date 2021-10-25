@@ -12,7 +12,7 @@ Completer::Completer(Window* window) :
     this->setHeaderLabels(columns);
 
     this->setFont(Editor::getFont());
-    this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
 }
 
 void Completer::setItems(const QString& base, const QList<CompleterEntry> entries) {

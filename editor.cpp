@@ -813,6 +813,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         this->window->closeInfoPopup();
         this->window->closeCompleter();
         this->window->closeReplace();
+        this->window->closeCommand();
         this->window->getStatusBar()->hideMessage();
         this->setSearchText("");
 
