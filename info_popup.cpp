@@ -23,6 +23,17 @@ void InfoPopup::show() {
     this->move(wpos.rx() + cursorRect.x() + 30, wpos.ry() + cursorRect.y() + 84);
 }
 
+void InfoPopup::keyPressEvent(QKeyEvent* event) {
+    Q_ASSERT(event != NULL);
+
+    switch (event->key()) {
+        case Qt::Key_Escape:
+            this->clear();
+            this->hide();
+            return;
+    }
+}
+
 void InfoPopup::setMessage(const QString& message) {
     this->setPlainText(message);
     this->show();

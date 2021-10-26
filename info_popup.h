@@ -14,6 +14,8 @@ public:
 
     void setMessage(const QString& message);
     void show();
+protected:
+    void keyPressEvent(QKeyEvent* event);
 
 private:
     Window* window;
