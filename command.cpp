@@ -67,11 +67,17 @@ void Command::show() {
     QPoint wpos = this->window->pos();
     QRect cursorRect = this->window->getEditor()->cursorRect();
     int winWidth = this->window->size().width();
+    int winHeight = this->window->size().height();
     int popupWidth = winWidth  - winWidth/3;
     QWidget::show();
     QWidget::raise();
     this->resize(600, 32);
     this->move(wpos.rx() + cursorRect.x() + 50, wpos.ry() + cursorRect.y() + 64);
+
+    // move it somewhere visible if not visible
+    if (this->pos().y() < wpos.ry() || this->pos().y() > wpos.ry()+winHeight) {
+        this->move(wpos.rx() + winWidth / 2 - (winWidth/3), wpos.ry() + 120);
+    }
 }
 
 bool Command::warningModifiedBuffers() {
