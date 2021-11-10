@@ -8,8 +8,11 @@ Completer::Completer(Window* window) :
     window(window) {
 
     QStringList columns;
-    columns << "Completion" << "Infos";
+    columns << "T" << "Completion" << "Infos";
     this->setHeaderLabels(columns);
+    this->setColumnWidth(0, 5);
+    this->setColumnWidth(1, 200);
+    this->setColumnWidth(2, 500);
 
     this->setFont(Editor::getFont());
     this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
@@ -17,7 +20,16 @@ Completer::Completer(Window* window) :
 
 void Completer::setItems(const QString& base, const QList<CompleterEntry> entries) {
     for (int i = 0; i < entries.size(); i++) {
-        QStringList list; list << entries[i].completion << entries[i].infos;
+        QStringList list;
+
+        if (entries[i].isFunc) {
+            list << "f";
+        } else {
+            list << "";
+        }
+
+        list << entries[i].completion << entries[i].infos;
+
         new QTreeWidgetItem(this, list);
     }
     this->base = base;
@@ -39,7 +51,7 @@ void Completer::keyPressEvent(QKeyEvent* event) {
             return;
         case Qt::Key_Return:
         case Qt::Key_Space:
-            this->window->getEditor()->applyAutocomplete(this->base, this->currentItem()->text(0));
+            this->window->getEditor()->applyAutocomplete(this->currentItem()->text(0), this->base, this->currentItem()->text(1), this->currentItem()->text(2));
             this->window->closeCompleter();
             return;
         case Qt::Key_N:
@@ -85,6 +97,6 @@ void Completer::show() {
     int winHeight = this->window->size().height();
     QWidget::show();
     QWidget::raise();
-    this->resize(600, 200);
+    this->resize(705, 200);
     this->move(wpos.rx() + cursorRect.x() + 50, wpos.ry() + cursorRect.y() + 64);
 }

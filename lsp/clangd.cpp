@@ -82,9 +82,10 @@ QList<CompleterEntry> LSPClangd::getEntries(const QJsonDocument& json) {
         return list;
     }
 
+
     for (int i = 0; i < items.size(); i++) {
         QJsonObject object = items[i].toObject();
-        list.append(CompleterEntry(object["insertText"].toString(), object["label"].toString()));
+        list.append(CompleterEntry(object["insertText"].toString(), object["label"].toString(), LSPReader::isFunc(object["kind"].toInteger(13))));
     }
 
     return list;

@@ -154,7 +154,7 @@ public:
     // for smart auto-complete.
     void lspAutocomplete();
 
-    void applyAutocomplete(const QString& base, const QString& word);
+    void applyAutocomplete(const QString& type, const QString& base, const QString& word, const QString& popup);
 
     // widget related
     // --------------
