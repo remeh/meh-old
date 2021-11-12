@@ -324,6 +324,7 @@ void Editor::cleanOnlyWhiteSpacesLine() {
 
 void Editor::setMode(int mode, QString command) {
     this->setOverwriteMode(false);
+    QTextCursor cursor = this->textCursor();
     switch (mode) {
     case MODE_NORMAL:
     default:
@@ -333,6 +334,8 @@ void Editor::setMode(int mode, QString command) {
         if (this->currentLineIsOnlyWhitespaces()) {
             this->cleanOnlyWhiteSpacesLine();
         }
+        cursor.clearSelection();
+        this->setTextCursor(cursor);
         this->setBlockCursor();
         break;
     case MODE_VISUAL:
