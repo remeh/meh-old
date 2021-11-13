@@ -46,6 +46,7 @@ class LSPReader
 {
 public:
     static QList<QJsonDocument> readMessage(QByteArray message);
+    static bool isFunc(int kind);
 };
 
 class LSP : public QObject

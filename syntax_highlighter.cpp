@@ -305,7 +305,5 @@ QVector<PluginRule> SyntaxHighlighter::gitRules() {
     rule.format = format;
     rv.append(rule);
 
-    qDebug() << "gitRules";
-
     return rv;
 }

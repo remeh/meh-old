@@ -227,9 +227,6 @@ void Editor::onChange(bool changed) {
 
 void Editor::onContentsChange(int position, int charsRemoved, int charsAdded) {
     this->lspRefreshTimer->start(500);
-    if (this->window != nullptr) {
-        this->window->getInfoPopup()->hide();
-    }
 }
 
 void Editor::save() {
@@ -327,6 +324,7 @@ void Editor::cleanOnlyWhiteSpacesLine() {
 
 void Editor::setMode(int mode, QString command) {
     this->setOverwriteMode(false);
+    QTextCursor cursor = this->textCursor();
     switch (mode) {
     case MODE_NORMAL:
     default:
@@ -336,6 +334,8 @@ void Editor::setMode(int mode, QString command) {
         if (this->currentLineIsOnlyWhitespaces()) {
             this->cleanOnlyWhiteSpacesLine();
         }
+        cursor.clearSelection();
+        this->setTextCursor(cursor);
         this->setBlockCursor();
         break;
     case MODE_VISUAL:
@@ -1089,7 +1089,7 @@ void Editor::autocomplete() {
     list.removeDuplicates();
 
     if (list.size() == 1) {
-        this->applyAutocomplete(base, list[0]);
+        this->applyAutocomplete("", base, list[0], "");
         return;
     }
 
@@ -1106,13 +1106,17 @@ void Editor::autocomplete() {
     this->window->openCompleter(base, entries);
 }
 
-void Editor::applyAutocomplete(const QString& base, const QString& word) {
+void Editor::applyAutocomplete(const QString& type, const QString& base, const QString& word, const QString& popup) {
     QTextCursor cursor = this->textCursor();
     cursor.beginEditBlock();
     cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, base.size());
     cursor.deleteChar();
     cursor.insertText(word);
     cursor.endEditBlock();
+
+    if (type == "f" && popup.size() > 0) {
+        this->window->getInfoPopup()->setMessage(popup);
+    }
 }
 
 int Editor::findPreviousOneInCurrentLine(QChar c) {

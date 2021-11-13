@@ -108,7 +108,7 @@ QList<CompleterEntry> LSPGeneric::getEntries(const QJsonDocument& json) {
 
     for (int i = 0; i < items.size(); i++) {
         QJsonObject object = items[i].toObject();
-        list.append(CompleterEntry(object["label"].toString(), object["detail"].toString()));
+        list.append(CompleterEntry(object["label"].toString(), object["detail"].toString(),  LSPReader::isFunc(object["kind"].toInteger(13))));
     }
 
     return list;

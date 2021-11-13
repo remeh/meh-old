@@ -324,3 +324,7 @@ QList<QJsonDocument> LSPReader::readMessage(QByteArray message) {
     }
     return rv;
 }
+
+bool LSPReader::isFunc(int kind) {
+    return (kind == 2 || kind == 3);
+}
