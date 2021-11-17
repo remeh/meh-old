@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QFileInfoList>
+#include <QFrame>
 #include <QIcon>
 #include <QKeyEvent>
 #include <QLabel>
@@ -16,7 +17,7 @@
 #include "window.h"
 
 FilesLookup::FilesLookup(Window* window) :
-    QWidget(window),
+    QFrame(window),
     window(window) {
     Q_ASSERT(window != nullptr);
 
@@ -24,7 +25,10 @@ FilesLookup::FilesLookup(Window* window) :
     this->label = new QLabel(this);
     this->list = new QListWidget(this);
     this->list->setSortingEnabled(true);
+    this->edit->setFont(Editor::getFont());
+    this->label->setFont(Editor::getFont());
     this->list->setFont(Editor::getFont());
+    this->setFont(Editor::getFont());
 
     this->setFocusPolicy(Qt::StrongFocus);
 
@@ -34,8 +38,6 @@ FilesLookup::FilesLookup(Window* window) :
     this->layout->addWidget(this->label);
     this->layout->addWidget(this->list);
     this->setLayout(layout);
-
-    this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
 
     connect(this->edit, &QLineEdit::textChanged, this, &FilesLookup::onEditChanged);
     connect(this->list, &QListWidget::itemDoubleClicked, this, &FilesLookup::onItemDoubleClicked);
@@ -69,28 +71,21 @@ void FilesLookup::showBuffers() {
 }
 
 void FilesLookup::show() {
-    this->edit->show();
-    this->label->show();
-    this->list->show();
-    this->edit->setFocus();
-    this->refreshList();
-
-    QPoint pos = this->window->pos();
     int winWidth = this->window->size().width();
     int winHeight = this->window->size().height();
 
     int popupWidth = winWidth  - winWidth/3;
     int popupHeight = winHeight / 2;
-    this->move(pos.rx() + winWidth / 2 - (winWidth/3), pos.ry() + 120);
     this->resize(popupWidth, popupHeight);
+    this->move(winWidth / 2 - (winWidth/3), 120);
 
+    this->refreshList();
+    this->edit->setFocus();
     QWidget::show();
+    QWidget::raise();
 }
 
 void FilesLookup::hide() {
-    this->edit->hide();
-    this->label->hide();
-    this->list->hide();
     QWidget::hide();
 }
 

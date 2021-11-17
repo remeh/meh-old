@@ -2,6 +2,7 @@
 
 #include <QEvent>
 #include <QFileInfo>
+#include <QFrame>
 #include <QGridLayout>
 #include <QKeyEvent>
 #include <QLabel>
@@ -17,7 +18,7 @@
 
 class Window;
 
-class FilesLookup : public QWidget {
+class FilesLookup : public QFrame {
     Q_OBJECT
 
 public:

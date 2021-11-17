@@ -14,10 +14,10 @@
 #include "window.h"
 
 Command::Command(Window* window) :
+    QLineEdit(window),
     window(window) {
     Q_ASSERT(window != NULL);
     this->setFont(Editor::getFont());
-    this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
 }
 
 void Command::keyPressEvent(QKeyEvent* event) {
@@ -64,7 +64,6 @@ void Command::show() {
     QLineEdit::show();
     QLineEdit::raise();
 
-    QPoint wpos = this->window->pos();
     QRect cursorRect = this->window->getEditor()->cursorRect();
     int winWidth = this->window->size().width();
     int winHeight = this->window->size().height();
@@ -72,11 +71,11 @@ void Command::show() {
     QWidget::show();
     QWidget::raise();
     this->resize(600, 32);
-    this->move(wpos.rx() + cursorRect.x() + 50, wpos.ry() + cursorRect.y() + 64);
+    this->move(cursorRect.x() + 50, cursorRect.y() + 30);
 
     // move it somewhere visible if not visible
-    if (this->pos().y() < wpos.ry() || this->pos().y() > wpos.ry()+winHeight) {
-        this->move(wpos.rx() + winWidth / 2 - (winWidth/3), wpos.ry() + 120);
+    if (this->pos().y() < 0 || this->pos().y() > winHeight) {
+        this->move(winWidth / 2 - (winWidth/3), 120);
     }
 }
 

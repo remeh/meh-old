@@ -13,9 +13,7 @@ Completer::Completer(Window* window) :
     this->setColumnWidth(0, 5);
     this->setColumnWidth(1, 200);
     this->setColumnWidth(2, 500);
-
     this->setFont(Editor::getFont());
-    this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
 }
 
 void Completer::setItems(const QString& base, const QList<CompleterEntry> entries) {
@@ -91,12 +89,11 @@ void Completer::fitContent() {
 }
 
 void Completer::show() {
-    QPoint wpos = this->window->pos();
     QRect cursorRect = this->window->getEditor()->cursorRect();
     int winWidth = this->window->size().width();
     int winHeight = this->window->size().height();
     QWidget::show();
     QWidget::raise();
     this->resize(705, 200);
-    this->move(wpos.rx() + cursorRect.x() + 50, wpos.ry() + cursorRect.y() + 64);
+    this->move(cursorRect.x() + 50, cursorRect.y() + 30);
 }
