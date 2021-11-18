@@ -75,6 +75,8 @@ Window::Window(QApplication* app, QString instanceSocket, QWidget* parent) :
     // layout
     // ----------------------
 
+    this->setStyleSheet("background-color: #262626; color: #ffffff;");
+
     this->tabs = new QTabWidget();
     this->tabs->setDocumentMode(true);
     this->tabs->setTabsClosable(true);
@@ -89,11 +91,13 @@ QTabWidget QTabBar{ \
 background-color: #262626;  \
 border: 0px;  \
 height: 34px; \
+qproperty-drawBase: 0; \
 } \
 QTabWidget QTabBar::tab{  \
 padding: 0px 5px 0px 5px;  \
 height: 34px;  \
 color: #136ba2;  \
+border-right: 0px; \
 }  \
 QTabWidget QTabBar::tab:selected{  \
 background-color: #1e1e1e;  \
