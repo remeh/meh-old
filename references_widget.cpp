@@ -1,3 +1,4 @@
+#include <QDir>
 #include <QGridLayout>
 #include <QWidget>
 
@@ -163,8 +164,16 @@ void ReferencesWidget::setLabelText(QString text) {
 
 void ReferencesWidget::insert(const QString& filepath, const QString& lineNumber, const QString& text) {
     QFileInfo info(filepath);
-    QStringList parts; parts << info.fileName() << lineNumber << text;
-    if (data.contains(filepath)) {
+
+    QStringList parts;
+    QString dirName = info.dir().dirName();
+    if (dirName != "." && !this->window->getBaseDir().endsWith(dirName + "/")) {
+        parts << dirName + "/" + info.fileName();
+    } else {
+        parts << info.fileName();
+    }
+    parts << lineNumber << text;
+    if (this->data.contains(filepath)) {
         QTreeWidgetItem* item = new QTreeWidgetItem(this->data[filepath], parts);
         item->setData(REF_WIDGET_DATA_ID, Qt::UserRole, filepath);
     } else {
