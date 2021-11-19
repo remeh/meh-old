@@ -13,14 +13,20 @@ QList<PluginRule> TasksPlugin::getSyntaxRules() {
     PluginRule rule;
     QTextCharFormat format;
 
-    format.setForeground(QColor::fromRgb(153,215,0));
+    format.setForeground(QColor::fromRgb(151,194,73));
     rule.pattern = QRegularExpression(QStringLiteral("\\[v\\] .*"));
     rule.format = format;
     rv.append(rule);
 
     format = QTextCharFormat();
-    format.setForeground(Qt::red);
+    format.setForeground(QColor::fromRgb(237,41,57));
     rule.pattern = QRegularExpression(QStringLiteral("\\[x\\] .*"));
+    rule.format = format;
+    rv.append(rule);
+
+    format = QTextCharFormat();
+    format.setForeground(QColor::fromRgb(247,152,98));
+    rule.pattern = QRegularExpression(QStringLiteral("\\[!\\] .*"));
     rule.format = format;
     rv.append(rule);
 
@@ -83,6 +89,21 @@ void TasksPlugin::keyPressEvent(QKeyEvent* event, bool ctrl, bool shift) {
             } else {
                 text.replace("[ ] ", "[v] "); // done
                 text.replace("[x] ", "[v] "); // done
+                text.replace("[!] ", "[v] "); // done
+            }
+            editor->deleteCurrentLine();
+            editor->textCursor().insertText(text);
+            editor->textCursor().endEditBlock();
+            break;
+        case Qt::Key_S:
+            editor->textCursor().beginEditBlock();
+            text = editor->textCursor().block().text();
+            if (text.contains("[!] ")) {
+                text.replace("[!] ", "[ ] "); // cancel
+            } else {
+                text.replace("[ ] ", "[!] "); // done
+                text.replace("[v] ", "[!] "); // done
+                text.replace("[x] ", "[!] "); // done
             }
             editor->deleteCurrentLine();
             editor->textCursor().insertText(text);
@@ -96,6 +117,7 @@ void TasksPlugin::keyPressEvent(QKeyEvent* event, bool ctrl, bool shift) {
             } else {
                 text.replace("[ ] ", "[x] "); // done
                 text.replace("[v] ", "[x] "); // done
+                text.replace("[!] ", "[x] "); // done
             }
             editor->deleteCurrentLine();
             editor->textCursor().insertText(text);
