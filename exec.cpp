@@ -1,3 +1,6 @@
+#include <QList>
+#include <QString>
+
 #include "buffer.h"
 #include "exec.h"
 #include "git.h"
@@ -30,16 +33,28 @@ void Exec::onFinished(int exitCode, QProcess::ExitStatus exitStatus) {
         this->process = nullptr;
     }
 
-    if (this->data.size() == 0) {
-        this->window->getStatusBar()->setMessage(this->command + QString("\n\nCommand executed but no output."));
-        this->window->getStatusBar()->showMessage();
-        return;
-    }
+    if (this->command.startsWith("fd ")) {
+        QList<QByteArray> split = this->data.split('\n');
+        QList<QString> files;
+        for (QByteArray arr : split) {
+            if (!arr.isEmpty()) {
+                files.append(QString(arr));
+            }
+        }
+        this->window->getFilesLookup()->showList(files);
+        this->window->getFilesLookup()->setLabel(":!" + this->command);
+    } else {
+        if (this->data.size() == 0) {
+            this->window->getStatusBar()->setMessage(this->command + QString("\n\nCommand executed but no output."));
+            this->window->getStatusBar()->showMessage();
+            return;
+        }
 
-    Editor* editor = this->window->newEditor(this->command, this->data);
-    // XXX(remy): set type
-    editor->getBuffer()->setType(BUFFER_TYPE_COMMAND);
-    editor->goToLine(0);
+        Editor* editor = this->window->newEditor(this->command, this->data);
+        // XXX(remy): set type
+        editor->getBuffer()->setType(BUFFER_TYPE_COMMAND);
+        editor->goToLine(0);
+    }
 
     // we've finished, clean-up
     this->data.clear();

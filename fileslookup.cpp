@@ -12,6 +12,7 @@
 
 #include "qdebug.h"
 
+#include "exec.h"
 #include "fileslookup.h"
 #include "mode.h"
 #include "window.h"
@@ -154,6 +155,31 @@ void FilesLookup::lookupDir(QString filepath) {
     }
 }
 
+void FilesLookup::showList(QList<QString> files) {
+    this->filenames.clear();
+    this->filteredFiles.clear();
+    this->directories.clear();
+    this->filteredDirs.clear();
+    this->buffers.clear();
+    this->filteredBuffers.clear();
+
+    this->list->setSortingEnabled(true);
+
+    for (QString file : files) {
+        QFileInfo info = QFileInfo(file);
+        if (info.isDir()) {
+            this->directories.insert(file);
+            this->filteredDirs.insert(file);
+        } else {
+            this->filenames.insert(file);
+            this->filteredFiles.insert(file);
+        }
+    }
+
+    this->show();
+    this->edit->setText("");
+}
+
 bool FilesLookup::openSelection() {
     QListWidgetItem* item = this->list->currentItem();
     if (item == nullptr) {
@@ -221,6 +247,12 @@ void FilesLookup::keyPressEvent(QKeyEvent* event) {
 
         case Qt::Key_Return:
             {
+                if (this->edit->text().startsWith(":!fd ")) {
+                    QString str = this->edit->text().remove(0, 5);
+                    this->window->getExec()->start(this->window->getBaseDir(), QStringList() << "fd" << str);
+                    this->label->setText(this->edit->text());
+                    return;
+                }
                 if (this->list->currentItem() == nullptr) {
                     return;
                 }

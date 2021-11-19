@@ -91,7 +91,6 @@ int main(int argv, char **args)
 
     // special case of reading from stdin
     if (arguments.size() > 0 && arguments.at(0) == "-") {
-
         QByteArray content;
 
         QFile in;

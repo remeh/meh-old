@@ -77,6 +77,8 @@ public:
     // getInfoPopup returns the InfoPopup instance.
     InfoPopup* getInfoPopup() const { return this->infoPopup; }
 
+    FilesLookup* getFilesLookup() const { return this->filesLookup; }
+
     // setBaseDir sets the base dir on which the FilesLookup
     // should be opened.
     void setBaseDir(const QString& dir);

@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QObject>
+#include <QProcess>
 #include <QString>
 #include <QWidget>
 
@@ -30,6 +31,9 @@ public:
     // TODO(remy): comment me
     void lookupBuffers();
 
+    // showLists is used by external objects to open the files lookup dialog and show a list of files.
+    void showList(QList<QString> files);
+
     // resetFiltered resets the list with filtered results: they again contain all entries.
     void resetFiltered();
 
@@ -49,6 +53,7 @@ public:
     void showFiles();
     void showBuffers();
     void hide();
+    void setLabel(const QString& text) { this->label->setText(text); }
 
 public slots:
     void onEditChanged();
