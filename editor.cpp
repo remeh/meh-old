@@ -563,17 +563,38 @@ void Editor::insertNewLine(bool above, bool noCutText) {
     if (this->currentLineIsOnlyWhitespaces()) {
         this->cleanOnlyWhiteSpacesLine();
     }
-
     if (above) {
         cursor.setPosition(position);
         this->setTextCursor(cursor);
         this->moveCursor(QTextCursor::StartOfBlock);
         this->insertPlainText("\n");
         this->moveCursor(QTextCursor::Up);
-        this->insertPlainText(indent);
     } else {
-        this->insertPlainText("\n" + indent);
+        this->insertPlainText("\n");
     }
+
+    // put the right indent onto the new line, take care that since we've moved
+    // previous line may now ends with a {, so we have again to check for that
+    if (!this->currentLineIndent().startsWith(indent)) {
+        QString text = this->textCursor().block().text();
+        this->deleteCurrentLine();
+        // while moving something down, we have to check if we've just created
+        // a new line ending with { or :, in order to adapt the indent properly
+        if (text.trimmed() != "") {
+            QTextCursor upCursor = this->textCursor();
+            upCursor.movePosition(QTextCursor::Up);
+            QString previousLine = upCursor.block().text();
+            if (previousLine.endsWith("{") || previousLine.endsWith(":")) {
+                indent += "    ";
+            }
+        }
+        this->insertPlainText(indent + text.trimmed());
+        this->moveCursor(QTextCursor::StartOfBlock);
+        for (QChar c : indent) {
+            this->moveCursor(QTextCursor::Right, QTextCursor::MoveAnchor);
+        }
+    }
+
     this->setMode(MODE_INSERT);
 
     cursor.endEditBlock();
