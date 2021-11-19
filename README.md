@@ -26,6 +26,7 @@
         * Fast lookup per directory
         * Filtering while typing
         * `Ctrl-n` next entry, `Ctrl-p` previous entry, `Return` open the file / move to the directory
+        * Use `:fd` to use `fd` to look for files in subdirs, and then filter in results
     * Search in current/all files with `ripgrep` integration
         * `:rg` search in all files with ripgrep for the word under the cursor
         * `:rg <pattern>` search in all files with ripgrep for the given pattern

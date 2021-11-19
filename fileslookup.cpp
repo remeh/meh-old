@@ -247,8 +247,9 @@ void FilesLookup::keyPressEvent(QKeyEvent* event) {
 
         case Qt::Key_Return:
             {
-                if (this->edit->text().startsWith(":!fd ")) {
-                    QString str = this->edit->text().remove(0, 5);
+                const QString& text = this->edit->text();
+                if (text.startsWith(":!fd ") || text.startsWith(":fd ")) {
+                    QString str = this->edit->text().remove(0, text.indexOf(" ")+1);
                     this->window->getExec()->start(this->window->getBaseDir(), QStringList() << "fd" << str);
                     this->label->setText(this->edit->text());
                     return;

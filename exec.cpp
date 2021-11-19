@@ -21,7 +21,9 @@ void Exec::onResults() {
 }
 
 void Exec::onErrorOccurred(QProcess::ProcessError error) {
-    this->process->deleteLater();
+    if (this->process) {
+        this->process->deleteLater();
+    }
 
     this->window->getStatusBar()->setMessage("An error occurred while running: '" + this->command + "':\n" + QVariant::fromValue(error).toString());
     this->window->getStatusBar()->showMessage();

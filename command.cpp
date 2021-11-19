@@ -109,7 +109,15 @@ void Command::execute(QString text) {
     settings.setValue("command/history", commands);
 
     QStringList list = text.split(" ");
-    const QString& command = list[0];
+    QString& command = list[0];
+
+    // some alias
+    // ----------------------
+
+    if (command == ":fd") {
+        list[0] = ":!fd";
+        command = QString(":!fd");
+    }
 
     // misc commands
     // ----------------------
