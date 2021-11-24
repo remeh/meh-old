@@ -20,7 +20,7 @@ SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
 
     QList<QString> languages{
         ".go", ".java", ".py", ".rs", ".rb", ".zig", ".c", ".cpp", ".h", ".hpp",
-        ".scala", ".js"
+        ".scala", ".js", ".cs"
     };
 
     todoRx = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME|XXX)"));
@@ -81,7 +81,7 @@ void SyntaxHighlighter::setCodeRules() {
         "private", "protected", "public",
         "slots", "static", "struct",
         "if", "else", "const",
-        "var", "return",
+        "var", "return", "continue",
         "void", "string", "bool",
         "func", "select", "range",
         "for", "switch", "case", "break",
