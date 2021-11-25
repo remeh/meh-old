@@ -156,6 +156,8 @@ void FilesLookup::lookupDir(QString filepath) {
 }
 
 void FilesLookup::showList(QList<QString> files) {
+    this->base = this->window->getBaseDir();
+
     this->filenames.clear();
     this->filteredFiles.clear();
     this->directories.clear();
