@@ -576,7 +576,7 @@ void Editor::insertNewLine(bool above, bool noCutText) {
     // put the right indent onto the new line, take care that since we've moved
     // previous line may now ends with a {, so we have again to check for that
     if (!this->currentLineIndent().startsWith(indent)) {
-        QString text = this->textCursor().block().text();
+        QString text = this->textCursor().block().text().trimmed();
         this->deleteCurrentLine();
         // while moving something down, we have to check if we've just created
         // a new line ending with { or :, in order to adapt the indent properly
@@ -584,14 +584,22 @@ void Editor::insertNewLine(bool above, bool noCutText) {
             QTextCursor upCursor = this->textCursor();
             upCursor.movePosition(QTextCursor::Up);
             QString previousLine = upCursor.block().text();
-            if (previousLine.endsWith("{") || previousLine.endsWith(":")) {
+            if ((previousLine.endsWith("{") || previousLine.endsWith(":")) &&
+                text != '}') {
                 indent += "    ";
             }
         }
-        this->insertPlainText(indent + text.trimmed());
+
+        this->insertPlainText(indent + text);
         this->moveCursor(QTextCursor::StartOfBlock);
         for (QChar c : indent) {
             this->moveCursor(QTextCursor::Right, QTextCursor::MoveAnchor);
+        }
+
+        // special move if we've just created a scope
+        if (text == "}") {
+            this->insertNewLine(true, true);
+            this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
         }
     }
 
@@ -1000,10 +1008,18 @@ int Editor::currentLineIsOnlyWhitespaces() {
     return count;
 }
 
-QChar Editor::currentLineLastChar() {
+QChar Editor::currentLineLastChar(bool ignoreLineReturn) {
+    QChar rv;
     QTextCursor cursor = this->textCursor();
     cursor.movePosition(QTextCursor::EndOfBlock);
-    return QChar(this->document()->characterAt(cursor.position()-1));
+
+    rv = QChar(this->document()->characterAt(cursor.position()-1));
+
+    if (rv == u'\u2029' && ignoreLineReturn) {
+        rv = QChar(this->document()->characterAt(cursor.position()-2));
+    }
+
+    return rv;
 }
 
 QList<QTextBlock> Editor::selectedBlocks() {

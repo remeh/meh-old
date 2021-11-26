@@ -226,7 +226,8 @@ private:
     void cleanOnlyWhiteSpacesLine();
 
     // currentLineLastChar returns the last char of the line.
-    QChar currentLineLastChar();
+    // ignoreLineReturn can be set in order to get the "last char before the line return".
+    QChar currentLineLastChar(bool ignoreLineReturn = false);
 
     // findNextOneInCurrentLine returns the distance to the next occurence of the
     // given char in the current line. The distance is from the current cursor position.
