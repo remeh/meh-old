@@ -60,6 +60,7 @@ private:
     QTextCharFormat commentFormat;
     QTextCharFormat quoteFormat;
     QTextCharFormat functionCallFormat;
+    QTextCharFormat specialCharsFormat;
 
     void setCodeRules();
     QVector<PluginRule> markdownRules();

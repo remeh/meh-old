@@ -36,6 +36,7 @@ SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
 
     commentFormat.setForeground(Qt::darkGray);
     functionCallFormat.setForeground(Qt::white);
+    specialCharsFormat.setForeground(SyntaxHighlighter::getMainColor());
     quoteFormat.setForeground(Qt::gray);
     quoteFormat.setFontItalic(true);
     todoFormat.setForeground(QColor::fromRgb(250, 50, 50));
@@ -212,6 +213,11 @@ void SyntaxHighlighter::highlightBlock(const QString &text) {
             isInQuote = c;
             quoteBuffer.clear();
             continue;
+        }
+
+        if (isInQuote == '0' && // only when not in a quote
+            (c == '(' || c == ')' || c == '{' || c == '}' || c == '[' || c == ']')) {
+            setFormat(i, 1, this->specialCharsFormat);
         }
 
         // end of word
