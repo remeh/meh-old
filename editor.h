@@ -180,7 +180,7 @@ public:
 
     void setTabIndex(int idx) { this->tabIndex = idx; }
     int getTabIndex() { return this->tabIndex; }
-    QWidget* lineNumberArea;
+    LineNumberArea* lineNumberArea;
 
 public slots:
     void update();

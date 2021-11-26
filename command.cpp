@@ -226,7 +226,7 @@ void Command::execute(QString text) {
                 staged = true;
             }
         }
-        this->window->getGit()->diff(this->window->getBaseDir(), staged);
+        this->window->getGit()->diff(this->window->getEditor(), staged, false);
         return;
     }
 

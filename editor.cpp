@@ -33,6 +33,7 @@
 
 #include "completer.h"
 #include "editor.h"
+#include "git.h"
 #include "info_popup.h"
 #include "line_number_area.h"
 #include "mode.h"
@@ -234,6 +235,7 @@ void Editor::save() {
     this->buffer->save(this->window);
     this->document()->setModified(false);
     this->getStatusBar()->setModified(false);
+    this->getWindow()->getGit()->diff(this, false, true);
 }
 
 void Editor::setBuffer(Buffer* buffer) {
@@ -259,6 +261,8 @@ void Editor::setBuffer(Buffer* buffer) {
 
     this->buffer = buffer;
     this->syntax = new SyntaxHighlighter(this, this->document());
+
+    this->getWindow()->getGit()->diff(this, false, true);
 }
 
 QIcon Editor::getIcon() {
@@ -598,13 +602,14 @@ void Editor::insertNewLine(bool above, bool noCutText) {
 
         // special move if we've just created a scope
         if (text == "}") {
-            this->insertNewLine(true, true);
+            this->insertPlainText("\n" + indent);
+            this->moveCursor(QTextCursor::Up, QTextCursor::MoveAnchor);
             this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+            this->insertPlainText(indent);
         }
     }
 
     this->setMode(MODE_INSERT);
-
     cursor.endEditBlock();
 }
 
@@ -1256,19 +1261,43 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
 
-            // background
+            // background (neutral or error from lsp)
+            // -------------------------------------
+
             if (diags.contains(blockNumber + 1)) {
               // use differents red if it's on the current line or not
               if (currentLine == blockNumber+1) {
-                painter.fillRect(0, top, this->window->width(), fontMetrics().height(), QColor(100,30,30));
+                painter.fillRect(0, top, lineNumberArea->width(), fontMetrics().height(), QColor(100,30,30));
               } else {
-                painter.fillRect(0, top, this->window->width(), fontMetrics().height(), QColor(70,30,30));
+                painter.fillRect(0, top, lineNumberArea->width(), fontMetrics().height(), QColor(70,30,30));
               }
             } else if (currentLine == blockNumber+1) {
                 painter.fillRect(0, top, lineNumberArea->width(), fontMetrics().height(), this->highlightedLine);
             }
 
+            // right border (git status)
+            // -------------------------
+
+            if (this->lineNumberArea != nullptr && this->lineNumberArea->gitFlags.contains(blockNumber+1)) {
+                int flag = this->lineNumberArea->gitFlags[blockNumber+1];
+                switch (flag) {
+                    case GIT_FLAG_ADDED:
+                        painter.fillRect(lineNumberArea->width()-2, top, 2, fontMetrics().height(), Qt::green);
+                        break;
+                    case GIT_FLAG_REMOVED:
+                        painter.fillRect(lineNumberArea->width()-2, top, 2, 4, Qt::red);
+                        break;
+                    case GIT_FLAG_BOTH:
+                        painter.fillRect(lineNumberArea->width()-2, top, 2, fontMetrics().height(), QColor(255,165,0));
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             // foreground
+            // ----------
+
             if (diags.contains(blockNumber + 1)) {
                 painter.setPen(QColor::fromRgb(150, 150, 150));
             } else if (currentLine == blockNumber+1) {

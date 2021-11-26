@@ -4,12 +4,14 @@
 #include <QProcess>
 #include <QString>
 
-#define GIT_UNKNOWN 0
-#define GIT_BLAME   1
-#define GIT_SHOW    2
-#define GIT_DIFF    3
+#define GIT_UNKNOWN		0
+#define GIT_BLAME	 		1
+#define GIT_SHOW 			2
+#define GIT_DIFF			3
+#define GIT_DIFF_STAT 	4
 
 class Buffer;
+class Editor;
 class Window;
 
 class Git : public QObject {
@@ -25,7 +27,7 @@ public:
     // show is showing the given git commit with this checksum
     void show(const QString& baseDir, const QString& checksum);
 
-    void diff(const QString& baseDir, bool staged);
+    void diff(Editor* editor, bool staged, bool stat = false);
 
     static bool isGitTempFile(const QString& filename);
     static bool isGitFile(const QString& filename);
@@ -46,4 +48,7 @@ private:
 
     // command contains the last command started
     int command;
+    Editor* statEditor;
+
+    void processDiff(const QString& diff);
 };
