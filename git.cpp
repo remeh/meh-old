@@ -6,9 +6,8 @@
 #include "line_number_area.h"
 #include "window.h"
 
-Git::Git(Window* window) : window(window), command(GIT_UNKNOWN), bufferName("") {
+Git::Git(Editor* editor) : editor(editor), command(GIT_UNKNOWN), bufferName("") {
     this->process = nullptr;
-    this->statEditor = nullptr;
 }
 
 void Git::onResults() {
@@ -19,10 +18,10 @@ void Git::onResults() {
 
 void Git::onErrorOccurred() {
     if (this->process) {
-        this->window->getStatusBar()->setMessage("An error occurred while running git blame.");
+        this->editor->getWindow()->getStatusBar()->setMessage("An error occurred while running git blame.");
         delete this->process;
         this->process = nullptr;
-        this->statEditor = nullptr;
+        this->editor = nullptr;
     }
 }
 
@@ -32,41 +31,41 @@ void Git::onFinished() {
         this->process = nullptr;
     }
 
-    int lineNumber = this->window->getEditor()->currentLineNumber();
+    int lineNumber = this->editor->currentLineNumber();
 
     switch (this->command) {
         case GIT_BLAME:
             {
                 QString str = this->data;
                 str = str.replace(QRegularExpression("\\)\\s*\n"), ")\n");
-                Editor* editor = this->window->newEditor(this->bufferName, str.toUtf8());
-                editor->getBuffer()->setType(BUFFER_TYPE_GIT_BLAME);
-                editor->goToLine(lineNumber);
+                Editor* newEditor = this->editor->getWindow()->newEditor(this->bufferName, str.toUtf8());
+                newEditor->getBuffer()->setType(BUFFER_TYPE_GIT_BLAME);
+                newEditor->goToLine(lineNumber);
             }
             break;
         case GIT_SHOW:
             {
                 QString str = this->data;
                 str = str.replace(QRegularExpression("\n\\s*\n"), "\n\n");
-                Editor* editor = this->window->newEditor(this->bufferName, str.toUtf8());
-                editor->getBuffer()->setType(BUFFER_TYPE_GIT_SHOW);
-                editor->goToLine(0);
+                Editor* newEditor = this->editor->getWindow()->newEditor(this->bufferName, str.toUtf8());
+                newEditor->getBuffer()->setType(BUFFER_TYPE_GIT_SHOW);
+                newEditor->goToLine(0);
             }
             break;
         case GIT_DIFF:
             {
                 QString str = this->data;
                 str = str.replace(QRegularExpression("\n\\s*\n"), "\n\n");
-                Editor* editor = this->window->newEditor(this->bufferName, str.toUtf8());
-                editor->getBuffer()->setType(BUFFER_TYPE_GIT_DIFF);
-                editor->goToLine(0);
+                Editor* newEditor = this->editor->getWindow()->newEditor(this->bufferName, str.toUtf8());
+                newEditor->getBuffer()->setType(BUFFER_TYPE_GIT_DIFF);
+                newEditor->goToLine(0);
             }
             break;
         case GIT_DIFF_STAT:
             {
                 QString diff = this->data;
                 this->processDiff(diff);
-                this->statEditor->update();
+                this->editor->update();
             }
             break;
     }
@@ -74,16 +73,11 @@ void Git::onFinished() {
     // we've finished, clean-up
     this->data.clear();
     this->command = GIT_UNKNOWN;
-    this->statEditor = nullptr;
 }
 
 void Git::processDiff(const QString& diff) {
-    if (this->statEditor == nullptr) {
-        return;
-    }
-
     // TODO(remy): limit the processing to a maximum size here?
-    this->statEditor->lineNumberArea->clearGitFlags();
+    this->editor->lineNumberArea->clearGitFlags();
 
     QRegularExpression rx(QStringLiteral("@@ -(\\d*),(\\d*) \\+(\\d*),(\\d*) @@"));
     QStringList lines = diff.split("\n");
@@ -119,27 +113,25 @@ void Git::processDiff(const QString& diff) {
         }
 
         if (line.startsWith("-")) {
-            this->statEditor->lineNumberArea->setGitFlag(newCounter, GIT_FLAG_REMOVED);
+            this->editor->lineNumberArea->setGitFlag(newCounter, GIT_FLAG_REMOVED);
             continue;
         }
 
         if (line.startsWith("+")) {
-            this->statEditor->lineNumberArea->setGitFlag(newCounter, GIT_FLAG_ADDED);
+            this->editor->lineNumberArea->setGitFlag(newCounter, GIT_FLAG_ADDED);
         }
 
         newCounter++;
     }
 }
 
-void Git::blame(const Buffer* buffer) {
-    if (buffer == nullptr) {
-        this->window->getStatusBar()->setMessage("Git blame called on a null buffer.");
-        return;
-    }
+void Git::blame() {
+    Q_ASSERT(this->editor != nullptr);
+    Q_ASSERT(this->editor->getBuffer() != nullptr);
 
     // TODO(remy): runGit(QStringList args, int command) command
 
-    const QString& filename = buffer->getFilename();
+    const QString& filename = this->editor->getBuffer()->getFilename();
     this->data.clear(); // clear the data read from the process before starting the blame
 
     // create and init the process
@@ -162,6 +154,9 @@ void Git::blame(const Buffer* buffer) {
 }
 
 void Git::show(const QString& workDir, const QString& checksum) {
+    Q_ASSERT(this->editor != nullptr);
+    Q_ASSERT(this->editor->getBuffer() != nullptr);
+
     this->data.clear(); // clear the data read from the process before starting the show
 
     // TODO(remy): runGit(QStringList args, int command) command
@@ -184,15 +179,13 @@ void Git::show(const QString& workDir, const QString& checksum) {
     connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Git::onFinished);
 }
 
-void Git::diff(Editor* editor, bool staged, bool stat) {
-    if (editor == nullptr || editor->getBuffer() == nullptr) {
-        return;
-    }
+void Git::diff(bool staged, bool stat) {
+    Q_ASSERT(this->editor != nullptr);
+    Q_ASSERT(this->editor->getBuffer() != nullptr);
 
-    const Buffer* buffer = editor->getBuffer();
+    const Buffer* buffer = this->editor->getBuffer();
 
     this->data.clear(); // clear the data read from the process before starting the show
-    this->statEditor = nullptr;
 
     // TODO(remy): runGit(QStringList args, int command) command
 
@@ -217,7 +210,6 @@ void Git::diff(Editor* editor, bool staged, bool stat) {
         this->command = GIT_DIFF;
     }
 
-    this->statEditor = editor;
     this->bufferName = QString("DIFF - ") + QFileInfo(buffer->getFilename()).fileName();
 
     // connect the events

@@ -29,8 +29,9 @@
 #include "syntax_highlighter.h"
 #include "tasks.h"
 
-class Window;
+class Git;
 class LineNumberArea;
+class Window;
 
 class Editor : public QPlainTextEdit
 {
@@ -180,6 +181,10 @@ public:
 
     void setTabIndex(int idx) { this->tabIndex = idx; }
     int getTabIndex() { return this->tabIndex; }
+
+    // getGit returns the Git instance.
+    Git* getGit() { return this->git; }
+
     LineNumberArea* lineNumberArea;
 
 public slots:
@@ -269,6 +274,7 @@ private:
 
     Window* window;
     SyntaxHighlighter* syntax;
+    Git* git;
 
     // mode is the currently used mode. See mode.h
     int mode;

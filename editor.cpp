@@ -59,6 +59,11 @@ Editor::Editor(Window* window) :
     this->lineNumberArea = new LineNumberArea(this);
     this->onUpdateLineNumberAreaWidth(0);
 
+    // git instance
+    // ------------
+
+    this->git = new Git(this);
+
     // editor font
     // ----------------------
 
@@ -122,6 +127,7 @@ Editor::~Editor() {
         delete this->buffer;
     }
 
+    delete this->git;
     delete this->selectionTimer;
     delete this->lspRefreshTimer;
     if (this->currentCompleter) {
@@ -235,7 +241,7 @@ void Editor::save() {
     this->buffer->save(this->window);
     this->document()->setModified(false);
     this->getStatusBar()->setModified(false);
-    this->getWindow()->getGit()->diff(this, false, true);
+    this->getGit()->diff(false, true);
 }
 
 void Editor::setBuffer(Buffer* buffer) {
@@ -262,7 +268,7 @@ void Editor::setBuffer(Buffer* buffer) {
     this->buffer = buffer;
     this->syntax = new SyntaxHighlighter(this, this->document());
 
-    this->getWindow()->getGit()->diff(this, false, true);
+    this->getGit()->diff(false, true);
 }
 
 QIcon Editor::getIcon() {

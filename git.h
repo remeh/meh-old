@@ -12,22 +12,21 @@
 
 class Buffer;
 class Editor;
-class Window;
 
 class Git : public QObject {
     Q_OBJECT
 
 public:
-    Git(Window* window);
+    Git(Editor* editor);
 
     // blame is running git blame on the buffer file, and his opening the result
     // in a new buffer.
-    void blame(const Buffer* buffer);
+    void blame();
 
     // show is showing the given git commit with this checksum
     void show(const QString& baseDir, const QString& checksum);
 
-    void diff(Editor* editor, bool staged, bool stat = false);
+    void diff(bool staged, bool stat = false);
 
     static bool isGitTempFile(const QString& filename);
     static bool isGitFile(const QString& filename);
@@ -40,7 +39,7 @@ public slots:
 private:
     QByteArray data;
     QProcess* process;
-    Window* window;
+    Editor* editor;
 
     // bufferName is a temporary var used to set the buffer name after the command
     // has been executed.
@@ -48,7 +47,6 @@ private:
 
     // command contains the last command started
     int command;
-    Editor* statEditor;
 
     void processDiff(const QString& diff);
 };

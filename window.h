@@ -96,9 +96,6 @@ public:
     // getRefWidget returns the ReferencesWidget instance.
     ReferencesWidget* getRefWidget() { return this->refWidget; }
 
-    // getGit returns the Git instance.
-    Git* getGit() { return this->git; }
-
     // getExec returns the Exec instance.
     Exec* getExec() { return this->exec; }
 
@@ -206,7 +203,6 @@ private:
     Completer* completer;
     ReferencesWidget *refWidget;
     StatusBar* statusBar;
-    Git* git;
     Exec* exec;
     ReplaceWidget* replace;
 

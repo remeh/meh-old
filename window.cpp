@@ -137,7 +137,6 @@ color:  #ffffff;  \
     // git instance and exec instance
     // ----------------------
 
-    this->git = new Git(this);
     this->exec = new Exec(this);
 
     // command server
@@ -157,7 +156,6 @@ Window::~Window() {
     commandServer.close();
     delete this->tabs;
     delete this->grep;
-    delete this->git;
     delete this->exec;
     delete this->lspManager;
 }

@@ -196,15 +196,22 @@ void Command::execute(QString text) {
     // --------------
 
     if (command == ":gblame") {
+        if (this->window->getEditor() == nullptr) {
+            return;
+        }
         Buffer* buffer = this->window->getEditor()->getBuffer();
         if (buffer == nullptr) {
             return;
         }
-        this->window->getGit()->blame(buffer);
+        this->window->getEditor()->getGit()->blame();
         return;
     }
 
     if (command == ":gshow") {
+        if (this->window->getEditor() == nullptr) {
+            return;
+        }
+
         // gshow is used to show the commit of a given checksum
         // if no parameter is given, use the word under the cursor for the checksum
         QString checksum;
@@ -216,17 +223,21 @@ void Command::execute(QString text) {
             this->window->getStatusBar()->setMessage("no checksum provided");
             return;
         }
-        this->window->getGit()->show(this->window->getBaseDir(), checksum);
+        this->window->getEditor()->getGit()->show(this->window->getBaseDir(), checksum);
     }
 
     if (command == ":gdiff") {
+        if (this->window->getEditor() == nullptr) {
+            return;
+        }
+
         bool staged = false;
         if (list.size() > 1) {
             if (list[1] == "--staged") {
                 staged = true;
             }
         }
-        this->window->getGit()->diff(this->window->getEditor(), staged, false);
+        this->window->getEditor()->getGit()->diff(staged, false);
         return;
     }
 
