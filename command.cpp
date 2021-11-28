@@ -231,13 +231,17 @@ void Command::execute(QString text) {
             return;
         }
 
+        bool stat = false;
         bool staged = false;
         if (list.size() > 1) {
             if (list[1] == "--staged") {
                 staged = true;
             }
+            if (list[1] == "-r" || list[1] == "--refresh") {
+                stat = true;
+            }
         }
-        this->window->getEditor()->getGit()->diff(staged, false);
+        this->window->getEditor()->getGit()->diff(staged, stat);
         return;
     }
 
