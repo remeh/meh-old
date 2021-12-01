@@ -1288,13 +1288,13 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
                 int flag = this->lineNumberArea->gitFlags[blockNumber+1];
                 switch (flag) {
                     case GIT_FLAG_ADDED:
-                        painter.fillRect(lineNumberArea->width()-2, top, 2, fontMetrics().height(), Qt::green);
+                        painter.fillRect(lineNumberArea->width()-2, top, 2, fontMetrics().height(), QColor::fromRgb(151, 194, 73));
                         break;
                     case GIT_FLAG_REMOVED:
-                        painter.fillRect(lineNumberArea->width()-2, top, 2, 4, Qt::red);
+                        painter.fillRect(lineNumberArea->width()-2, top, 2, 4, QColor::fromRgb(232, 52, 28));
                         break;
                     case GIT_FLAG_BOTH:
-                        painter.fillRect(lineNumberArea->width()-2, top, 2, fontMetrics().height(), QColor(255,165,0));
+                        painter.fillRect(lineNumberArea->width()-2, top, 2, fontMetrics().height(), QColor::fromRgb(242, 212, 44));
                         break;
                     default:
                         break;
