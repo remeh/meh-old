@@ -19,6 +19,7 @@ StatusBar::StatusBar(Window* window) :
     this->mode->setMaximumHeight(15);
     #endif
     this->mode->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
     this->filename = new QPushButton("");
     this->filename->setFlat(true);
     this->filename->setFocusPolicy(Qt::NoFocus);
@@ -28,6 +29,8 @@ StatusBar::StatusBar(Window* window) :
     this->filename->setMaximumHeight(17);
     #endif
     this->filename->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    this->breadcrumb = new Breadcrumb(window);
+
     this->lineNumber = new QLabel("0");
     this->lineNumber->setFont(Editor::getFont());
     this->lineNumber->setFont(Editor::getFont());
@@ -39,7 +42,8 @@ StatusBar::StatusBar(Window* window) :
     this->lineNumber->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->glayout->setContentsMargins(10, 0, 10, 5);
     this->glayout->addWidget(this->mode);
-    this->glayout->addWidget(this->filename, 0, 1, Qt::AlignCenter);
+//    this->glayout->addWidget(this->filename, 0, 1, Qt::AlignCenter);
+    this->glayout->addWidget(this->breadcrumb, 0, 1, Qt::AlignCenter);
     this->glayout->addWidget(this->lineNumber, 0, 2, Qt::AlignRight);
     this->setFont(Editor::getFont());
     this->message = new QPlainTextEdit();
@@ -77,9 +81,8 @@ void StatusBar::setMode(const QString& newMode) {
 }
 
 void StatusBar::setEditor(Editor* editor) {
-    if (this->filename == nullptr || editor == nullptr) {
-        return;
-    }
+    Q_ASSERT(this->filename != nullptr);
+    Q_ASSERT(editor != nullptr);
 
     switch (editor->getBuffer()->getType()) {
         case BUFFER_TYPE_GIT_BLAME:
@@ -87,6 +90,7 @@ void StatusBar::setEditor(Editor* editor) {
             break;
         default:
             this->filename->setText(editor->getBuffer()->getFilename());
+            this->breadcrumb->setFullpath(editor->getBuffer()->getFilename());
     }
 }
 

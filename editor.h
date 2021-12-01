@@ -17,8 +17,10 @@
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTimer>
+#include <QVBoxLayout>
 #include <QVector>
 
+#include "breadcrumb.h"
 #include "buffer.h"
 #include "fileslookup.h"
 #include "lsp.h"

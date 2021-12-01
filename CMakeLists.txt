@@ -18,6 +18,7 @@ find_package(Qt6 COMPONENTS Network REQUIRED)
 set(SOURCES
     main.cpp
     resources.qrc
+    breadcrumb.cpp
     buffer.cpp
     command.cpp
     completer.cpp

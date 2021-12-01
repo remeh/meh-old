@@ -8,6 +8,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "breadcrumb.h"
+
 class Editor;
 class Window;
 
@@ -38,6 +40,7 @@ public slots:
 protected:
 private:
     Window* window;
+    Breadcrumb* breadcrumb;
     QVBoxLayout* vlayout;
     QGridLayout* glayout;
     QLabel* mode;
