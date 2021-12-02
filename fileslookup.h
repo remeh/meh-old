@@ -50,7 +50,7 @@ public:
     void filter();
 
     void show();
-    void showFiles();
+    void showFiles(const QString& baseDir);
     void showBuffers();
     void hide();
     void setLabel(const QString& text) { this->label->setText(text); }

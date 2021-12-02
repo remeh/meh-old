@@ -241,7 +241,7 @@ void Window::closeCommand() {
 }
 
 void Window::openListFiles() {
-    this->filesLookup->showFiles();
+    this->filesLookup->showFiles("");
 }
 
 void Window::openListBuffers() {

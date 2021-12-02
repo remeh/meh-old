@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QFile>
 #include <QLocalSocket>
+#include <QLoggingCategory>
 #include <QObject>
 #include <QStringList>
 #include <QStyleFactory>
@@ -19,6 +20,11 @@
 
 int main(int argv, char **args)
 {
+    // ensure to see the debug logs from the app
+    // switch qt.*.debug to true to see Qt debug logs
+    QLoggingCategory::setFilterRules("*.debug=true\n"
+"qt.*.debug=false");
+
     QApplication app(argv, args);
     app.setCursorFlashTime(0);
     app.setWheelScrollLines(5);
@@ -27,6 +33,7 @@ int main(int argv, char **args)
     QCoreApplication::setOrganizationDomain("remy.io");
     QCoreApplication::setApplicationName("meh");
     QStringList arguments = QCoreApplication::arguments();
+
 
     // -n flag: to use a different instance than /tmp/meh.sock
     // --------------

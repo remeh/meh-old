@@ -4,6 +4,7 @@
 #include <QList>
 #include <QMouseEvent>
 #include <QPushButton>
+#include <QSignalMapper>
 #include <QString>
 #include <QWidget>
 
@@ -20,7 +21,9 @@ public:
     void deleteLabels();
 
 protected:
-    void mousePressEvent(QMouseEvent*) override;
+
+private slots:
+    void onClicked();
 
 private:
     Window* window;

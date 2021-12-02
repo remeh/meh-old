@@ -57,10 +57,14 @@ void FilesLookup::onItemDoubleClicked() {
     this->hide();
 }
 
-void FilesLookup::showFiles() {
+void FilesLookup::showFiles(const QString& baseDir) {
     this->base = "";
     this->edit->setText("");
-    this->lookupDir(this->window->getBaseDir());
+    if (baseDir.size() == 0) {
+        this->lookupDir(this->window->getBaseDir());
+    } else {
+        this->lookupDir(baseDir);
+    }
     this->show();
 }
 
