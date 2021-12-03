@@ -511,6 +511,12 @@ void Window::closeEditor(const QString& id) {
     // for the time being since it avoid code duplication and is way more readable.
     Editor* editor = this->getEditor(id);
 
+    Editor* currentEditor = this->getEditor();
+    QString currentEditorId = "";
+    if (currentEditor != nullptr) {
+        currentEditorId = currentEditor->getId();
+    }
+
     if (editor == nullptr) {
         qDebug() << "Window::closeEditor:" << "can't find editor with id:" << id;
     }
@@ -531,13 +537,20 @@ void Window::closeEditor(const QString& id) {
     this->tabs->removeTab(tabIdx);
     editor->deleteLater(); // since we use removeTab, it's not done by the QTabWidget
 
-    if (this->checkpoints.size() > 0) {
-        this->lastCheckpoint();
+    if (id != currentEditorId) {
+        // do not change current tab if the one just closed isn't the current one.
         return;
+    }
+
+    if (this->checkpoints.size() > 0) {
+        if (this->lastCheckpoint()) {
+            return;
+        }
     }
 
     if (this->getEditor() != nullptr) {
         this->setCurrentEditor(this->getEditor()->getId());
+        qDebug() << "second";
         return;
     }
 
@@ -569,7 +582,7 @@ void Window::saveCheckpoint() {
     }
 }
 
-void Window::lastCheckpoint() {
+bool Window::lastCheckpoint() {
     while (!this->checkpoints.isEmpty()) {
         Checkpoint c = this->checkpoints.takeLast();
         Editor* editor = this->getEditor(c.id);
@@ -579,9 +592,10 @@ void Window::lastCheckpoint() {
             cursor.setPosition(c.position);
             editor->setTextCursor(cursor);
             // we've restored one, we can leave
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 // lsp

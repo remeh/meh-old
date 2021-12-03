@@ -159,7 +159,8 @@ public:
     void saveCheckpoint();
 
     // lastCheckpoint pops the last checkpoint and goes into this file / position.
-    void lastCheckpoint();
+    // Returns true if a checkpoint has indeed be used.
+    bool lastCheckpoint();
 
     // lsp
     // -----------
