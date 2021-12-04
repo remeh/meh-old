@@ -72,10 +72,10 @@ private:
     QListWidget* list;
     QGridLayout* layout;
 
-    QSet<QString> directories;
-    QSet<QString> filteredDirs;
-    QSet<QString> filenames;
-    QSet<QString> filteredFiles;
-    QSet<QString> buffers;
-    QSet<QString> filteredBuffers;
+    QList<QString> directories;
+    QList<QString> filteredDirs;
+    QList<QString> filenames;
+    QList<QString> filteredFiles;
+    QList<QString> buffers;
+    QList<QString> filteredBuffers;
 };

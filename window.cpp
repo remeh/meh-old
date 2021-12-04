@@ -441,7 +441,7 @@ QList<Editor*> Window::getEditors() {
         }
         Editor* ed = static_cast<Editor*>(page);
         if (ed == nullptr) {
-            qDebug() << "Window::closeEditor: can't case page, should never happen";
+            qDebug() << "Window::closeEditor: can't cast page, should never happen";
             continue;
         }
         list.append(ed);

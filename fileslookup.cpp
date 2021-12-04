@@ -72,6 +72,7 @@ void FilesLookup::showBuffers() {
     this->base = this->window->getBaseDir();
     this->edit->setText("");
     this->lookupBuffers();
+    this->list->setSortingEnabled(false);
     this->show();
 }
 
@@ -118,11 +119,11 @@ void FilesLookup::lookupBuffers() {
         }
 
         if (buffer->getType() == BUFFER_TYPE_FILE) {
-            this->filenames.insert(value);
-            this->filteredFiles.insert(value);
+            this->filenames.append(value);
+            this->filteredFiles.append(value);
         } else {
-            this->buffers.insert(value);
-            this->filteredBuffers.insert(value);
+            this->buffers.append(value);
+            this->filteredBuffers.append(value);
         }
     }
 }
@@ -150,11 +151,11 @@ void FilesLookup::lookupDir(QString filepath) {
         if (info.isDir()) {
             QString filename = info.fileName();
             if (filename == ".") { continue; }
-            this->directories.insert(filename);
-            this->filteredDirs.insert(filename);
+            this->directories.append(filename);
+            this->filteredDirs.append(filename);
         } else {
-            this->filenames.insert(info.fileName());
-            this->filteredFiles.insert(info.fileName());
+            this->filenames.append(info.fileName());
+            this->filteredFiles.append(info.fileName());
         }
     }
 }
@@ -174,11 +175,11 @@ void FilesLookup::showList(QList<QString> files) {
     for (QString file : files) {
         QFileInfo info = QFileInfo(file);
         if (info.isDir()) {
-            this->directories.insert(file);
-            this->filteredDirs.insert(file);
+            this->directories.append(file);
+            this->filteredDirs.append(file);
         } else {
-            this->filenames.insert(file);
-            this->filteredFiles.insert(file);
+            this->filenames.append(file);
+            this->filteredFiles.append(file);
         }
     }
 
@@ -277,22 +278,16 @@ void FilesLookup::resetFiltered() {
     this->filteredFiles.clear();
     this->filteredBuffers.clear();
 
-    auto it = this->directories.begin();
-    while (it != this->directories.end()) {
-        this->filteredDirs.insert(*it);
-        ++it;
+    for (QString it : this->directories) {
+        this->filteredDirs.append(it);
     }
 
-    it = this->filenames.begin();
-    while (it != this->filenames.end()) {
-        this->filteredFiles.insert(*it);
-        ++it;
+    for (QString it : this->filenames) {
+        this->filteredFiles.append(it);
     }
 
-    it = this->buffers.begin();
-    while (it != this->buffers.end()) {
-        this->filteredBuffers.insert(*it);
-        ++it;
+    for (QString it : this->buffers) {
+        this->filteredBuffers.append(it);
     }
 }
 
@@ -330,44 +325,37 @@ void FilesLookup::filter() {
 // every time but just removing the filtered entries.
 void FilesLookup::refreshList() {
     this->list->clear();
-    QSet<QString>::iterator it = this->filteredDirs.begin();
-    while (it != this->filteredDirs.end()) {
+    for (QString it : this->filteredDirs) {
         QIcon icon = QIcon(":/res/directory-in.png");
-        if (*it == "..") {
+        if (it == "..") {
             icon = QIcon(":/res/directory-out.png");
         }
-        QListWidgetItem* item = new QListWidgetItem(icon, *it, this->list);
+        QListWidgetItem* item = new QListWidgetItem(icon, it, this->list);
         item->setData(FILESLOOKUP_DATA_TYPE, "directory");
-        item->setData(FILESLOOKUP_DATA_ID, *it);
-        item->setText(*it);
-        ++it;
+        item->setData(FILESLOOKUP_DATA_ID, it);
+        item->setText(it);
     }
-    it = this->filteredFiles.begin();
-    while (it != this->filteredFiles.end()) {
-        QString fullPath = *it;
-        if (!(it->startsWith("/"))) {
-            fullPath = this->base + *it;
+    for (QString it : this->filteredFiles) {
+        QString fullPath = it;
+        if (!(it.startsWith("/"))) {
+            fullPath = this->base + it;
         }
         QFileInfo fi(fullPath);
         fullPath = fi.canonicalFilePath();
-
         QIcon icon = QIcon(":/res/plus.png");
         if (this->window->hasBuffer(fullPath)) {
             icon = QIcon(":/res/edit.png");
         }
-        QListWidgetItem* item = new QListWidgetItem(icon, *it, this->list);
+        QListWidgetItem* item = new QListWidgetItem(icon, it, this->list);
         item->setData(FILESLOOKUP_DATA_TYPE, "file");
         item->setData(FILESLOOKUP_DATA_ID, fullPath);
-        item->setText(*it);
-        ++it;
+        item->setText(it);
     }
-    it = this->filteredBuffers.begin();
-    while (it != this->filteredBuffers.end()) {
-        QListWidgetItem* item = new QListWidgetItem(QIcon(":/res/edit.png"), *it, this->list);
+    for (QString it : this->filteredBuffers) {
+        QListWidgetItem* item = new QListWidgetItem(QIcon(":/res/edit.png"), it, this->list);
         item->setData(FILESLOOKUP_DATA_TYPE, "buffer");
-        item->setData(FILESLOOKUP_DATA_ID, *it);
-        item->setText(*it);
-        ++it;
+        item->setData(FILESLOOKUP_DATA_ID, it);
+        item->setText(it);
     }
 
     // now, select the first entry which is not ..
