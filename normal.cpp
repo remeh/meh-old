@@ -173,6 +173,7 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
             }
             this->up();
             return;
+        case Qt::Key_Return:
         case Qt::Key_J:
             if (shift) {
                 this->moveCursor(QTextCursor::EndOfLine);
