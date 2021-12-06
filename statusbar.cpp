@@ -20,15 +20,6 @@ StatusBar::StatusBar(Window* window) :
     #endif
     this->mode->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    this->filename = new QPushButton("");
-    this->filename->setFlat(true);
-    this->filename->setFocusPolicy(Qt::NoFocus);
-    #ifdef Q_OS_MAC
-    this->filename->setMaximumHeight(26);
-    #else
-    this->filename->setMaximumHeight(17);
-    #endif
-    this->filename->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->breadcrumb = new Breadcrumb(window);
 
     this->lineNumber = new QLabel("0");
@@ -42,7 +33,6 @@ StatusBar::StatusBar(Window* window) :
     this->lineNumber->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->glayout->setContentsMargins(10, 0, 10, 5);
     this->glayout->addWidget(this->mode);
-//    this->glayout->addWidget(this->filename, 0, 1, Qt::AlignCenter);
     this->glayout->addWidget(this->breadcrumb, 0, 1, Qt::AlignCenter);
     this->glayout->addWidget(this->lineNumber, 0, 2, Qt::AlignRight);
     this->setFont(Editor::getFont());
@@ -60,14 +50,6 @@ StatusBar::StatusBar(Window* window) :
     this->setLayout(vlayout);
 
     this->hideMessage();
-
-    connect(this->filename, &QPushButton::clicked, this, &StatusBar::onFilenameClicked);
-}
-
-void StatusBar::onFilenameClicked() {
-    if (this->window != nullptr) {
-        this->window->openListBuffers();
-    }
 }
 
 void StatusBar::setMode(const QString& newMode) {
@@ -81,16 +63,16 @@ void StatusBar::setMode(const QString& newMode) {
 }
 
 void StatusBar::setEditor(Editor* editor) {
-    Q_ASSERT(this->filename != nullptr);
     Q_ASSERT(editor != nullptr);
 
     switch (editor->getBuffer()->getType()) {
         case BUFFER_TYPE_GIT_BLAME:
-            this->filename->setText("GIT BLAME - " + editor->getBuffer()->getName());
+            this->breadcrumb->setFullpath("GIT BLAME - " + editor->getBuffer()->getName());
+            this->breadcrumb->setModified(editor->getBuffer()->modified);
             break;
         default:
-            this->filename->setText(editor->getBuffer()->getFilename());
             this->breadcrumb->setFullpath(editor->getBuffer()->getFilename());
+            this->breadcrumb->setModified(editor->getBuffer()->modified);
     }
 }
 
@@ -106,16 +88,7 @@ void StatusBar::setMessage(const QString& message) {
 }
 
 void StatusBar::setModified(bool modified) {
-    if (this->filename->text().endsWith("*")) {
-        if (!modified) {
-            int size = this->filename->text().size();
-            this->filename->setText(this->filename->text().remove(size-1, size));
-        }
-    } else {
-        if (modified) {
-            this->filename->setText(this->filename->text() + "*");
-        }
-    }
+    this->breadcrumb->setModified(modified);
 }
 
 void StatusBar::setLineNumber(int lineNumber) {

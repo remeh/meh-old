@@ -550,7 +550,6 @@ void Window::closeEditor(const QString& id) {
 
     if (this->getEditor() != nullptr) {
         this->setCurrentEditor(this->getEditor()->getId());
-        qDebug() << "second";
         return;
     }
 

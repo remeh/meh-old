@@ -9,7 +9,7 @@
 #include "window.h"
 
 Breadcrumb::Breadcrumb(Window* window) :
-    QWidget(nullptr),
+    QWidget(nullptr), modified(false),
     window(window), layout(nullptr) {
     this->deleteLabels();
     QHBoxLayout* layout = new QHBoxLayout();
@@ -59,6 +59,38 @@ void Breadcrumb::onClicked() {
             this->window->getFilesLookup()->showFiles(canonicalPath);
         }
     }
+}
+
+void Breadcrumb::setModified(bool modified) {
+    // two cases to deal with here: modified because something has just been edited
+    // or modified because this tab is being reactivated and is containing a modified file
+    if (modified) {
+        QPushButton* label = new QPushButton();
+        label->setText("*");
+        label->setFont(Editor::getFont());
+
+        label->setFlat(true);
+        label->setStyleSheet("padding: 0px; margin: 0px; color: #bbbbbb;");
+        label->setProperty("PATH", "");
+        connect(label, &QPushButton::clicked, this, &Breadcrumb::onClicked);
+        this->layout->addWidget(label);
+        this->modified = true;
+        return;
+    }
+
+    // if (!modified)
+    QLayoutItem *item = this->layout->itemAt(this->layout->count()-1);
+    QPushButton* button = static_cast<QPushButton*>(item->widget());
+
+    if (button) {
+        if (button->text() == "*") {
+            item = this->layout->takeAt(this->layout->count()-1);
+            item->widget()->hide();
+            delete item->widget();
+            delete item;
+        }
+    }
+    this->modified = false;
 }
 
 void Breadcrumb::recomputeLabels() {

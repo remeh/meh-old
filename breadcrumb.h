@@ -19,6 +19,7 @@ public:
     void recomputeLabels();
     void setFullpath(const QString& fullpath);
     void deleteLabels();
+    void setModified(bool modified);
 
 protected:
 
@@ -31,4 +32,5 @@ private:
     QList<QPushButton*> labels;
     QString fullpath;
     QHBoxLayout* layout;
+    bool modified;
 };

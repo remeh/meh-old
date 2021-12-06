@@ -21,7 +21,7 @@ public:
 
     void setMode(const QString& mode);
     void setEditor(Editor* editor);
-    void setMessage(const QString& filename);
+    void setMessage(const QString& message);
     void setLineNumber(int lineNumber);
     void setModified(bool);
 
@@ -35,8 +35,6 @@ public:
 
 	void setLspRunning(bool running);
 
-public slots:
-    void onFilenameClicked();
 protected:
 private:
     Window* window;
@@ -44,7 +42,6 @@ private:
     QVBoxLayout* vlayout;
     QGridLayout* glayout;
     QLabel* mode;
-    QPushButton* filename;
     QLabel* lineNumber;
     QPlainTextEdit* message;
 
