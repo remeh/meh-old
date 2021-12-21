@@ -42,6 +42,11 @@
 #include "tasks.h"
 #include "window.h"
 
+const QStringList Editor::dontReinsert = { ")", "]", "}", "(", "[", "{", "<",
+                                           ">", ":", ";", ",", "." };
+
+const QStringList Editor::insertClose = { "(", ")", "<", ">", "[", "]", "{", "}" };
+
 Editor::Editor(Window* window) :
     tasksPlugin(nullptr),
     QPlainTextEdit(window),
@@ -493,21 +498,21 @@ void Editor::down() {
     this->moveCursor(QTextCursor::Down);
 }
 
-void Editor::right() {
+void Editor::right(bool ignoreLr) {
     {
         QTextCursor cursor = this->textCursor();
         QChar c = this->document()->characterAt(cursor.position()+1);
-        if (c != QChar(u'\u2029')) {
+        if (ignoreLr || c != QChar(u'\u2029')) {
             this->moveCursor(QTextCursor::Right);
         }
     }
 }
 
-void Editor::left() {
+void Editor::left(bool ignoreLr) {
     {
         QTextCursor cursor = this->textCursor();
         QChar c = this->document()->characterAt(cursor.position()-1);
-        if (c != u'\u2029') {
+        if (ignoreLr || c != u'\u2029') {
             this->moveCursor(QTextCursor::Left);
         }
     }
@@ -922,6 +927,21 @@ void Editor::keyPressEvent(QKeyEvent* event) {
         return;
     }
 
+    QChar charUnderCursor = this->getCharUnderCursor();
+    int pos = Editor::dontReinsert.indexOf(QString(charUnderCursor));
+    if (pos >= 0 && Editor::dontReinsert[pos] == event->text()) {
+        this->right(true);
+        return;
+    }
+
+    pos = Editor::insertClose.indexOf(event->text());
+    if (pos >= 0 && pos % 2 == 0) {
+        QPlainTextEdit::keyPressEvent(event);
+        this->insertPlainText(Editor::insertClose[pos+1]);
+        this->left();
+        return;
+    }
+
     if (event->text() == "}") {
         if (this->currentLineIsOnlyWhitespaces() >= 0) {
             this->removeIndentation(this->textCursor());
@@ -1091,6 +1111,13 @@ QString Editor::getWordUnderCursor() {
     }
 
     return rv;
+}
+
+QChar Editor::getCharUnderCursor() {
+    QTextCursor cursor = this->textCursor();
+    // TODO(remy): can throw a warning if outside
+    QChar c = this->document()->characterAt(cursor.position());
+    return c;
 }
 
 void Editor::lspAutocomplete() {

@@ -39,6 +39,9 @@ class Editor : public QPlainTextEdit
 {
     Q_OBJECT
 
+    const static QStringList dontReinsert;
+    const static QStringList insertClose;
+
 public:
     Editor(Window* window);
     ~Editor();
@@ -94,8 +97,8 @@ public:
 
     void up();
     void down();
-    void left();
-    void right();
+    void left(bool ignoreLr = false);
+    void right(bool ignoreLr = false);
 
     // at the start of the line, move onto the first char instead of being in
     // the indentation
@@ -119,6 +122,9 @@ public:
 
     // getWordUnderCursor returns the word under the cursor if any.
     QString getWordUnderCursor();
+
+    // getCharUnderCursor returns the char under the cursor if any.
+    QChar getCharUnderCursor();
 
     // removeIndentation removes one level of indentation on the line of the given cursor..
     void removeIndentation(QTextCursor cursor);
