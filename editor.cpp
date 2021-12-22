@@ -43,9 +43,10 @@
 #include "window.h"
 
 const QStringList Editor::dontReinsert = { ")", "]", "}", "(", "[", "{", "<",
-                                           ">", ":", ";", ",", "." };
+                                           ">", ":", ";", ",", ".", "\"", "'" };
 
-const QStringList Editor::insertClose = { "(", ")", "<", ">", "[", "]", "{", "}" };
+const QStringList Editor::insertClose = { "(", ")", "<", ">", "[", "]", "{", "}",
+                                          "\"", "\"" };
 
 Editor::Editor(Window* window) :
     tasksPlugin(nullptr),
