@@ -42,6 +42,8 @@ class Editor : public QPlainTextEdit
     const static QStringList dontReinsert;
     const static QStringList insertClose;
 
+    const static QString oneIndent;
+
 public:
     Editor(Window* window);
     ~Editor();
@@ -225,8 +227,11 @@ private:
     // currentLineIndent returns the current line indentation.
     QString currentLineIndent();
 
-    // toggleComments comments or uncomments the given blocks.
-    void toggleComments(QList<QTextBlock> blocks, const QString& commentChars);
+    // insertComments comments the given blocks.
+    void insertComments(QList<QTextBlock> blocks, const QString& commentChars);
+
+    // insertComments remove comments from the given blocks.
+    void removeComments(QList<QTextBlock> blocks, const QString& commentChars);
 
     // selectedBlocks returns all the block contained in the current selection.
     QList<QTextBlock> selectedBlocks();

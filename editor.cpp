@@ -45,8 +45,9 @@
 const QStringList Editor::dontReinsert = { ")", "]", "}", "(", "[", "{", "<",
                                            ">", ":", ";", ",", ".", "\"", "'" };
 
-const QStringList Editor::insertClose = { "(", ")", "<", ">", "[", "]", "{", "}",
-                                          "\"", "\"" };
+const QStringList Editor::insertClose = { "(", ")", "[", "]", "{", "}", "\"", "\"" };
+
+const QString Editor::oneIndent = "    ";
 
 Editor::Editor(Window* window) :
     tasksPlugin(nullptr),
@@ -93,7 +94,7 @@ Editor::Editor(Window* window) :
     // tab space size
     // ----------------------
 
-    const int tabSpace = 4;
+    const int tabSpace = Editor::oneIndent.size();
     QFontMetrics metrics(this->getFont());
     this->setTabStopDistance(tabSpace*metrics.horizontalAdvance(" "));
 
@@ -573,7 +574,7 @@ void Editor::insertNewLine(bool above, bool noCutText) {
     indent = this->currentLineIndent();
     QChar lastChar = this->currentLineLastChar();
     if (lastChar == ':' || lastChar == '{') {
-        indent += "    ";
+        indent += Editor::oneIndent;
     }
 
     if (this->currentLineIsOnlyWhitespaces()) {
@@ -602,7 +603,7 @@ void Editor::insertNewLine(bool above, bool noCutText) {
             QString previousLine = upCursor.block().text();
             if ((previousLine.endsWith("{") || previousLine.endsWith(":")) &&
                 text != '}') {
-                indent += "    ";
+                indent += Editor::oneIndent;
             }
         }
 
@@ -617,7 +618,7 @@ void Editor::insertNewLine(bool above, bool noCutText) {
             this->insertPlainText("\n" + indent);
             this->moveCursor(QTextCursor::Up, QTextCursor::MoveAnchor);
             this->moveCursor(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
-            this->insertPlainText(indent);
+            this->insertPlainText(Editor::oneIndent);
         }
     }
 
@@ -821,16 +822,26 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                 return;
 
             case Qt::Key_M:
-                {
-                    QList<QTextBlock> blocks = this->selectedBlocks();
-                    if (blocks.size() == 0) {
-                        blocks.append(this->textCursor().block());
-                    }
-                    if (shift) {
-                        this->toggleComments(blocks, "#");
-                    } else {
-                        this->toggleComments(blocks, "//");
-                    }
+            case Qt::Key_Ugrave: // non-shift ù
+            case Qt::Key_Percent: // with shift %
+            {
+                     QList<QTextBlock> blocks = this->selectedBlocks();
+                     if (blocks.size() == 0) {
+                         blocks.append(this->textCursor().block());
+                     }
+                     if (shift) {
+                         if (event->key() == Qt::Key_M) {
+                             this->removeComments(blocks, "// ");
+                         } else {
+                             this->removeComments(blocks, "# ");
+                         }
+                     } else {
+                         if (event->key() == Qt::Key_M) {
+                             this->insertComments(blocks, "// ");
+                         } else {
+                             this->insertComments(blocks, "# ");
+                         }
+                     }
                 }
                 return;
         }
@@ -924,7 +935,7 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     }
 
     if (event->key() == Qt::Key_Tab) {
-        this->textCursor().insertText("    ");
+        this->textCursor().insertText(Editor::oneIndent);
         return;
     }
 
@@ -975,27 +986,67 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     QPlainTextEdit::keyPressEvent(event);
 }
 
-void Editor::toggleComments(QList<QTextBlock> blocks, const QString& commentChars) {
+void Editor::insertComments(QList<QTextBlock> blocks, const QString& commentChars) {
+    QTextCursor cursor = this->textCursor();
+
+    cursor.beginEditBlock();
+    int leftPos = 0;
+    bool posFind = false;
+    for (int i = 0; i < blocks.size(); i++) {
+        QTextBlock block = blocks.at(i);
+        cursor.setPosition(block.position());
+        QString text = block.text();
+        if (text.size() == 0) {
+            continue;
+        }
+
+        if (posFind && text.size() > leftPos) {
+            for (int j = 0; j < leftPos; j++) {
+                cursor.movePosition(QTextCursor::Right);
+            }
+            cursor.insertText(commentChars);
+            continue;
+        }
+
+        for (int j = 0; j < text.size(); j++) {
+            if (text[j] == QChar(' ') || text[j] == QChar('\t')) {
+                cursor.movePosition(QTextCursor::Right);
+                leftPos++;
+                continue;
+            }
+            posFind = true;
+            cursor.insertText(commentChars);
+            break;
+        }
+    }
+    cursor.endEditBlock();
+}
+
+void Editor::removeComments(QList<QTextBlock> blocks, const QString& commentChars) {
     QTextCursor cursor = this->textCursor();
 
     cursor.beginEditBlock();
     for (int i = 0; i < blocks.size(); i++) {
         QTextBlock block = blocks.at(i);
+        cursor.setPosition(block.position());
         QString text = block.text();
 
-        int commentPos = text.indexOf(commentChars);
-
-        // we still want to be sure that it is as the start of the line
-        if (commentPos != -1 && text.startsWith(commentChars)) {
-            // uncomment
-            cursor.setPosition(block.position() + commentPos);
-            for (int j = 0; j < commentChars.size(); j++) {
-                cursor.deleteChar();
+        for (int j = 0; j < text.size(); j++) {
+            if (text[j] == QChar(' ') || text[j] == QChar('\t')) {
+                cursor.movePosition(QTextCursor::Right);
+                continue;
             }
-        } else {
-            // comment
-            cursor.setPosition(block.position());
-            cursor.insertText(commentChars);
+            if (text[j] == commentChars[0]) {
+                for (int k = 0; k < commentChars.size(); k++) {
+                    if (text.size() > j+k && text[j+k] == commentChars[k]) {
+                        cursor.deleteChar();
+                    }
+                }
+                break;
+            }
+            // in this case, it means we've already hit the first char,
+            // and it is not a comment, we don't want to move further in the line.
+            break;
         }
     }
     cursor.endEditBlock();
@@ -1003,7 +1054,7 @@ void Editor::toggleComments(QList<QTextBlock> blocks, const QString& commentChar
 
 void Editor::insertIndentation(QTextCursor cursor) {
     cursor.movePosition(QTextCursor::StartOfBlock);
-    cursor.insertText("    ");
+    cursor.insertText(Editor::oneIndent);
 }
 
 void Editor::removeIndentation(QTextCursor cursor) {
