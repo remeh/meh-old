@@ -936,11 +936,31 @@ void Editor::keyPressEvent(QKeyEvent* event) {
     }
 
     pos = Editor::insertClose.indexOf(event->text());
-    if (pos >= 0 && pos % 2 == 0) {
-        QPlainTextEdit::keyPressEvent(event);
-        this->insertPlainText(Editor::insertClose[pos+1]);
-        this->left();
-        return;
+    // insert only if it's an opening one and if the char under the cursor
+    // is part of this list or empty (we don't want to insert a double stuff
+    // before a word or something similar)
+    if (pos >= 0 && pos % 2 == 0 &&
+        (Editor::insertClose.contains(charUnderCursor)
+            || charUnderCursor == QChar(u'\u2029')
+            || charUnderCursor == QChar(' '))) {
+
+        bool add = true;
+        // special case:
+        // do not add the closing > if it looks like we're writing a for,
+        // a while or a if
+        QString currentLine = this->currentLine().trimmed();
+
+        if (event->text() == '<' && (currentLine.startsWith("for") ||
+              currentLine.startsWith("if") || currentLine.startsWith("while"))) {
+            add = false;
+        }
+
+        if (add) {
+            QPlainTextEdit::keyPressEvent(event);
+            this->insertPlainText(Editor::insertClose[pos+1]);
+            this->left();
+            return;
+        }
     }
 
     if (event->text() == "}") {

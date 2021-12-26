@@ -231,6 +231,11 @@ private:
     // selectedBlocks returns all the block contained in the current selection.
     QList<QTextBlock> selectedBlocks();
 
+    // currentLine returns the current line text.
+    QString currentLine() {
+        return this->textCursor().block().text();
+    }
+
     // currentLineIsOnlyWhitespaces return -1 if this is wrong and returns how
     // many whitespaces (' ' or '\t') are composing this line.
     int currentLineIsOnlyWhitespaces();
