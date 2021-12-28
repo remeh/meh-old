@@ -7,6 +7,7 @@ InfoPopup::InfoPopup(Window* window) :
     Q_ASSERT(window != NULL);
     this->setFont(Editor::getFont());
     this->setFocusPolicy(Qt::NoFocus);
+    this->setStyleSheet("border: 1px solid #999999;");
 }
 
 void InfoPopup::show() {
@@ -17,7 +18,7 @@ void InfoPopup::show() {
     int winWidth = this->window->size().width();
     int popupWidth = winWidth  - winWidth/3;
     QWidget::show();
-    this->resize(qBound(600, winWidth * 4/5, winWidth * 4/5), 200);
+    this->resize(qBound(600, winWidth * 3/5, winWidth * 3/5), 200);
     this->move(cursorRect.x() + 30, cursorRect.y() + 60);
 }
 

@@ -212,12 +212,12 @@ void Editor::onTriggerSelectionHighlight() {
     // lsp info
     // --------
 
-//    LSP* lsp = this->window->getLSPManager()->getLSP(this->buffer->getId());
-//    if (lsp == nullptr) { return; }
-//    int reqId = QRandomGenerator::global()->generate();
-//    if (reqId < 0) { reqId *= -1; }
-//    lsp->hover(reqId, buffer->getFilename(), currentLineNumber(), currentColumn());
-//    this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_HOVER, this->buffer);
+    // LSP* lsp = this->window->getLSPManager()->getLSP(this->buffer->getId());
+    // if (lsp == nullptr) { return; }
+    // int reqId = QRandomGenerator::global()->generate();
+    // if (reqId < 0) { reqId *= -1; }
+    // lsp->hover(reqId, buffer->getFilename(), currentLineNumber(), currentColumn());
+    // this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_HOVER, this->buffer);
 }
 
 void Editor::highlightText(QString text) {
@@ -501,22 +501,18 @@ void Editor::down() {
 }
 
 void Editor::right(bool ignoreLr) {
-    {
-        QTextCursor cursor = this->textCursor();
-        QChar c = this->document()->characterAt(cursor.position()+1);
-        if (ignoreLr || c != QChar(u'\u2029')) {
-            this->moveCursor(QTextCursor::Right);
-        }
+    QTextCursor cursor = this->textCursor();
+    QChar c = this->document()->characterAt(cursor.position()+1);
+    if (ignoreLr || c != QChar(u'\u2029')) {
+        this->moveCursor(QTextCursor::Right);
     }
 }
 
 void Editor::left(bool ignoreLr) {
-    {
-        QTextCursor cursor = this->textCursor();
-        QChar c = this->document()->characterAt(cursor.position()-1);
-        if (ignoreLr || c != u'\u2029') {
-            this->moveCursor(QTextCursor::Left);
-        }
+    QTextCursor cursor = this->textCursor();
+    QChar c = this->document()->characterAt(cursor.position()-1);
+    if (ignoreLr || c != u'\u2029') {
+        this->moveCursor(QTextCursor::Left);
     }
 }
 
