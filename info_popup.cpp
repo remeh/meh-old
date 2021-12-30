@@ -37,3 +37,8 @@ void InfoPopup::setMessage(const QString& message) {
     this->setPlainText(message);
     this->show();
 }
+
+void InfoPopup::moveNearMouse() {
+    QPoint p = this->window->mapFromGlobal(QCursor::pos());
+    this->move(p.x(), p.y() + 10);
+}

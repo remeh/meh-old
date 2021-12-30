@@ -2,6 +2,7 @@
 
 #include <QChar>
 #include <QColor>
+#include <QContextMenuEvent>
 #include <QFocusEvent>
 #include <QFont>
 #include <QIcon>
@@ -124,6 +125,7 @@ public:
 
     // getWordUnderCursor returns the word under the cursor if any.
     QString getWordUnderCursor();
+    QString getWordUnderCursor(QTextCursor cursor);
 
     // getCharUnderCursor returns the char under the cursor if any.
     QChar getCharUnderCursor();
@@ -201,6 +203,7 @@ public slots:
     void update();
 
 protected:
+    void contextMenuEvent(QContextMenuEvent*) override;
     void keyPressEvent(QKeyEvent*) override;
     void mousePressEvent(QMouseEvent*) override;
     void paintEvent(QPaintEvent*) override;
@@ -214,6 +217,7 @@ private slots:
     void onContentsChange(int position, int charsRemoved, int charsAdded);
     void onUpdateLineNumberAreaWidth(int newBlockCount);
     void onUpdateLineNumberArea(const QRect &rect, int dy);
+    void onMenuInfo();
 
 private:
     // keyPressEventNormal handles this event in normal mode.
@@ -223,6 +227,10 @@ private:
     void keyPressEventVisualLine(QKeyEvent* event, bool ctrl, bool shift);
     void keyPressEventLeaderMode(QKeyEvent* event, bool ctrl, bool shift);
     void keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift);
+
+    // it is temporarily stored to get the position of the click in the text,
+    // but the moment an entry of the menu has been selected.
+    QContextMenuEvent* menuOpenedEvent;
 
     // currentLineIndent returns the current line indentation.
     QString currentLineIndent();

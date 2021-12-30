@@ -13,6 +13,7 @@ public:
     InfoPopup(Window* window);
 
     void setMessage(const QString& message);
+    void moveNearMouse();
     void show();
 protected:
     void keyPressEvent(QKeyEvent* event);

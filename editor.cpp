@@ -11,6 +11,7 @@
 #include <QJsonObject>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPaintEvent>
@@ -208,16 +209,6 @@ void Editor::onTriggerSelectionHighlight() {
     }
     this->highlightText(text);
     this->selectionTimer->stop();
-
-    // lsp info
-    // --------
-
-    // LSP* lsp = this->window->getLSPManager()->getLSP(this->buffer->getId());
-    // if (lsp == nullptr) { return; }
-    // int reqId = QRandomGenerator::global()->generate();
-    // if (reqId < 0) { reqId *= -1; }
-    // lsp->hover(reqId, buffer->getFilename(), currentLineNumber(), currentColumn());
-    // this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_HOVER, this->buffer);
 }
 
 void Editor::highlightText(QString text) {
@@ -622,6 +613,35 @@ void Editor::insertNewLine(bool above, bool noCutText) {
     cursor.endEditBlock();
 }
 
+void Editor::contextMenuEvent(QContextMenuEvent* event) {
+    // we store it to access position slightly later
+    this->menuOpenedEvent = event;
+
+    QMenu menu;
+    menu.addAction(tr("Information"), this, &Editor::onMenuInfo);
+    menu.exec(event->globalPos());
+}
+
+void Editor::onMenuInfo() {
+    // lsp info
+    // --------
+
+    QPoint pos = this->menuOpenedEvent->pos();
+    pos.setX(this->lineNumberAreaWidth() + pos.x() - this->viewportMargins().left());
+    pos.setY(pos.y() - this->viewportMargins().top());
+    QTextCursor cursor = this->cursorForPosition(pos);
+
+    int lineNumber = cursor.blockNumber() + 1;
+    int columnNumber = cursor.columnNumber();
+
+    LSP* lsp = this->window->getLSPManager()->getLSP(this->buffer->getId());
+    if (lsp == nullptr) { return; }
+    int reqId = QRandomGenerator::global()->generate();
+    if (reqId < 0) { reqId *= -1; }
+    lsp->hover(reqId, buffer->getFilename(), lineNumber, columnNumber);
+    this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_HOVER_MOUSE, this->buffer);
+}
+
 void Editor::paintEvent(QPaintEvent* event) {
     Q_ASSERT(event != NULL);
 
@@ -637,6 +657,8 @@ void Editor::paintEvent(QPaintEvent* event) {
 
 void Editor::mousePressEvent(QMouseEvent* event) {
     Q_ASSERT(event != NULL);
+
+    this->window->getInfoPopup()->hide();
 
     if (event->button() == Qt::LeftButton) {
         if (this->mode == MODE_NORMAL) {
@@ -1144,9 +1166,13 @@ QList<QTextBlock> Editor::selectedBlocks() {
 }
 
 QString Editor::getWordUnderCursor() {
-    QString rv;
-
     QTextCursor cursor = this->textCursor();
+    return this->getWordUnderCursor(cursor);
+}
+
+QString Editor::getWordUnderCursor(QTextCursor cursor) {
+
+    QString rv;
     QString text = cursor.block().text();
 
     int pos = cursor.positionInBlock();

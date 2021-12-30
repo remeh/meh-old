@@ -733,6 +733,7 @@ void Window::lspInterpret(QJsonDocument json) {
                 return;
             }
         case LSP_ACTION_HOVER:
+        case LSP_ACTION_HOVER_MOUSE:
             {
                 if (json["result"].isNull() || json["result"]["contents"].isNull()) {
                     this->getInfoPopup()->setMessage("Nothing found.");
@@ -741,6 +742,9 @@ void Window::lspInterpret(QJsonDocument json) {
 
                 auto contents = json["result"]["contents"].toObject();
                 this->getInfoPopup()->setMessage(contents["value"].toString());
+                if (LSP_ACTION_HOVER_MOUSE) {
+                    this->getInfoPopup()->moveNearMouse();
+                }
                 return;
             }
         case LSP_ACTION_SIGNATURE_HELP:
