@@ -742,7 +742,7 @@ void Window::lspInterpret(QJsonDocument json) {
 
                 auto contents = json["result"]["contents"].toObject();
                 this->getInfoPopup()->setMessage(contents["value"].toString());
-                if (LSP_ACTION_HOVER_MOUSE) {
+                if (action.action == LSP_ACTION_HOVER_MOUSE) {
                     this->getInfoPopup()->moveNearMouse();
                 }
                 return;

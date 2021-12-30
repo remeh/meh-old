@@ -23,6 +23,7 @@ set(SOURCES
     command.cpp
     completer.cpp
     editor.cpp
+    editor_menu.cpp
     exec.cpp
     fileslookup.cpp
     git.cpp

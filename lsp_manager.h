@@ -3,6 +3,7 @@
 #include <QList>
 #include <QMap>
 #include <QObject>
+#include <QRandomGenerator>
 #include <QString>
 #include <QTime>
 
@@ -55,6 +56,15 @@ public:
     // setExecutedAction stores which action has been executed for the given
     // request ID. The buffer the user was into at this moment is also stored.
     void setExecutedAction(int reqId, int action, Buffer* buffer);
+
+    // randomId returns a random ID to attribute to an action.
+    int randomId() {
+        int reqId = QRandomGenerator::global()->generate();
+        if (reqId < 0) {
+            reqId *= -1;
+        }
+        return reqId;
+    };
 
     // getExecutedAction returns information on the executed action for the
     // given request ID.

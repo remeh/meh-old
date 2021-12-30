@@ -156,6 +156,15 @@ public:
     // removeOpenedState deletes the "open" flag for this file.
     void removeOpenedState(const QString& filepath);
 
+    // Menu
+    // -------------
+
+    // it is temporarily stored to get the position of the click in the text,
+    // but the moment an entry of the menu has been selected.
+    QContextMenuEvent* menuOpenedEvent;
+
+    void menuGetLineAndColumn(int* line, int* column);
+
     // LSP
     // -------------
 
@@ -218,6 +227,10 @@ private slots:
     void onUpdateLineNumberAreaWidth(int newBlockCount);
     void onUpdateLineNumberArea(const QRect &rect, int dy);
     void onMenuInfo();
+    void onMenuGoToDef();
+    void onMenuCopy();
+    void onMenuCut();
+    void onMenuPaste();
 
 private:
     // keyPressEventNormal handles this event in normal mode.
@@ -227,10 +240,6 @@ private:
     void keyPressEventVisualLine(QKeyEvent* event, bool ctrl, bool shift);
     void keyPressEventLeaderMode(QKeyEvent* event, bool ctrl, bool shift);
     void keyPressEventSubMode(QKeyEvent* event, bool ctrl, bool shift);
-
-    // it is temporarily stored to get the position of the click in the text,
-    // but the moment an entry of the menu has been selected.
-    QContextMenuEvent* menuOpenedEvent;
 
     // currentLineIndent returns the current line indentation.
     QString currentLineIndent();

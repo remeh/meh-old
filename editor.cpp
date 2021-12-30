@@ -185,7 +185,6 @@ void Editor::onTriggerLspRefresh() {
     this->lspRefreshTimer->stop();
 }
 
-
 void Editor::onTriggerSelectionHighlight() {
     if (this->window == nullptr || this->buffer == nullptr) {
         return;
@@ -611,35 +610,6 @@ void Editor::insertNewLine(bool above, bool noCutText) {
 
     this->setMode(MODE_INSERT);
     cursor.endEditBlock();
-}
-
-void Editor::contextMenuEvent(QContextMenuEvent* event) {
-    // we store it to access position slightly later
-    this->menuOpenedEvent = event;
-
-    QMenu menu;
-    menu.addAction(tr("Information"), this, &Editor::onMenuInfo);
-    menu.exec(event->globalPos());
-}
-
-void Editor::onMenuInfo() {
-    // lsp info
-    // --------
-
-    QPoint pos = this->menuOpenedEvent->pos();
-    pos.setX(this->lineNumberAreaWidth() + pos.x() - this->viewportMargins().left());
-    pos.setY(pos.y() - this->viewportMargins().top());
-    QTextCursor cursor = this->cursorForPosition(pos);
-
-    int lineNumber = cursor.blockNumber() + 1;
-    int columnNumber = cursor.columnNumber();
-
-    LSP* lsp = this->window->getLSPManager()->getLSP(this->buffer->getId());
-    if (lsp == nullptr) { return; }
-    int reqId = QRandomGenerator::global()->generate();
-    if (reqId < 0) { reqId *= -1; }
-    lsp->hover(reqId, buffer->getFilename(), lineNumber, columnNumber);
-    this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_HOVER_MOUSE, this->buffer);
 }
 
 void Editor::paintEvent(QPaintEvent* event) {
