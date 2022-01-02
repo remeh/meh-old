@@ -226,8 +226,10 @@ private slots:
     void onContentsChange(int position, int charsRemoved, int charsAdded);
     void onUpdateLineNumberAreaWidth(int newBlockCount);
     void onUpdateLineNumberArea(const QRect &rect, int dy);
+    void onMenuLspCall(int lspAction);
     void onMenuInfo();
     void onMenuGoToDef();
+    void onMenuReferences();
     void onMenuCopy();
     void onMenuCut();
     void onMenuPaste();
