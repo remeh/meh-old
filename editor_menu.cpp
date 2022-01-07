@@ -24,6 +24,7 @@ void Editor::contextMenuEvent(QContextMenuEvent* event) {
     if (lsp == nullptr) {
         information->setDisabled(true);
         definition->setDisabled(true);
+        references->setDisabled(true);
     }
 
     menu.addSeparator();
