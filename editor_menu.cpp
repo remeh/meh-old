@@ -40,6 +40,10 @@ void Editor::contextMenuEvent(QContextMenuEvent* event) {
         cut->setDisabled(true);
     }
 
+    menu.addSeparator();
+
+    menu.addAction(tr("Rg"), this, &Editor::onMenuRg);
+
     menu.exec(event->globalPos());
 }
 
@@ -110,4 +114,18 @@ void Editor::onMenuCut() {
 }
 void Editor::onMenuPaste() {
     this->paste();
+}
+void Editor::onMenuRg() {
+    QTextCursor cursor = this->textCursor();
+    QString text = cursor.selectedText();
+
+    if (text.size() == 0) {
+        text = this->window->getEditor()->getWordUnderCursor();
+    }
+
+    if (text.size() == 0) {
+        return;
+    }
+
+    this->window->openGrep(text);
 }

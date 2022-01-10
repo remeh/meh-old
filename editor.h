@@ -233,6 +233,7 @@ private slots:
     void onMenuCopy();
     void onMenuCut();
     void onMenuPaste();
+    void onMenuRg();
 
 private:
     // keyPressEventNormal handles this event in normal mode.
