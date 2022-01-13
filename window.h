@@ -171,6 +171,10 @@ public:
     // the given line (of the current buffer) in the statusbar.
     void showLSPDiagnosticsOfLine(const QString& buffId, int line);
 
+    // showLSPDiagnostics shows all diagnostics for the given buffer in the
+    // statusbar.
+    void showLSPDiagnostics(const QString& buffId);
+
     // lspInterpretMessages is called when data has been received from the LSP server
     // and that we need to interpret them. Note that it can interpret several
     // messages in on call (if the LSP server has sent several messages in one output)

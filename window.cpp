@@ -600,6 +600,26 @@ bool Window::lastCheckpoint() {
 // lsp
 // -------------
 
+void Window::showLSPDiagnostics(const QString& buffId) {
+    auto allDiags = this->getLSPManager()->getDiagnostics(buffId);
+
+    // get all the keys, and sort them in order to display them in a proper order.
+    QList<int> lines = allDiags.keys();
+    std::sort(lines.begin(), lines.end());
+
+    for (int j = 0; j < lines.size(); j++) {
+        auto lineDiags = allDiags[lines[j]];
+        for (int i = 0; i < lineDiags.size(); i++) {
+            auto diag = lineDiags[i];
+            if (diag.message.size() > 0) {
+                QFileInfo fi = QFileInfo(diag.absFilename);
+                QString message = fi.fileName() + ":" + QString::number(diag.line) + " " + diag.message;
+                this->getStatusBar()->setMessage(message);
+            }
+        }
+    }
+}
+
 void Window::showLSPDiagnosticsOfLine(const QString& buffId, int line) {
     auto allDiags = this->getLSPManager()->getDiagnostics(buffId);
     auto lineDiags = allDiags[line];

@@ -326,15 +326,20 @@ void Command::execute(QString text) {
         this->window->getLSPManager()->setExecutedAction(reqId, LSP_ACTION_COMPLETION, currentBuffer);
     }
 
-    if (command == ":err")  {
+    if (command.startsWith(":err")) {
         if (lsp == nullptr) { this->window->getStatusBar()->setMessage("No LSP server running."); return; }
         Editor* editor = this->window->getEditor();
         if (editor == nullptr) {
             qDebug() << "error: command: `:err` window->getEditor() == nullptr";
             return;
         }
-        this->window->showLSPDiagnosticsOfLine(editor->getId(), editor->currentLineNumber());
+        if (command == ":errlist" || command == ":errl") {
+            this->window->showLSPDiagnostics(editor->getId());
+        } else if (command == ":err") {
+            this->window->showLSPDiagnosticsOfLine(editor->getId(), editor->currentLineNumber());
+        }
         return;
+
     }
 
     if (command == ":rlsp" || command == ":reloadlsp") {
