@@ -666,15 +666,9 @@ void Editor::mousePressEvent(QMouseEvent* event) {
     }
 
     if (event->button() == Qt::BackButton) {
-        // XXX(remy): reimplement me
-         qDebug() << "Editor::mousePressEvent" << "BackButton";
-//        if (this->buffers.size() > 0) {
-//            // NOTE(remy): don't remove it here, just take a ref,
-//            // the selectOrCreateBuffer takes care of the list order etc.
-//            const QString& id = this->buffersPos.last();
-//            this->selectOrCreateBuffer(id);
-//        }
-//        return;
+        this->window->lastCheckpoint();
+        this->centerCursor();
+        return;
     }
 
     QPlainTextEdit::mousePressEvent(event);
