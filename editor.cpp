@@ -146,8 +146,8 @@ Editor::~Editor() {
 QFont Editor::getFont() {
     QFont font;
     #ifdef Q_OS_MAC
-    font.setFamily("Inconsolata");
-    font.setPointSize(15);
+    font.setFamily("Roboto Mono");
+    font.setPointSize(12);
     #else
     font.setFamilies(QStringList() << "Roboto Mono" << "Inconsolata" << "Ubuntu Mono" << "Source Code Pro");
     font.setPointSize(9.0);
