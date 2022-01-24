@@ -149,8 +149,8 @@ QFont Editor::getFont() {
     font.setFamily("Inconsolata");
     font.setPointSize(15);
     #else
-    font.setFamilies(QStringList() << "Source Code Pro" << "Inconsolata");
-    font.setPointSize(10.5);
+    font.setFamilies(QStringList() << "Roboto Mono" << "Inconsolata" << "Ubuntu Mono" << "Source Code Pro");
+    font.setPointSize(9.0);
     #endif
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
