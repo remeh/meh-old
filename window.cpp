@@ -499,6 +499,9 @@ Editor* Window::setCurrentEditor(QString id) {
         if (currentEditor != nullptr && this->previousEditorId != currentEditor->getId()) {
             this->previousEditorId = QString(currentEditor->getId());
         }
+
+        this->setWindowIcon(editor->getIcon());
+
         return editor;
     }
 
