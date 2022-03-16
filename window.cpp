@@ -201,7 +201,7 @@ bool Window::areYouSure(const QString& message) {
         }
     }
 
-    QMessageBox msgBox;
+    QMessageBox msgBox(this);
     msgBox.setText(message);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
