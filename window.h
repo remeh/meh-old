@@ -151,9 +151,9 @@ public:
     // saveAll saves all the loaded buffers.
     void saveAll();
 
-    // modifiedBuffers returns a list of the loaded and modified buffers that
-    // would need to be stored on disk.
-    QStringList modifiedBuffers();
+    // modifiedBuffersIds returns true if at least one buffer has a change
+    // which has not been saved.
+    QStringList modifiedBuffersIds();
 
     // saveCheckpoint stores the current filename/cursor position information has a checkpoint.
     void saveCheckpoint();

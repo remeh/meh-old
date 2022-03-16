@@ -80,19 +80,16 @@ void Command::show() {
 }
 
 bool Command::warningModifiedBuffers() {
-    return false;
-
-    // XXX(remy): reimplement me
-//	QStringList modifiedBuffers = this->window->getEditor()->modifiedBuffers();
-//	if (modifiedBuffers.size() > 0) {
-//		QString msg = "Some opened buffers have not been saved:\n\n";
-//		for (int i = 0; i < modifiedBuffers.size(); i++) {
-//			msg += modifiedBuffers.at(i) + "\n";
-//		}
-//		QMessageBox::warning(this->window, "Unsaved buffers", msg);
-//		return true;
-//	}
-//	return false;
+	QStringList modifiedBuffersIds = this->window->modifiedBuffersIds();
+	if (modifiedBuffersIds.size() > 0) {
+		QString msg = "Some opened buffers have not been saved:\n\n";
+		for (int i = 0; i < modifiedBuffersIds.size(); i++) {
+			msg += modifiedBuffersIds.at(i) + "\n";
+		}
+		QMessageBox::warning(this->window, "Unsaved buffers", msg);
+		return true;
+	}
+	return false;
 }
 
 void Command::execute(QString text) {

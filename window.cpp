@@ -388,6 +388,18 @@ void Window::saveAll() {
     }
 }
 
+QStringList Window::modifiedBuffersIds() {
+    QStringList rv;
+
+    for (Editor* editor : this->getEditors()) {
+        if (editor->getBuffer()->modified) {
+            rv << editor->getId();
+        }
+    }
+
+    return rv;
+}
+
 bool Window::hasBuffer(const QString& id) {
     return this->getEditor(id) != nullptr;
 }
