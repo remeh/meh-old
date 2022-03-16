@@ -274,13 +274,16 @@ QIcon Editor::getIcon() {
     } else if (this->bufferExtension().size() > 0) {
         QPixmap pixmap(QPixmap::fromImage(QImage(":res/icon-empty.png")));
         QPainter painter(&pixmap);
-        painter.setPen(QColor(0, 0, 0));
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::TextAntialiasing);
+        painter.setPen(QColor(60, 60, 60));
         #ifdef Q_OS_MAC
         painter.setFont(QFont(font().family(), 240));
-        #else
-        painter.setFont(QFont(font().family(), 190));
-        #endif
         painter.drawText(QRect(60, 75, 390, 245), Qt::AlignCenter, this->bufferExtension());
+        #else
+        painter.setFont(QFont(font().family(), 150));
+        painter.drawText(QRect(60, 95, 390, 245), Qt::AlignCenter, this->bufferExtension());
+        #endif
         return QIcon(pixmap);
     }
     return QIcon(":res/icon.png");
