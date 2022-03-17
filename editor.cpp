@@ -681,8 +681,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                     cursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor, 20);
                     this->moveToFirstWord(&cursor);
                     cursor.endEditBlock();
-                    this->selectionTimer->stop(); // we don't want to refresh the highlight
                     this->setTextCursor(cursor);
+                    this->selectionTimer->stop(); // we don't want to refresh the highlight
                 }
                 return;
             case Qt::Key_D:
@@ -692,8 +692,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                     cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, 20);
                     this->moveToFirstWord(&cursor);
                     cursor.endEditBlock();
-                    this->selectionTimer->stop(); // we don't want to refresh the highlight
                     this->setTextCursor(cursor);
+                    this->selectionTimer->stop(); // we don't want to refresh the highlight^
                 }
                 return;
             case Qt::Key_Return:
