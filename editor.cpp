@@ -277,13 +277,8 @@ QIcon Editor::getIcon() {
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setRenderHint(QPainter::TextAntialiasing);
         painter.setPen(QColor(60, 60, 60));
-        #ifdef Q_OS_MAC
-        painter.setFont(QFont(font().family(), 240));
-        painter.drawText(QRect(60, 75, 390, 245), Qt::AlignCenter, this->bufferExtension());
-        #else
         painter.setFont(QFont(font().family(), 150));
         painter.drawText(QRect(60, 95, 390, 245), Qt::AlignCenter, this->bufferExtension());
-        #endif
         return QIcon(pixmap);
     }
     return QIcon(":res/icon.png");

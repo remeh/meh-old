@@ -501,6 +501,7 @@ Editor* Window::setCurrentEditor(QString id) {
         }
 
         this->setWindowIcon(editor->getIcon());
+        this->app->setWindowIcon(editor->getIcon());
 
         return editor;
     }
