@@ -277,13 +277,8 @@ QIcon Editor::getIcon() {
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setRenderHint(QPainter::TextAntialiasing);
         painter.setPen(QColor(60, 60, 60));
-        #ifdef Q_OS_MAC
-        painter.setFont(QFont(font().family(), 240));
-        painter.drawText(QRect(60, 75, 390, 245), Qt::AlignCenter, this->bufferExtension());
-        #else
         painter.setFont(QFont(font().family(), 150));
         painter.drawText(QRect(60, 95, 390, 245), Qt::AlignCenter, this->bufferExtension());
-        #endif
         return QIcon(pixmap);
     }
     return QIcon(":res/icon.png");
@@ -686,8 +681,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                     cursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor, 20);
                     this->moveToFirstWord(&cursor);
                     cursor.endEditBlock();
-                    this->selectionTimer->stop(); // we don't want to refresh the highlight
                     this->setTextCursor(cursor);
+                    this->selectionTimer->stop(); // we don't want to refresh the highlight
                 }
                 return;
             case Qt::Key_D:
@@ -697,8 +692,8 @@ void Editor::keyPressEvent(QKeyEvent* event) {
                     cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, 20);
                     this->moveToFirstWord(&cursor);
                     cursor.endEditBlock();
-                    this->selectionTimer->stop(); // we don't want to refresh the highlight
                     this->setTextCursor(cursor);
+                    this->selectionTimer->stop(); // we don't want to refresh the highlight^
                 }
                 return;
             case Qt::Key_Return:

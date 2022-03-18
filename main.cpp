@@ -29,11 +29,11 @@ int main(int argv, char **args)
     app.setCursorFlashTime(0);
     app.setWheelScrollLines(5);
     app.setStyle(QStyleFactory::create("Fusion"));
+    app.setWindowIcon(QIcon(":res/icon.png"));
     QCoreApplication::setOrganizationName("mehteor");
     QCoreApplication::setOrganizationDomain("remy.io");
     QCoreApplication::setApplicationName("meh");
     QStringList arguments = QCoreApplication::arguments();
-
 
     // -n flag: to use a different instance than /tmp/meh.sock
     // --------------
