@@ -181,6 +181,21 @@ void Window::onNewSocketCommand() {
         for (int i = 0; i < list.size(); i++) {
             QString filename = list.at(i);
             this->setCurrentEditor(filename);
+            // look if next entry is a "jump to line" value
+            if (i+1 < list.size()) {
+                if (list.at(i+1).at(0) == QChar('+')) {
+                    QString arg = list.at(i+1);
+                    bool ok = false;
+                    int lineNumber = arg.toInt(&ok);
+                    if (ok) {
+                        Editor* currentEditor = this->getEditor();
+                        if (currentEditor != nullptr) {
+                            currentEditor->goToLine(lineNumber);
+                        }
+                    }
+                    ++i; // jump this one, we've used it as a line number
+                }
+            }
         }
     }
 }

@@ -69,7 +69,9 @@ int main(int argv, char **args)
             }
             for (int i = 0; i < arguments.size(); i++) {
                 QFileInfo fi(arguments.at(i));
-                if (fi.exists()) {
+                if (arguments.at(i).startsWith("+")) {
+                  // do nothing, we just keep the +XXX value
+                } else if (fi.exists()) {
                   arguments[i] = fi.canonicalFilePath();
                 } else {
                   arguments[i] = QDir::currentPath() + "/" + arguments.at(i);
