@@ -41,15 +41,19 @@ void Editor::keyPressEventNormal(QKeyEvent* event, bool ctrl, bool shift) {
         // arrow keys in normal mode
         case Qt::Key_Left:
             this->left();
+            this->selectionTimer->stop(); // we don't want to refresh the highlight
             return;
         case Qt::Key_Down:
             this->down();
+            this->selectionTimer->stop(); // we don't want to refresh the highlight
             return;
         case Qt::Key_Up:
             this->up();
+            this->selectionTimer->stop(); // we don't want to refresh the highlight
             return;
         case Qt::Key_Right:
             this->right();
+            this->selectionTimer->stop(); // we don't want to refresh the highlight
             return;
 
         case Qt::Key_Y:
