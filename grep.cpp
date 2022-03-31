@@ -89,17 +89,23 @@ void Grep::readAndAppendResult(const QString& result) {
     this->window->getRefWidget()->insert(parts[0], parts[1], parts[2]);
 }
 
-void Grep::grep(const QString& string, const QString& baseDir) {
-    this->grep(string, baseDir, "");
+int Grep::grep(const QString& string, const QString& baseDir) {
+    int rv = this->grep(string, baseDir, "");
     this->window->getRefWidget()->clear();
+    return rv;
 }
 
 // TODO(remy): support case insensitive
-void Grep::grep(const QString& string, const QString& baseDir, const QString& target) {
+int Grep::grep(const QString& string, const QString& baseDir, const QString& target) {
     if (this->process != nullptr) {
         this->process->terminate();
         delete this->process;
         this->process = nullptr;
+    }
+
+    if (string.size() == 0 || string.trimmed().size() == 0) {
+        this->window->getStatusBar()->setMessage("can't start a search with an empty string.");
+        return -1;
     }
 
     // reinit
@@ -124,4 +130,6 @@ void Grep::grep(const QString& string, const QString& baseDir, const QString& ta
     connect(this->process, &QProcess::readyReadStandardOutput, this, &Grep::onResults);
     connect(this->process, &QProcess::errorOccurred, this, &Grep::onErrorOccurred);
     connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Grep::onFinished);
+
+    return 0;
 }

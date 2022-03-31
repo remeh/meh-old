@@ -19,8 +19,9 @@ public:
 
     // baseDir is the directory from which the command is run.
     // target is the target in which ripgrep should look for matches.
-    void grep(const QString& string, const QString& baseDir, const QString& target);
-    void grep(const QString& string, const QString& baseDir);
+    // Returns 0 if a grep has been started, -1 otherwise.
+    int grep(const QString& string, const QString& baseDir, const QString& target);
+    int grep(const QString& string, const QString& baseDir);
 
     // openSelection opens the needed buffer as the proper line.
     void openSelection();

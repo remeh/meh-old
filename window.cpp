@@ -307,12 +307,16 @@ void Window::openGrep(const QString& string) {
 }
 
 void Window::openGrep(const QString& string, const QString& target) {
+    int rv = -1;
     if (target.size() > 0) {
-        this->grep->grep(string, this->baseDir, target);
+        rv = this->grep->grep(string, this->baseDir, target);
     } else {
-        this->grep->grep(string, this->baseDir);
+        rv = this->grep->grep(string, this->baseDir);
     }
-    this->grep->show();
+
+    if (rv == 0) {
+        this->grep->show();
+    }
 }
 
 void Window::closeGrep() {
