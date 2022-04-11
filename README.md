@@ -7,27 +7,27 @@
 ## Features
 
     * C++/Qt6, tested on Linux and macOS (will most likely work on Windows as well)
-    * Vim-like movements: `h`, `j`, `k`, `l`, `f`, `F`, `o`, `O`, `a`, `A`, `I`, `g`, `G`, ...
-    * Insert, normal, replace, command, visual and visual-line mode are implemented (`i`, `Esc`, `r`, `R`, `:`, `v` and `V`)
+    * **Vim-like** movements: `h`, `j`, `k`, `l`, `f`, `F`, `o`, `O`, `a`, `A`, `I`, `g`, `G`, ...
+    * Insert, normal, replace, command, visual and visual-line modes are implemented (`i`, `Esc`, `r`, `R`, `:`, `v` and `V`)
     * Open multiple files
         * Ctrl-O (other) to go back to previous buffer
         * Ctrl-P to use the file opener
         * Ctrl-Shift-P to use the file opener with opened buffers
         * `:e <filepath>`
-    * Single instance mode to open new files in existing instance
-    * LSP client for C++ (clangd), Go (gopls) and Zig (zls):
+    * **Instances mode** to open new files in existing instance
+    * **Generic LSP client**, plugged for C++ (clangd), Go (gopls) and Zig (zls):
         * Go to definition with the `:def` command
         * Auto-completion with `Ctrl-Enter`
         * Display references to a variable / method / ... with `:ref` command
         * Get error of the current line with `err` or clicking on the red highlighted line number
         * Get functions/methods signatures and documentation with `:sig`
         * `:i` or `:info` to get infos on what's under the cursor
-    * File opener
+    * **Fast file opener**
         * Fast lookup per directory
         * Filtering while typing
         * `Ctrl-n` next entry, `Ctrl-p` previous entry, `Return` open the file / move to the directory
         * Use `:fd` to use `fd` to look for files in subdirs, and then filter in results
-    * Search in current/all files with `ripgrep` integration
+    * **Search** in current/all files with `ripgrep` integration
         * `:rg` search in all files with ripgrep for the word under the cursor
         * `:rg <pattern>` search in all files with ripgrep for the given pattern
         * `:rgf` search in current file with ripgrep for the word under the cursor
@@ -37,15 +37,16 @@
             * `j` and `k` for also works for next / previous result
             * `Ctrl-j` and `Ctrl-k` to expand / close results on a file
             * use `x` or `Backspace` to remove entries from the results to remove the noise
-    * Git support:
-        * `:gblame` opens the git blame of the current buffer
+    * **Git support**:
+        * Display lines git status (added, edited, removed)
+        * `:gblame` opens the git blame of the current buffer and goes to current line
         * `:gshow [<checksum>]` show the commit of the given checksum or the one under the cursor if none provided
         * `:gdiff [--staged]` shows the current diff / staged diff
     * Search in file with `/`, next occurrences with `n` and `N`. `,` to search for the word under the cursor
     * Toggle `//` comments with Ctrl-M on selected lines (or current line if no selection), `#` with Ctrl-Shift-M
-    * Auto-complete with words in opened buffers with `Ctrl-N`
-    * Auto-indentation (respect previous line indentation, automatically changes it depending on `{`, `}`, and `:`)
-    * Simple syntax highlighting (regexp based)
+    * **Auto-complete** with words in opened buffers with `Ctrl-N`
+    * **Auto-indentation** (respect previous line indentation, automatically changes it depending on `{`, `}`, and `:`)
+    * **Simple syntax highlighting** (token parsing & regex based)
     * Execute a command and display the output in a buffer (with `:exec <command> <args>` or `:!<command> <args>`)
     * Highlight the selection / word under the cursor
     * Commands history
@@ -69,10 +70,6 @@
     * Basic tasks manager (list of todo, done, cancelled tasks)
     * Confirm messagebox while re-opening a file already opened in another instance.
     * Others: `J`, `C`, `D`, `ct` `cT` `cf` `cF`, `vf`, `vF`, `<`, `>`, ...
-
-## Roadmap
-
-    * After having started `:gblame`, enter should load the file in the commit under the cursor
 
 ## License
 
