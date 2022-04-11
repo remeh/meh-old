@@ -154,21 +154,20 @@ int main(int argv, char **args)
     QCoreApplication::setApplicationName("meh");
     QList<Argument> arguments = buildArguments();
 
-    // -n flag: to use a different instance than /tmp/meh.sock
-    // --------------
+	// remove the binary name
+
+    arguments.takeFirst();
+
+    // -n flag: use a different instance socket than /tmp/meh.sock
 
     QString instanceSocket = "";
-    if (!arguments.empty() && arguments.size() > 1 &&
-        (arguments.at(1)).isNewWindowFlag()) {
-        instanceSocket = arguments.at(1).right(-2);
+
+    if (arguments.size() >= 1 && arguments.first().isNewWindowFlag()) {
+        instanceSocket = arguments.first().right(-2);
         arguments.removeFirst();
     }
 
     instanceSocket = QString("/tmp/meh") + instanceSocket + ".sock";
-
-	// remove the binary name
-
-    arguments.takeFirst();
 
     // if there is an existing instance, send it the command to open a file
     // instead of creating a new window
