@@ -38,13 +38,9 @@ bool reuseInstance(QList<Argument>& arguments, const QString& instanceSocket) {
         return false;
     }
 
-    if (arguments.size() < 2) {
+    if (arguments.size() < 1) {
         return false;
     }
-
-    // remove the binary name
-
-    arguments.removeFirst();
 
     // give a look at the first parameter
 
