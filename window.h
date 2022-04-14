@@ -8,6 +8,7 @@
 #include <QLocalServer>
 #include <QPaintEvent>
 #include <QResizeEvent>
+#include <QSettings>
 #include <QString>
 #include <QTabWidget>
 #include <QWidget>
@@ -227,6 +228,9 @@ private:
     QList<Checkpoint> checkpoints;
 
     QLocalServer commandServer;
+
+    // opened project if any
+    QSettings project;
 
     LSPManager* lspManager;
 };

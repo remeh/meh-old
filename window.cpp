@@ -374,7 +374,8 @@ void Window::openProject(QString filename) {
         }
     }
 
-    // TODO(remy): store the settings in the Window
+    this->project = settings;
+
     // TODO(remy): gopls tags
 
     // focus on the project file
