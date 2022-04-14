@@ -103,6 +103,11 @@ public:
     bool areYouSure();
     bool areYouSure(const QString& message);
 
+    // projects
+    // --------
+
+    void openProject(QString filename);
+
     // buffers manipulation
     // --------------------
 

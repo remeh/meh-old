@@ -4,6 +4,7 @@
 #include <QLocalSocket>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QSettings>
 #include <QString>
 #include <QThread>
 #include <QMessageBox>
@@ -343,6 +344,41 @@ void Window::resizeEvent(QResizeEvent* event) {
     if (this->getEditor() != nullptr) {
         this->getEditor()->onWindowResized(event);
     }
+}
+
+// project
+// -------
+
+void Window::openProject(QString filename) {
+    QFileInfo projectFi(filename);
+
+    // this file does not exist, we may just want to create it then.
+    if (!projectFi.exists()) {
+        this->newEditor(filename, filename);
+        return;
+    }
+
+    // file is existing, open it and read a few keys
+    QSettings settings(filename, QSettings::IniFormat);
+
+    QStringList sl = settings.value("files").toStringList();
+
+    // first, open the project file
+    Editor* projectEditor = this->newEditor(projectFi.canonicalFilePath(), filename);
+
+    // open files if any has been configured
+    for (QString filename : sl) {
+        QFileInfo fi(filename);
+        if (fi.exists()) {
+            this->newEditor(fi.canonicalFilePath(), filename);
+        }
+    }
+
+    // TODO(remy): store the settings in the Window
+    // TODO(remy): gopls tags
+
+    // focus on the project file
+    this->setCurrentEditor(projectEditor->getId());
 }
 
 // buffers

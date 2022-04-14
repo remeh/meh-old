@@ -21,6 +21,7 @@
 class Argument : public QString {
 public:
     Argument(const QString& str) : QString(str) {};
+    bool isProjectFile() const { return this->endsWith(".meh"); }
     bool isPosition() const { return this->startsWith("+"); }
     bool isStdin() const { return *this == QString("-"); }
     bool isNewWindowFlag() const { return startsWith("-n"); }
@@ -186,6 +187,13 @@ int main(int argv, char **args)
         // ------------
 
         readFromStdin(window);
+    } else if (arguments.size() > 0 && arguments.at(0).isProjectFile()) {
+
+        // we are about to open a project file, we can ignore the rest of the argument
+        // that's not supported to have anything after it
+
+        window.openProject(QString(arguments.at(0)));
+
     } else if (arguments.size() > 0) {
 
         // these are files, let's try to open them if they're not a
