@@ -2,6 +2,7 @@
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QProcessEnvironment>
 #include <QStringList>
 
 #include "../completer.h"
@@ -15,6 +16,16 @@ LSPGeneric::LSPGeneric(Window* window, const QString& baseDir, const QString& la
     this->baseDir = baseDir;
     this->command = command;
     this->args = args;
+}
+
+LSPGeneric::LSPGeneric(Window* window, const QString& baseDir, const QString& language,
+                       const QString& command, QStringList args, QProcessEnvironment extraEnv) : LSP(window) {
+    this->serverSpawned = false;
+    this->language = language;
+    this->baseDir = baseDir;
+    this->command = command;
+    this->args = args;
+    this->extraEnv = extraEnv;
 }
 
 LSPGeneric::~LSPGeneric() {
@@ -33,6 +44,10 @@ void LSPGeneric::readStandardOutput() {
 // --------------------------
 
 bool LSPGeneric::start() {
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert(this->extraEnv);
+    this->lspServer.setEnvironment(env.toStringList());
+
     this->lspServer.start(this->command, this->args);
     this->serverSpawned = this->lspServer.waitForStarted(5000);
     return this->serverSpawned;

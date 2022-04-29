@@ -25,6 +25,7 @@ Window::Window(QApplication* app, QString instanceSocket, QWidget* parent) :
     app(app),
     instanceSocket(instanceSocket),
     QWidget(parent),
+    projectSettings(nullptr),
     commandServer(this) {
     // widgets
     // ----------------------
@@ -153,6 +154,10 @@ color:  #ffffff;  \
 Window::~Window() {
     // XXX(remy): do I have to delete all editors myself since they are owned
     // by the QTabWidget?
+
+    if (this->projectSettings != nullptr) {
+        delete this->projectSettings;
+    }
 
     commandServer.close();
     delete this->tabs;
@@ -359,9 +364,15 @@ void Window::openProject(QString filename) {
     }
 
     // file is existing, open it and read a few keys
-    QSettings settings(filename, QSettings::IniFormat);
+    QSettings* settings = new QSettings(filename, QSettings::IniFormat);
+    if (settings == nullptr) {
+        return;
+    }
 
-    QStringList sl = settings.value("files").toStringList();
+    // this has to be done before opening any file.
+    this->projectSettings = settings;
+
+    QStringList sl = settings->value("files").toStringList();
 
     // first, open the project file
     Editor* projectEditor = this->newEditor(projectFi.canonicalFilePath(), filename);
@@ -373,8 +384,6 @@ void Window::openProject(QString filename) {
             this->newEditor(fi.canonicalFilePath(), filename);
         }
     }
-
-    this->project = settings;
 
     // TODO(remy): gopls tags
 

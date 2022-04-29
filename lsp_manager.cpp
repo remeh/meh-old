@@ -56,7 +56,13 @@ LSP* LSPManager::start(Buffer* buffer, const QString& language) {
     Q_ASSERT(buffer != nullptr);
 
     if (language == "go") {
-         LSP* lsp = new LSPGeneric(window, window->getBaseDir(), "go", "gopls", QStringList());
+         QProcessEnvironment extraEnv;
+         if (this->window->getProjectSettings() != nullptr &&
+              this->window->getProjectSettings()->contains("goflags")) {
+             extraEnv.insert("GOFLAGS", this->window->getProjectSettings()->value("goflags").toString());
+         }
+
+         LSP* lsp = new LSPGeneric(window, window->getBaseDir(), "go", "gopls", QStringList(), extraEnv);
 
          if (!lsp->start()) {
              // TODO(remy): warning here

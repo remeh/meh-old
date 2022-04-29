@@ -1,4 +1,5 @@
 #include <QList>
+#include <QProcessEnvironment>
 #include <QString>
 #include <QStringList>
 
@@ -13,6 +14,7 @@ class LSPGeneric : public LSP
 {
 public:
     LSPGeneric(Window* window, const QString& baseDir, const QString& language, const QString& command, QStringList args);
+    LSPGeneric(Window* window, const QString& baseDir, const QString& language, const QString& command, QStringList args, QProcessEnvironment extraEnv);
     ~LSPGeneric() override;
     void readStandardOutput() override;
 
@@ -35,5 +37,6 @@ private:
     QString command;
     QString language;
     QStringList args;
+    QProcessEnvironment extraEnv;
     LSPWriter writer;
 };

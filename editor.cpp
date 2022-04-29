@@ -146,10 +146,10 @@ Editor::~Editor() {
 QFont Editor::getFont() {
     QFont font;
     #ifdef Q_OS_MAC
-    font.setFamily("Roboto Mono");
-    font.setPointSize(12);
+    font.setFamily("Ubuntu Mono");
+    font.setPointSize(14);
     #else
-    font.setFamilies(QStringList() << "Roboto Mono" << "Inconsolata" << "Ubuntu Mono" << "Source Code Pro");
+    font.setFamilies(QStringList() << "Ubuntu Mono" << "Inconsolata" << "Roboto Mono" << "Source Code Pro");
     font.setPointSize(9.0);
     #endif
     font.setStyleHint(QFont::Monospace);

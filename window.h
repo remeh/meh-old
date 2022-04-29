@@ -109,6 +109,8 @@ public:
 
     void openProject(QString filename);
 
+    QSettings* getProjectSettings() { return this->projectSettings; }
+
     // buffers manipulation
     // --------------------
 
@@ -230,7 +232,7 @@ private:
     QLocalServer commandServer;
 
     // opened project if any
-    QSettings project;
+    QSettings* projectSettings;
 
     LSPManager* lspManager;
 };
