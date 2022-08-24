@@ -634,7 +634,7 @@ void Window::closeEditor(const QString& id) {
         return;
     }
 
-    this->newEditor("notes", QString("/tmp/meh-notes"));
+    this->newEditor("notes", QString("/tmp/meh-notes.md"));
 }
 
 // checkpoints

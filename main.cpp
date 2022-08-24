@@ -248,7 +248,7 @@ int main(int argv, char **args)
         // no arguments, open the notes
         // ------------
 
-        window.newEditor("notes", QString("/tmp/meh-notes"));
+        window.newEditor("notes", QString("/tmp/meh-notes.md"));
     }
 
     return app.exec();
