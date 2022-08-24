@@ -48,6 +48,16 @@ void ReferencesWidget::sort(int column, Qt::SortOrder order) {
     }
 }
 
+
+// selectFirst selects the first entry in the list if any.
+void ReferencesWidget::selectFirst() {
+    QTreeWidgetItem* first = this->tree->topLevelItem(0);
+    if (first != nullptr) {
+        this->tree->setCurrentItem(first);
+    }
+}
+
+
 void ReferencesWidget::show() {
     this->tree->show();
     this->label->setFocus();
