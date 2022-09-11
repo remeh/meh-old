@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QLocalSocket>
 #include <QLoggingCategory>
+#include <QMessageBox>
 #include <QObject>
 #include <QStringList>
 #include <QStyleFactory>
@@ -65,10 +66,19 @@ bool reuseInstance(QList<Argument>& arguments, const QString& instanceSocket) {
     socket.connectToServer(instanceSocket);
 
     if (socket.state() != QLocalSocket::ConnectedState) {
-        qDebug() << "An error happened while connecting to " << instanceSocket <<
-            socket.errorString();
-        qDebug() << "Will create a new instance instead.";
-        return false;
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Can't connect to instance.");
+        msgBox.setText("An error happened while connecting to " + instanceSocket + "\n" +
+        socket.errorString() + "\n" + "Delete it?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        if (msgBox.exec() == QMessageBox::Yes) {
+            qDebug() << "Deleting" << instanceSocket;
+            QFile f(instanceSocket);
+            f.remove();
+            return false;
+        }
+        return true;
     }
 
     // if there's no argument, we want to open the notes
@@ -238,7 +248,7 @@ int main(int argv, char **args)
         // no arguments, open the notes
         // ------------
 
-        window.newEditor("notes", QString("/tmp/meh-notes"));
+        window.newEditor("notes", QString("/tmp/meh-notes.md"));
     }
 
     return app.exec();

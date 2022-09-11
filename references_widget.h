@@ -35,6 +35,9 @@ public:
     void insert(const QString& file, const QString& lineNumber, const QString& text);
     void sort(int column, Qt::SortOrder order);
 
+    // selectFirst selects the first entry in the list if any.
+    void selectFirst();
+
     void onKeyPressEvent(QKeyEvent*);
 
 protected:

@@ -487,7 +487,7 @@ void Command::execute(QString text) {
     }
 
     if (command == ":notes") {
-        this->window->setCurrentEditor("/tmp/meh-notes");
+        this->window->setCurrentEditor("/tmp/meh-notes.md");
         return;
     }
 

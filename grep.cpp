@@ -28,6 +28,9 @@ void Grep::focus() {
 
 void Grep::hide() {
     if (this->process != nullptr) {
+        disconnect(this->process, &QProcess::readyReadStandardOutput, this, &Grep::onResults);
+        disconnect(this->process, &QProcess::errorOccurred, this, &Grep::onErrorOccurred);
+        disconnect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &Grep::onFinished);
         this->process->terminate();
         delete this->process;
         this->process = nullptr;
@@ -65,6 +68,7 @@ void Grep::onFinished() {
 
     this->window->getRefWidget()->fitContent();
     this->window->getRefWidget()->sort(0, Qt::AscendingOrder);
+    this->window->getRefWidget()->selectFirst();
 }
 
 void Grep::keyPressEvent(QKeyEvent* event) {
