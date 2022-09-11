@@ -127,6 +127,8 @@ public:
     QString getWordUnderCursor();
     QString getWordUnderCursor(QTextCursor cursor);
 
+    QString getSelectionOrWordUnderCursor();
+
     // getCharUnderCursor returns the char under the cursor if any.
     QChar getCharUnderCursor();
 
@@ -234,6 +236,8 @@ private slots:
     void onMenuCut();
     void onMenuPaste();
     void onMenuRg();
+    void onMenuRgFuncs();
+    void onMenuRgCalls();
 
 private:
     // keyPressEventNormal handles this event in normal mode.

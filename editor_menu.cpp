@@ -42,7 +42,12 @@ void Editor::contextMenuEvent(QContextMenuEvent* event) {
 
     menu.addSeparator();
 
-    menu.addAction(tr("Rg"), this, &Editor::onMenuRg);
+    // ripgreps
+    QMenu* extra = menu.addMenu("Ripgrep");
+    extra->addAction(tr("Search"), this, &Editor::onMenuRg);
+    extra->addSeparator();
+    extra->addAction(tr("Implementations"), this, &Editor::onMenuRgFuncs);
+    extra->addAction(tr("Impl. and calls"), this, &Editor::onMenuRgCalls);
 
     menu.exec(event->globalPos());
 }
@@ -115,17 +120,27 @@ void Editor::onMenuCut() {
 void Editor::onMenuPaste() {
     this->paste();
 }
+
 void Editor::onMenuRg() {
-    QTextCursor cursor = this->textCursor();
-    QString text = cursor.selectedText();
-
-    if (text.size() == 0) {
-        text = this->window->getEditor()->getWordUnderCursor();
-    }
-
-    if (text.size() == 0) {
-        return;
-    }
+    QString text = this->getSelectionOrWordUnderCursor();
+    if (text.size() == 0) { return; }
 
     this->window->openGrep(text);
+}
+
+void Editor::onMenuRgFuncs() {
+    QString text = this->getSelectionOrWordUnderCursor();
+    if (text.size() == 0) { return; }
+
+
+    QString finalText = "(func |def |fn |private | protected| public |::){1}.*" + text + "\\(";
+    this->window->openGrep(finalText);
+}
+
+void Editor::onMenuRgCalls() {
+    QString text = this->getSelectionOrWordUnderCursor();
+    if (text.size() == 0) { return; }
+
+    QString finalText = "[\\. >]{1}" + text + "\\(";
+    this->window->openGrep(finalText);
 }

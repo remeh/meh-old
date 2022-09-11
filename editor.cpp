@@ -1152,6 +1152,17 @@ QString Editor::getWordUnderCursor(QTextCursor cursor) {
     return rv;
 }
 
+QString Editor::getSelectionOrWordUnderCursor() {
+    QTextCursor cursor = this->textCursor();
+    QString text = cursor.selectedText();
+
+    if (text.size() == 0) {
+        text = this->window->getEditor()->getWordUnderCursor();
+    }
+
+    return text;
+}
+
 QChar Editor::getCharUnderCursor() {
     QTextCursor cursor = this->textCursor();
     // TODO(remy): can throw a warning if outside
