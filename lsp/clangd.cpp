@@ -11,7 +11,7 @@
 #include "generic.h"
 
 LSPClangd::LSPClangd(Window* window, const QString& baseDir) : LSP(window) {
-    this->generic = new LSPGeneric(window, baseDir, "cpp", "clangd", QStringList());
+    this->generic = new LSPGeneric(window, baseDir, "cpp", "clangd", QStringList() << "--completion-style=detailed");
 }
 
 LSPClangd::~LSPClangd() {
@@ -71,11 +71,11 @@ QString LSPClangd::getLanguage() {
 QList<CompleterEntry> LSPClangd::getEntries(const QJsonDocument& json) {
     QList<CompleterEntry> list;
 
-    if (json["result"].isNull() || json["result"]["items"].isNull()) {
+    if (json[tr("result")].isNull() || json[tr("result")][tr("items")].isNull()) {
         return list;
     }
 
-    QJsonArray items = json["result"]["items"].toArray();
+    QJsonArray items = json[tr("result")][tr("items")].toArray();
 
     if (items.size() == 0) {
         this->window->getStatusBar()->setMessage("Nothing found.");
@@ -85,7 +85,7 @@ QList<CompleterEntry> LSPClangd::getEntries(const QJsonDocument& json) {
 
     for (int i = 0; i < items.size(); i++) {
         QJsonObject object = items[i].toObject();
-        list.append(CompleterEntry(object["insertText"].toString(), object["label"].toString(), LSPReader::isFunc(object["kind"].toInteger(13))));
+        list.append(CompleterEntry(object[tr("insertText")].toString(), object[tr("label")].toString(), LSPReader::isFunc(object[tr("kind")].toInteger(13))));
     }
 
     return list;
