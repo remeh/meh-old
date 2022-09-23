@@ -26,10 +26,8 @@ SyntaxHighlighter::SyntaxHighlighter(Editor* editor, QTextDocument *parent) :
     todoRx = QRegularExpression(QStringLiteral("(TODO|NOTE|FIXME|XXX)"));
     whitespaceEolRx = QRegularExpression(QStringLiteral("( |\t)+$"));
 
-    selectionFormat.setForeground(QColor::fromRgb(242, 212, 44));
-    selectionFormat.setUnderlineColor(QColor::fromRgb(242, 212, 44));
-    selectionFormat.setFontUnderline(true);
-    selectionFormat.setUnderlineStyle(QTextCharFormat::SingleUnderline);
+    selectionFormat.setForeground(Qt::white);
+    selectionFormat.setBackground(QColor::fromRgb(90, 90, 90));
 
     searchTextFormat.setForeground(Qt::white);
     searchTextFormat.setBackground(QColor::fromRgb(129,179,234));
