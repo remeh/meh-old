@@ -46,7 +46,8 @@
 const QStringList Editor::dontReinsert = { ")", "]", "}", "(", "[", "{", "<",
                                            ">", ":", ";", ",", ".", "\"", "'" };
 
-const QStringList Editor::insertClose = { "(", ")", "[", "]", "{", "}", "\"", "\"" };
+// const QStringList Editor::insertClose = { "(", ")", "[", "]", "{", "}", "\"", "\"" };
+const QStringList Editor::insertClose = { "{", "}", "[", "]" };
 
 const QString Editor::oneIndent = "    ";
 
