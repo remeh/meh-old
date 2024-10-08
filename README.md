@@ -2,7 +2,7 @@
 
 `meh` is remeh's personal code editor.
 
-![Screenshot](https://raw.githubusercontent.com/remeh/meh/master/res/screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/remeh/meh-old/master/res/screenshot.png)
 
 ## Features
 
